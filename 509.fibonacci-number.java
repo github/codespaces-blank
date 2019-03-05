@@ -55,6 +55,10 @@
  * 0 ≤ N ≤ 30.
  * 
  */
+
+// Recursive
+// Time complexity: O(n^2)
+// Space complexity: O(n)
 // class Solution {
 //     public int fib(int N) {
 //         if (N == 0) {
@@ -66,20 +70,56 @@
 //     }
 // }
 
+// Iterative
+// Time complexity: O(n^2)
+// Space complexity: O(n)
+// class Solution {
+//     public int fib(int N) {
+//         if (N <= 1) {
+//             return N;
+//         }
+//         int a = 0;
+//         int b = 1;
+//         while (N > 1) {
+//             int sum = a + b;
+//             a = b;
+//             b = sum;
+//             N--;
+//         }
+//         return b;
+//     }
+// }
+
+// DP - Top Down Approach
+// Time complexity: O(n)
+// Space complexity: O(n)
+// class Solution {
+//     int[] fib = new int[31];
+
+//     public int fib(int N) {
+//         if (N <= 1) {
+//             return N;
+//         } else if (fib[N] != 0) {
+//             return fib[N];
+//         } else {
+//             return fib[N] = fib(N - 1) + fib(N - 2);
+//         }
+//     }
+// }
+
+// DP - Bottom Up Approach
+// Time complexity: O(n)
+// Space complexity: O(n)
 class Solution {
     public int fib(int N) {
         if (N <= 1) {
             return N;
         }
-        int a = 0;
-        int b = 1;
-        while (N > 1) {
-            int sum = a + b;
-            a = b;
-            b = sum;
-            N--;
+        int[] fib = new int[N + 1];
+        fib[1] = 1;
+        for (int i = 2; i <= N; i++) {
+            fib[i] = fib[i - 1] + fib[i - 2];
         }
-        return b;
+        return fib[N];
     }
 }
-
