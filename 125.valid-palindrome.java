@@ -32,6 +32,10 @@
  * 
  * 
  */
+
+// O(n) runtime, O(1) space
+// two pointers - one at the head while the other one at the tail.
+// Move them towards each other until they meet while skipping non-alphanumeric characters.
 class Solution {
     public boolean isPalindrome(String s) {
         int left = 0;
