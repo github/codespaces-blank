@@ -54,6 +54,7 @@ import java.util.Set;
  // hashset with two pointers
  // add fast to set when there is no duplicates
  // remove slow from set when there are duplicates
+ // fast pointer is not included, it always pointers to the next character out of the reuslt
 class Solution {
     public int lengthOfLongestSubstring(String s) {
         Set<Character> distinct = new HashSet<>();
@@ -71,6 +72,44 @@ class Solution {
             }
         }
         return longest;
+    }
+}
+
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        Set<Character> distinct = new HashSet<>();
+        int slow = 0;
+        int fast = 0;
+        int longest = 0;
+        for (; fast < s.length(); fast++) {
+            while (distinct.contains(s.charAt(fast))) {
+                distinct.remove(s.charAt(slow));
+                slow++;
+            }
+            distinct.add(s.charAt(fast));
+            longest = Math.max(longest, fast - slow + 1);
+        }
+        return longest;
+    }
+}
+
+// similar to the above one, use array instead to only support ascii code.
+// if we want to support unicode, than should use hashset
+// j pointer is included in the result, it pointers to the last character of the result
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        boolean[] exist = new boolean[256];
+        int i = 0;
+        int maxLength = 0;
+        for (int j = 0; j < s.length(); j++) {
+            while (exist[s.charAt(j)]) {
+                exist[s.charAt(i)] = false;
+                i++;
+            }
+            exist[s.charAt(j)] = true;
+            maxLength = Math.max(j - i + 1, maxLength);
+        }
+        return maxLength;
     }
 }
 
