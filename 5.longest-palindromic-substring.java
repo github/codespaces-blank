@@ -60,6 +60,7 @@ class Solution {
             l--;
             r++;
         }
+        // l and r points to the outside of the word
         return s.substring(l + 1, r);
     }
 }
