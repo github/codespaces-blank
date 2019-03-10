@@ -30,6 +30,12 @@
  * 
  * 
  */
+
+ // O(n^2) runtime, O(1) space
+ // palindrome mirrors around its center. Therefore, a palindrome can be expanded from
+ // its center, and there are only 2n - 1 such centers.
+ // why is 2n -1, not n? The reason is the center of a palindrome can be in between two 
+ // letters. even number and odd number
 class Solution {
     public String longestPalindrome(String s) {
         if (s == null) {
