@@ -59,9 +59,59 @@
  *     TreeNode(int x) { val = x; }
  * }
  */
+// class Solution {
+//     public boolean isBalanced(TreeNode root) {
+//         if (root == null) {
+//             return true;
+//         }
+//         int leftHeight = maxDepth(root.left);
+//         int rightHeight = maxDepth(root.right);
+//         if (Math.abs(leftHeight - rightHeight) > 1) {
+//             return false;
+//         }
+//         return isBalanced(root.left) && isBalanced(root.right);
+//     }
+
+//     private int maxDepth(TreeNode root) {
+//         if (root == null) {
+//             return 0;
+//         }
+//         int leftHeight = maxDepth(root.left);
+//         int rightHeight = maxDepth(root.right);
+//         return Math.max(leftHeight, rightHeight) + 1;
+//     }
+// }
+
+// O(n) runtime, O(n) space
+// Bottom-up Recursion
+/*
+ * We use a ssentinel value -1 to represent that the tree is unbalanced so we could avoid 
+ * unnecessary calculations.
+ * In each step, we look at the left subtree's depth(leftHeight), and ask: Is the left subtree unbalanced?
+ * If it is indeed unblanced, we return -1 right away. Otherwise, (leftHeight) represents the left
+ * subtree's depth. We then repeat the same process for the right subtree's depth(rightHeight)
+ */
 class Solution {
     public boolean isBalanced(TreeNode root) {
-        
+        return DFSHeight(root) != -1;
+    }
+
+    private int DFSHeight(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        int leftHeight = DFSHeight(root.left);
+        if (leftHeight == -1) {
+            return -1;
+        }
+        int rightHeight = DFSHeight(root.right);
+        if (rightHeight == -1) {                                                
+            return -1;
+        }
+        if (Math.abs(leftHeight - rightHeight) > 1) {
+            return -1;
+        }
+        return Math.max(leftHeight, rightHeight) + 1;
     }
 }
 
