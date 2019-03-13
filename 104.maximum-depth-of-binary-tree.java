@@ -1,8 +1,3 @@
-import java.util.LinkedList;
-import java.util.Queue;
-
-import javax.swing.tree.TreeNode;
-
 /*
  * @lc app=leetcode id=104 lang=java
  *
@@ -48,6 +43,7 @@ import javax.swing.tree.TreeNode;
  */
 
  // Recursive
+ // O(n) runtime, O(logn) space
 class Solution {
     public int maxDepth(TreeNode root) {
         // base case
@@ -63,29 +59,29 @@ class Solution {
 }
 
 // Iterative - BFS
-// class Solution {
-//     public int maxDepth(TreeNode root) {
-//         if(root == null) {
-//             return 0;
-//         }
-//         Queue<TreeNode> queue = new LinkedList<>();
-//         queue.offer(root);
-//         int count = 0;
-//         while(!queue.isEmpty()) {
-//             int size = queue.size();
-//             while(size > 0) {
-//                 TreeNode node = queue.poll();
-//                 if(node.left != null) {
-//                     queue.offer(node.left);
-//                 }
-//                 if(node.right != null) {
-//                     queue.offer(node.right);
-//                 }
-//                 size--;
-//             }
-//             count++;
-//         }
-//         return count;
-//     }
-// }
+class Solution {
+    public int maxDepth(TreeNode root) {
+        if(root == null) {
+            return 0;
+        }
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        int count = 0;
+        while(!queue.isEmpty()) {
+            int size = queue.size();
+            while(size > 0) {
+                TreeNode node = queue.poll();
+                if(node.left != null) {
+                    queue.offer(node.left);
+                }
+                if(node.right != null) {
+                    queue.offer(node.right);
+                }
+                size--;
+            }
+            count++;
+        }
+        return count;
+    }
+}
 
