@@ -1,3 +1,4 @@
+
 /*
  * @lc app=leetcode id=98 lang=java
  *
@@ -57,6 +58,9 @@
  *     TreeNode(int x) { val = x; }
  * }
  */
+
+// O(n)runtime, O(n) space
+// top-down recursion
 class Solution {
     public boolean isValidBST(TreeNode root) {
         return valid(root, null, null);
@@ -69,6 +73,36 @@ class Solution {
         return (low == null || root.val > low) && (high == null || root.val < high) 
         && valid(root.left, low, root.val) 
         && valid(root.right, root.val, high);
+    }
+}
+
+// in-order traverse
+// O(n) runtime, O(n) space
+class Solution {
+    public boolean isValidBST(TreeNode root) {
+        Stack<TreeNode> stack = new Stack();
+        double inorder = - Double.MAX_VALUE;
+
+        while (!stack.isEmpty() || root != null) {
+            // store middle node into stack
+            // and keep go to left
+            while (root != null) {
+                stack.push(root);
+                root = root.left;
+            }
+            root = stack.pop();
+            // if next element in order traversal is smaller than the previous one
+            // that's not BST
+            if (root.val <= inorder) {
+                return false;
+            }
+            inorder = root.val;
+            // go to right, and keep go left
+            // check if right node has left node as well
+            // if right is null, we pop() from stack
+            root = root.right;
+        }
+        return true;
     }
 }
 
