@@ -59,28 +59,28 @@
  *     TreeNode(int x) { val = x; }
  * }
  */
-// class Solution {
-//     public boolean isBalanced(TreeNode root) {
-//         if (root == null) {
-//             return true;
-//         }
-//         int leftHeight = maxDepth(root.left);
-//         int rightHeight = maxDepth(root.right);
-//         if (Math.abs(leftHeight - rightHeight) > 1) {
-//             return false;
-//         }
-//         return isBalanced(root.left) && isBalanced(root.right);
-//     }
+class Solution {
+    public boolean isBalanced(TreeNode root) {
+        if (root == null) {
+            return true;
+        }
+        int leftHeight = maxDepth(root.left);
+        int rightHeight = maxDepth(root.right);
+        if (Math.abs(leftHeight - rightHeight) > 1) {
+            return false;
+        }
+        return isBalanced(root.left) && isBalanced(root.right);
+    }
 
-//     private int maxDepth(TreeNode root) {
-//         if (root == null) {
-//             return 0;
-//         }
-//         int leftHeight = maxDepth(root.left);
-//         int rightHeight = maxDepth(root.right);
-//         return Math.max(leftHeight, rightHeight) + 1;
-//     }
-// }
+    private int maxDepth(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        int leftHeight = maxDepth(root.left);
+        int rightHeight = maxDepth(root.right);
+        return Math.max(leftHeight, rightHeight) + 1;
+    }
+}
 
 // O(n) runtime, O(n) space
 // Bottom-up Recursion
