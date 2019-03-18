@@ -63,6 +63,8 @@ class Node {
 };
 */
 class Solution {
+    // Key: origin node
+    // value: new clone node
     private HashMap<Node, Node> map = new HashMap<>();
     
     public Node cloneGraph(Node node) {
@@ -74,6 +76,7 @@ class Solution {
     }
 
     private void dfs(Node node) {
+        // if node was already visited
         if (map.containsKey(node)) {
             return;
         }
