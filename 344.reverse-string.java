@@ -42,43 +42,45 @@
  * 
  */
 class Solution {
-    // public void reverseString(char[] s) {
-    //     reverseString(s, 0);
-    // }
+    public void reverseString(char[] s) {
+        reverseString(s, 0);
+    }
 
-    // private void reverseString(char[] s, int index) {
-    //     // base case
-    //     if (index >= s.length / 2) {
-    //         return;
-    //     }
-    //     // recursive rule
-    //     swap(s, index, s.length - index - 1);
-    //     reverseString(s, index + 1);
-    // }
+    private void reverseString(char[] s, int index) {
+        // base case
+        if (index >= s.length / 2) {
+            return;
+        }
+        // recursive rule
+        swap(s, index, s.length - index - 1);
+        reverseString(s, index + 1);
+    }
 
-    // private void swap(char[] s, int left, int right) {
-    //     char temp = s[left];
-    //     s[left] = s[right];
-    //     s[right] = temp;
-    // }
+    private void swap(char[] s, int left, int right) {
+        char temp = s[left];
+        s[left] = s[right];
+        s[right] = temp;
+    }
 
     // tail recusion
-    // public void reverseString(char[] s) {
-    //     helper(0, s.length - 1, s);
-    // }
+    public void reverseString(char[] s) {
+        helper(0, s.length - 1, s);
+    }
 
-    // private void helper(int start, int end, char[] s) {
-    //     if (start >= end) {
-    //         return;
-    //     }
+    private void helper(int start, int end, char[] s) {
+        if (start >= end) {
+            return;
+        }
 
-    //     // swap between the first and the last element
-    //     char temp = s[start];
-    //     s[start] = s[end];
-    //     s[end] = temp;
+        // swap between the first and the last element
+        char temp = s[start];
+        s[start] = s[end];
+        s[end] = temp;
 
-    //     helper(start + 1, end - 1, s);
-    // }
+        // helper(s, left + 1, right + 1); correct
+        // helper(s, left++, right--); wrong,  ++ after the recursion call
+        helper(start + 1, end - 1, s);
+    }
 
     public void reverseString(char[] s) {
         helper(0, s.length - 1, s);
@@ -98,3 +100,21 @@ class Solution {
     }
 }
 
+class Solution {
+    public void reverseString(char[] s) {
+        if (s == null || s.length <= 1) {
+            return;
+        }
+        int left = 0;
+        int right = s.length - 1;
+        while (left < right) {
+            swap(s, left++, right--);
+        }
+    }
+    
+    private void swap(char[] s, int left, int right) {
+        char temp = s[left];
+        s[left] = s[right];
+        s[right] = temp;
+    }
+}
