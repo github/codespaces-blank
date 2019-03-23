@@ -102,9 +102,12 @@ class Solution {
         }
 
         int num = 0;
+        // "words and 987", it will by pass the while loop and return
         while (i < n && Character.isDigit(str.charAt(i))) {
+            // Integer.parseInt(string), the parameter is string not char
             int digit = Character.getNumericValue(str.charAt(i));
-            if (num > maxDiv10 || num == maxDiv10 && digit >= 8) {
+            //check if total will be overflow after 10 times and add digit
+            if (num > maxDiv10 || num == maxDiv10 && digit > Integer.MAX_VALUE % 10) {
                 return sign == 1 ? Integer.MAX_VALUE : Integer.MIN_VALUE;
             }
             num = num * 10 + digit;
