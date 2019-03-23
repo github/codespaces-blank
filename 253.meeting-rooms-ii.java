@@ -86,3 +86,50 @@ class Solution {
     }
 }
 
+/**
+ * Algorithm
+
+1. Separate out the start times and the end times in their separate arrays.
+2. Sort the start times and the end times separately. Note that this will mess up the original correspondence of start times and end times. They will be treated individually now.
+3. We consider two pointers: s_ptr and e_ptr which refer to start pointer and end pointer. The start pointer simply iterates over all the meetings and the end pointer helps us track if a meeting has ended and if we can reuse a room.
+4. When considering a specific meeting pointed to by s_ptr, we check if this start timing is greater than the meeting pointed to by e_ptr. If this is the case then that would mean some meeting has ended by the time the meeting at s_ptr had to start. So we can reuse one of the rooms. Otherwise, we have to allocate a new room.
+5. If a meeting has indeed ended i.e. if start[s_ptr] >= end[e_ptr], then we increment e_ptr.
+6. Repeat this process until s_ptr processes all of the meetings.
+ */
+class Solution {
+    public int minMeetingRooms(Interval[] intervals) {
+        if (intervals == null || intervals.length == 0) {
+            return 0;
+        }
+
+        int[] start = new int[intervals.length];
+        int[] end = new int[intervals.length];
+
+        for (int i = 0; i < intervals.length; i++) {
+            start[i] = intervals[i].start;
+            end[i] = intervals[i].end;
+        }
+
+        Arrays.sort(start);
+        Arrays.sort(end);
+
+        int usedRooms = 0;
+        int startPointer = 0;
+        int endPointer = 0;
+
+        while (startPointer < intervals.length) {
+            // if there is a meeting that has ended by the time the meeting at startPointer starts
+            if (start[startPointer] >= end[endPointer]) {
+                usedRooms -= 1;
+                endPointer += 1;
+            }
+
+            // we do this irrespective of whether a room frees up or not.
+            // if a room got free, than this usedRooms += 1 would not have any effect. usedRooms would
+            // remain the same in that case. If no room was free, then this would increase usedRooms
+            usedRooms += 1;
+            startPointer += 1;
+        }
+        return usedRooms;
+    }
+}
