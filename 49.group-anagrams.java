@@ -51,3 +51,8 @@ class Solution {
     }
 }
 
+/**
+ * Hash_Map.values()
+ * Parameters: The method does not accept any parameters.
+ * Return Value: The method is used to return a collection view containing all the values of the map.
+ */
