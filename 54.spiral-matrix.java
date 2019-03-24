@@ -57,7 +57,7 @@ class Solution {
             rowBegin++;
 
             // traverse down
-            for (int i = rowBegin; i < colEnd; i++) {
+            for (int i = rowBegin; i <= colEnd; i++) {
                 result.add(matrix[i][colEnd]);
             }
             // 最后一列已读取

@@ -59,6 +59,7 @@ class Solution {
         }
 
         int sum = 0;
+        // 和 dummy Node不太一样
         ListNode list = new ListNode(0);
         while (!s1.isEmpty() || !s2.isEmpty()) {
             if (!s1.isEmpty()) {

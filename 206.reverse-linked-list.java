@@ -36,23 +36,23 @@
  */
 
  /** Iterative **/
-// class Solution {
-//     public ListNode reverseList(ListNode head) {
-//         if (head == null || head.next == null) {
-//             return head;
-//         }
-//         ListNode prev = null;
-//         ListNode next = null;
-//         ListNode currentNode = head;
-//         while (currentNode != null) {
-//             next = currentNode.next;
-//             currentNode.next = prev;
-//             prev = currentNode;
-//             currentNode = next;
-//         }
-//         return prev;
-//     }
-// }
+class Solution {
+    public ListNode reverseList(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode prev = null;
+        ListNode next = null;
+        ListNode currentNode = head;
+        while (currentNode != null) {
+            next = currentNode.next;
+            currentNode.next = prev;
+            prev = currentNode;
+            currentNode = next;
+        }
+        return prev;
+    }
+}
 
 // https://leetcode.com/explore/learn/card/recursion-i/251/scenario-i-recurrence-relation/2379/
 /**
