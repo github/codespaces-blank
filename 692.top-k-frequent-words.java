@@ -49,9 +49,71 @@
  * 
  * 
  */
+// Lambda Comparator
 class Solution {
     public List<String> topKFrequent(String[] words, int k) {
-        
+        Map<String, Integer> countMap = new HashMap<>();
+        for (String word : words) {
+            countMap.put(word, countMap.getOrDefault(word, 0) + 1);
+        }
+        List<String> result = new ArrayList<>(countMap.keySet());
+        Collections.sort(result, (w1, w2) -> countMap.get(w1).equals(countMap.get(w2)) ? w1.compareTo(w2) : countMap.get(w2) - countMap.get(w1));
+        return result.subList(0, k);
     }
 }
 
+// Classic Comparator
+class Solution {
+    public List<String> topKFrequent(String[] words, int k) {
+        Map<String, Integer> countMap = new HashMap<>();
+        for (String word : words) {
+            countMap.put(word, countMap.getOrDefault(word, 0) + 1);
+        }
+        List<String> result = new ArrayList<>(countMap.keySet());
+        Collections.sort(result, new Comparator<String>(){
+            @Override
+            public int compare(String e1, String e2) {
+                if (countMap.get(e1).equals(countMap.get(e2))) {
+                    return e1.compareTo(e2);
+                }
+                return countMap.get(e1) < countMap.get(e2) ? 1 : -1;
+            }
+        });
+        return result.subList(0, k);
+    }
+}
+
+
+// HashMap with MaxHeap
+class Solution {
+    public List<String> topKFrequent(String[] words, int k) {
+        Map<String, Integer> map = new HashMap<>();
+        for (String word : words) {
+            map.put(word, map.getOrDefault(word, 0) + 1);
+        }
+        PriorityQueue<String> maxHeap = new PriorityQueue<String>(new Comparator<String> (){
+            @Override
+            public int compare(String s1, String s2) {
+                if (map.get(s1).equals(map.get(s2))) {
+                    // alphabetical order
+                    return s1.compareTo(s2);
+                }
+                return map.get(s1) < map.get(s2) ? 1 : -1;
+            }
+        });
+        
+        for (String word : map.keySet()) {
+            maxHeap.offer(word);
+            if (maxHeap.size() > k) {
+                maxHeap.poll();
+            }
+        }
+        
+        List<String> result = new ArrayList<>();
+        while (!maxHeap.isEmpty() && k > 0) {
+            result.add(maxHeap.poll());
+            k--;
+        }
+        return result;
+    }
+}
