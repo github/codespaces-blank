@@ -24,7 +24,17 @@
  */
 class Solution {
     public int countPrimes(int n) {
-        
+        boolean[] isMultipleOfPrime = new boolean[n];
+        int count = 0;
+        for (int i = 2; i < n; i++) {
+            if (!isMultipleOfPrime[i]) {
+                count++;
+            }
+            for (int j = i; j < n; j = j + i) {
+                isMultipleOfPrime[j] = true;
+            }
+        }
+        return count;
     }
 }
 
