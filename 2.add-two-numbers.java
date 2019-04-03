@@ -76,6 +76,7 @@ class Solution {
         int val = (l1 == null ? 0 : l1.val) + (l2 == null ? 0 : l2.val);
         ListNode head = new ListNode(val % 10);
         head.next = addTwoNumbers(l1 == null ? null : l1.next, l2 == null ? null : l2.next);
+        // 所有recursive好了之后的最后一步,放在这里
         if (val >= 10) head.next = addTwoNumbers(head.next, new ListNode(1));
         return head;
     }

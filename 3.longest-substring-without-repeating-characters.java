@@ -96,6 +96,7 @@ class Solution {
 // similar to the above one, use array instead to only support ascii code.
 // if we want to support unicode, than should use hashset
 // j pointer is included in the result, it pointers to the last character of the result
+// 一般有char,然后是有没有出现过,都可以考虑用array,会节省空间
 class Solution {
     public int lengthOfLongestSubstring(String s) {
         boolean[] exist = new boolean[256];
@@ -116,6 +117,8 @@ class Solution {
 //The reason is that if s[j] have a duplicate in the range [i, j) with index j
 // we don't need to increase i little by little. 
 // We can skip all the elements in the range [i, j] and let i to be j+1 directly.
+// key: char
+// value: index + 1 in array
 class Solution {
     public int lengthOfLongestSubstring(String s) {
         int n = s.length();
@@ -125,10 +128,36 @@ class Solution {
         int slow = 0;
         for (; fast < n; fast++) {
             if (map.containsKey(s.charAt(fast))) {
+                // "abba", 当看到第二个a的时候,因为我们没有删除第一个a,所以我们要比较slow,
+                // 所以可能返回的是第一个a,在slow的左边,所以我们要比较map返回的是不是最新的
+                // a -> 1
+                // b -> 3
+                // slow -> 3
                 slow = Math.max(map.get(s.charAt(fast)), slow);
             }
             longest = Math.max(longest, fast - slow + 1);
             map.put(s.charAt(fast), fast + 1);
+        }
+        return longest;
+    }
+}
+
+// key: char
+// value: index in array
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        int n = s.length();
+        int longest = 0;
+        Map<Character, Integer> map = new HashMap<>();
+        int fast = 0;
+        int slow = 0;
+        for (; fast < n; fast++) {
+            if (map.containsKey(s.charAt(fast))) {
+                // "abba", 当看到第二个a的时候,因为我们没有删除第一个a,所以我们要比较slow
+                slow = Math.max(map.get(s.charAt(fast)) + 1, slow);
+            }
+            longest = Math.max(longest, fast - slow + 1);
+            map.put(s.charAt(fast), fast);
         }
         return longest;
     }
