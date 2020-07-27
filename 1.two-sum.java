@@ -1,4 +1,5 @@
 import java.util.HashMap;
+import java.util.Map;
 
 /*
  * @lc app=leetcode id=1 lang=java
