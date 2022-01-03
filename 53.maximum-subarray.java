@@ -32,6 +32,7 @@
 // f(k) = max(f(k - 1) + A[k], A[k])
 // maxEndingHere is the maximum sum of subarray that must end at index k, while
 // maxSoFar is the global maximum subarray sum
+// https://www.geeksforgeeks.org/largest-sum-contiguous-subarray/
 class Solution {
     public int maxSubArray(int[] nums) {
         int maxEndingHere = nums[0];
