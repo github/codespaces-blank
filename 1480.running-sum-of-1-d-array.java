@@ -5,22 +5,23 @@
  */
 
 // @lc code=start
-// class Solution {
-//     public int[] runningSum(int[] nums) {
-//         if (nums == null || nums.length == 0) {
-//             return new int[] {};
-//         }
+class Solution {
+    // bad solution, no need to create a new variable.
+    public int[] runningSum(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return new int[] {};
+        }
         
-//         int[] result = new int[nums.length];
-//         int sum = 0;
-//         for (int i = 0; i < nums.length; i++) {
-//             sum += nums[i];
-//             result[i] = sum;
-//         }
+        int[] result = new int[nums.length];
+        int sum = 0;
+        for (int i = 0; i < nums.length; i++) {
+            sum += nums[i];
+            result[i] = sum;
+        }
         
-//         return result;
-//     }
-// }
+        return result;
+    }
+}
 
 // better solution
 class Solution {
