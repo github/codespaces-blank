@@ -69,7 +69,7 @@ class Solution {
 
     private int pascal(int i, int j) {
         // base case
-        if (j == 0 || j == i) {
+        if (i == 0 || j == 0 || j == i) {
             return 1;
         }
 
