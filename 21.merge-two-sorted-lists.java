@@ -71,11 +71,12 @@ class Solution {
             current = current.next;
         }
 
-        if (l1 != null) {
-            current.next = l1;
-        } else {
-            current.next = l2;
-        }
+        current.next = l1 == null ? l2 : l1;
+        // if (l1 != null) {
+        //     current.next = l1;
+        // } else {
+        //     current.next = l2;
+        // }
 
         return dummyNode.next;
     }
