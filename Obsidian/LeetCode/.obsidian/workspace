@@ -1,0 +1,129 @@
+{
+  "main": {
+    "id": "8c7551c62934fe82",
+    "type": "split",
+    "children": [
+      {
+        "id": "88206fb82bf0298c",
+        "type": "leaf",
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "1672. Richest Customer Wealth.md",
+            "mode": "preview"
+          }
+        },
+        "group": "51bacfa5c4ba5207"
+      },
+      {
+        "id": "3e919e6fe661ce49",
+        "type": "leaf",
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "1672. Richest Customer Wealth.md",
+            "mode": "source"
+          }
+        },
+        "group": "51bacfa5c4ba5207"
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "25e87aaceae5a1a5",
+    "type": "split",
+    "children": [
+      {
+        "id": "021eb8540dcc1181",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f917eaf98c7cbcf3",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {}
+            }
+          },
+          {
+            "id": "2e62f44df2a19ca0",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "7db0a43ff89dd599",
+    "type": "split",
+    "children": [
+      {
+        "id": "418289f479e5ca07",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "374f97c6dc9e098a",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "1672. Richest Customer Wealth.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "e2f4f58383537bd1",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "1672. Richest Customer Wealth.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "0275ef7a843863a8",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "active": "3e919e6fe661ce49",
+  "lastOpenFiles": [
+    "1672. Richest Customer Wealth.md"
+  ]
+}
