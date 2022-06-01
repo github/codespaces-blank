@@ -55,6 +55,7 @@
 // @lc code=start
 // map里面存的是未添加现在值得count，我们把值赋给Result，就相当于完成了当前得配对
 // https://leetcode.com/problems/number-of-good-pairs/discuss/731561/JavaC++Python-Count
+// Time O(n), Space O(n)
 class Solution {
     public int numIdenticalPairs(int[] nums) {
         if (nums == null || nums.length == 0) {
@@ -69,6 +70,34 @@ class Solution {
         }
 
         return result;
+    }
+}
+
+class Solution {
+    public int numIdenticalPairs(int[] nums) {
+        if (nums == null || nums.length <= 1) {
+            return 0;
+        }
+        
+        // Move elements to a map
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int i : nums) {
+            map.put(i, map.getOrDefault(i, 0) + 1);
+        }
+        
+        int result = 0;
+        // Traverse map and doing math to calculate the results
+        for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
+            if (entry.getValue() > 1) {
+                result += calculatePairs(entry.getValue() - 1);
+            }
+        }
+        
+        return result;
+    }
+    
+    private int calculatePairs(int value) {
+        return (1 + value) * value / 2;
     }
 }
 // @lc code=end
