@@ -93,7 +93,8 @@ class Solution {
             bucket[i] += bucket[i - 1];
         }
 
-        // because we count the num smaller than current, so we just get bucket[nums[i - 1]]
+        // because we count the num smaller than current, so we just get bucket[nums[i] - 1]
+        // when nums[i] == 0, bucket[-1] is invalid, so we need to have a special case here
         for (int i = 0; i < nums.length; i++) {
             if (nums[i] == 0) {
                 result[i] = 0;
