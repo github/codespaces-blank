@@ -70,5 +70,30 @@ class Solution {
         return result.stream().mapToInt(i -> i).toArray();
     }
 }
+
+class Solution {
+    public int[] decompressRLElist(int[] nums) {
+        // sum up all odd number as the length of the result array
+        int totalNumber = 0;
+        for (int i = 0; i < nums.length; i += 2) {
+            totalNumber += nums[i];
+        }
+        int[] result = new int[totalNumber];
+        
+        // set even number value nums[i - 1] times
+        int index = 0;
+        for (int i = 1; i < nums.length; i += 2) {
+            int count = nums[i - 1];
+            int value = nums[i];
+            while (count > 0) {
+                result[index] = nums[i];
+                index++;
+                count--;
+            }
+        }
+        
+        return result;
+    }
+} 
 // @lc code=end
 
