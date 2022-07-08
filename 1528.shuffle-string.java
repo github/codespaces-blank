@@ -53,21 +53,21 @@
 
 // sort
 // no need extra space, but time complexity is high
-// class Solution {
-//     public String restoreString(String s, int[] indices) {
-//         StringBuffer result = new StringBuffer();
-//         while (result.length() < s.length()) {
-//             for (int i = 0; i < s.length(); i++) {
-//                 if (indices[i] == result.length()) {
-//                     result.append(s.charAt(i));
-//                     break;
-//                 }
-//             }
-//         }
+class Solution {
+    public String restoreString(String s, int[] indices) {
+        StringBuffer result = new StringBuffer();
+        while (result.length() < s.length()) {
+            for (int i = 0; i < s.length(); i++) {
+                if (indices[i] == result.length()) {
+                    result.append(s.charAt(i));
+                    break;
+                }
+            }
+        }
 
-//         return result.toString();
-//     }
-// }
+        return result.toString();
+    }
+}
 
 // create a new array and put the value in order then combine to a new string
 // need extra space
@@ -85,6 +85,32 @@ class Solution {
         }
 
         return result.toString();
+    }
+}
+
+class Solution {
+    public String restoreString(String s, int[] indices) {
+        char[] sArray = s.toCharArray();
+        for (int i = 0; i < indices.length; i++) {
+            while (indices[i] != i) {
+                swapString(sArray, i, indices[i]);
+                swapInt(indices, i, indices[i]);
+            }
+        }
+
+        return String.valueOf(sArray);
+    }
+
+    private void swapInt(int[] indices, int left, int right) {
+        int temp = indices[left];
+        indices[left] = indices[right];
+        indices[right] = temp;
+    }
+
+    private void swapString(char[] sArray, int left, int right) {
+        char temp = sArray[left];
+        sArray[left] = sArray[right];
+        sArray[right] = temp;
     }
 }
 
