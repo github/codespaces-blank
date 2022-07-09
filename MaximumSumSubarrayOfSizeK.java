@@ -27,18 +27,6 @@ class MaximumSumSubarrayOfSizeK {
     public static int findMaxSumSubArray(int k, int[] arr) {
         int maxSum = 0, windowStart = 0, windowSum = 0;
 
-        // 这种算法不是很好：
-        // 如果到K了，先减掉前面的，然后补上后面新的。Math.max()会在没满k的时候也会触发，但不会影响结果。
-        // 还有一种更好的逻辑
-        // for (int windowEnd = 0; windowEnd < arr.length; windowEnd++) {
-        //     if (windowEnd >= k) {
-        //         windowSum -= arr[windowStart];
-        //         windowStart++;
-        //     }
-        //     windowSum += arr[windowEnd];
-        //     maxSum = Math.max(maxSum, windowSum);
-        // }
-
         // 在这种逻辑下，只在end到k的情况下，才会去比较math.max(),
         // 先把end加上，如果到k了，则比较math.max(),为下一次的window做好准备(减去start那个值)，轮到下一次时，直接加end的值就好了
         for (int windowEnd = 0; windowEnd < arr.length; windowEnd++) {
