@@ -51,6 +51,34 @@ class Solution {
     }
 }
 
+class Solution {
+    public List<List<String>> groupAnagrams(String[] strs) {
+        if (strs == null || strs.length == 0) {
+            return new ArrayList();
+        }
+        
+        Map<String, List<String>> group = new HashMap<>();
+        for (String s : strs) {
+            String code = encode(s);
+            group.putIfAbsent(code, new ArrayList());
+            group.get(code).add(s);
+        }
+        
+        return new ArrayList(group.values());
+    }
+    
+    // encode hash based on element appearence times
+    String encode(String s) {
+        char[] count = new char[26];
+        for (char c : s.toCharArray()) {
+            int delta = c - 'a';
+            count[delta]++;
+        }
+        
+        return new String(count);
+    }
+}
+
 /**
  * Hash_Map.values()
  * Parameters: The method does not accept any parameters.
