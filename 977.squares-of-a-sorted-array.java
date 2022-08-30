@@ -71,3 +71,25 @@ class Solution {
     }
 }
 
+class Solution {
+    public int[] sortedSquares(int[] nums) {
+        int[] results = new int[nums.length];
+
+        // use two pointers to sort the array by Math.abs(value)
+        // get the square and put to the results array
+        int left = 0, right = nums.length - 1, index = nums.length - 1;
+        while (left <= right) {
+        if (Math.abs(nums[left]) >= Math.abs(nums[right])) {
+            results[index] = nums[left] * nums[left];
+            left++;
+        } else {
+            results[index] = nums[right] * nums[right];
+            right--;
+        }
+        index--;
+        }
+        
+        return results;
+    }
+}
+
