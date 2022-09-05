@@ -22,8 +22,11 @@ class StringPermutation {
             }
             
             if (windowEnd >= pattern.length() - 1) {
-                char leftChar = str.charAt(windowStart);
+                char leftChar = str.charAt(windowStart++);
                 if (map.containsKey(leftChar)) {
+                    if (map.get(leftChar) == 0) {
+                        matched--;
+                    }
                     map.put(leftChar, map.get(leftChar) + 1);
                 }
             }
