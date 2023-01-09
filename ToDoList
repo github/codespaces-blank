@@ -1,0 +1,186 @@
+import os
+
+if not os.path.exists('ToDoList.db'):
+    print("Error: database file does not exist") #this imports the os and checks if the database already exists before doing so, if it doesnt exist then it will print the error message saying it doesnt exist 
+else:
+    import sqlite3
+    import datetime
+
+db = "ToDoList.db" #this will pull the database from the folder to be used alongside the program 
+conn = sqlite3.connect('ToDoList.db', timeout=5) #this connects to sqlite3 and theres a timeout added as I had a problem with the database already existing therefore the timeout mitigates this issue 
+cursor = conn.cursor() 
+
+#Create Table in Database
+def createTable():
+    query = """CREATE TABLE tasks 
+    (TaskID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
+    Task TEXT NOT NULL, 
+    Subject TEXT NOT NULL, 
+    Start DATETIME NOT NULL, 
+    End DATETIME NOT NULL, 
+    Dateadded TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+    Completed BOOLEAN NOT NULL DEFAULT FALSE)""" # creates a table called tasks then adds the following column inputs; 1. TaskID as an integer, thats the primary key of the table, 
+    #which uniquely identifies each row of the table, the autoincrement means that the column will automatically generate whenever a new row is added, the NOT NULL means that it will be given a non-null value when added by default.
+    #2. task will be added to the column as a text format and again with the default no-null value added.
+    #3. subject will be added to the column as a text format and again with the default no-null value added.
+    #4. the start column will be added as a datetime format, which will indicate the start time and date of a task and again with the default no-null value added.
+    #5. the end column will be added as a datetime format, which will indicate the start time and date of a task and again with the default no-null value added.
+    #6. the dateadded will be added and it will be added by default as the current date and time
+    #7. the completed boolean was added to represent when a task has been completed or not, as the default will be false, which will suggest a task is still active then when a command is given to give it a true value then the program will know its completed
+    try:
+        cursor.execute(query)
+    except sqlite3.OperationalError:
+        print("Table already exists")  # if the table already exists when its executed to make a table then the following error will display 
+    conn.commit()
+
+def addTask():
+    #This will add a task to the database based on user input
+    Task = input("Enter Task: ")[:32] #this allows the user to input a task with a 32 character limit 
+    Subject = input("Enter Subject: ")[:32] #this allows the user to input a task subject with a 32 character limit 
+    Start = input("Enter the start date and time formatted (DD-MM-YYYY HH:MM): ")[:32] #this allows the user to input a start time and date with a 32 character limit 
+    Start = datetime.datetime.strptime(Start, '%d-%m-%Y %H:%M')
+    End = input("Enter the end date and time formatted (DD-MM-YYYY HH:MM): ")[:32] #this allows the user to input a end time and date with a 32 character limit 
+    End = datetime.datetime.strptime(End, '%d-%m-%Y %H:%M')
+    query = """INSERT INTO tasks (Task, Subject, Start, End) VALUES (?, ?, ?, ?)""" #this inserts the following data inputs into the table and the question marks tell the progrom how many data inputs are being sent across to the table 
+    try:
+        cursor.execute(query, (Task, Subject, Start, End)) #this executes the command to put the following entries into the table 
+    except:
+        print("There was an error adding the task") #this is an error message incase there was an error inputting the following information into the table for whatever reason 
+    else:
+        conn.commit()
+        print(f"{Task} has been added successfully") #this confirms to the user that the information was stored correctly. 
+
+def viewTasks():
+    query = """SELECT TaskID, Task, Subject, Start, End FROM tasks WHERE Completed = 0""" #this will notify the user if there was a problem fetching the selected tasks for whatever reeason 
+    cursor.execute(query)
+    results = cursor.fetchall()
+    print("Here are all the tasks currently available:\n") #this will display all the selected columns
+    for row in results:
+        for item in row:
+            print(item, end=" ")
+        print("\n")
+
+def RemoveTask():
+    TaskID = input("Enter the TaskID of the task you wish to remove: ") #asks the user to input the taskid they wish to remove from the task list 
+    query = """UPDATE tasks SET Completed = 1 WHERE TaskID = ?""" #this will give the complete boolean a positive value to represent that the task needs to be deleted and will show it as completed
+    try:
+        cursor.execute(query, (TaskID,))
+    except:
+        print("There was an error removing the task") #this will notify the user when there was a problem giving the boolean a positive value and not removed the task
+    else:
+        conn.commit()
+        print("Task with TaskID {TaskID} has been removed") #this will confirm to the user that the task with the following ID has been removed. 
+
+def viewCompletedTasks():
+    query = """SELECT * FROM tasks WHERE Completed = 1""" #this will gather all of the tasks that have been given a positive value for the boolean, to show previous inputted tasks that have been completed 
+    cursor.execute(query)
+    results = cursor.fetchall()
+    print("Here are all the tasks that have been completed:\n") #this will confirm to the user that the function has been successfully operated 
+    if results == []:
+        print("There are no tasks that have been completed") #this will display when there are no previously completed tasks if the result is 0 
+    else:
+        for row in results:
+            for item in row:
+                print(item, end=" ")
+            print("\n") #this will print the final result of the completed tasks 
+
+def sortTasks():
+    #this will allow the user to sort the tasks into ascending order from the start to the end
+    query = """SELECT TaskID, Task, Subject, Start, End FROM tasks WHERE Completed = 0 ORDER BY Start ASC""" #this will sort the tasks in order from the earliest date to the latest date 
+    cursor.execute(query)
+    results = cursor.fetchall() #this will fetch the data that is required from the columns to perform the operation 
+    print("Here are all the tasks sorted by start date:\n")
+    for row in results:
+        for item in row:
+            print(item, end=" ")
+        print("\n") #this will print and display the tasks in the order that was originally stated 
+
+def updateTask():
+    #This will allow the user to update a selected task with the taskID
+    viewTasks()
+    TaskID = input("Enter the TaskID of the car you wish to update: ")[:32]
+    Task = input("Enter Task: ")[:32]
+    Subject = input("Enter Subject: ")[:32]
+    Start = input("Enter the start date and time formatted (DD-MM-YYYY HH:MM): ")[:32] #this allows the user to input a start time and date with a 32 character limit 
+    Start = datetime.datetime.strptime(Start, '%d-%m-%Y %H:%M')
+    End = input("Enter the end date and time formatted (DD-MM-YYYY HH:MM): ")[:32] #this allows the user to input a end time and date with a 32 character limit 
+    End = datetime.datetime.strptime(End, '%d-%m-%Y %H:%M')
+    query = """UPDATE tasks SET Task = ?, Subject = ?, Start = ?, End = ? WHERE TaskID = ?""" #updates the relevant entry for the sql table 
+    try:
+        cursor.execute(query, (Task, Subject, Start, End, TaskID))
+    except:
+        print("Invalid input") #error handling message for an incorrect input 
+    else:
+        conn.commit()
+        print("Task with TaskID {TaskID} has been updated") #confirmation to the user that the following taskid has been updated successfully
+
+def filterTasks():
+    subject = input("Enter the subject to filter by: ")[:32] #prompts the user to enter their desired subject into the filter 
+    query = """SELECT TaskID, Task, Subject, Start, End FROM tasks WHERE LOWER(Subject) = LOWER(?) AND Completed = 0""" #this query will select the tasks where the boolean is negative, which means that the task is still currently active and not completed
+    cursor.execute(query, (subject,))
+    results = cursor.fetchall()
+    print("Here are the tasks filtered by subject:\n") 
+    for row in results:
+        for item in row:
+            print(item, end=" ")
+        print("\n") #this will print the selected subject that the user inputted 
+
+def sortTasks():
+    query = """SELECT TaskID, Task, Subject, Start, End FROM tasks WHERE Completed = 0 ORDER BY Start ASC"""
+    cursor.execute(query)
+    results = cursor.fetchall()
+    print("Here are all the tasks sorted by start date:\n")
+    for row in results:
+        for item in row:
+            print(item, end=" ")
+        print("\n")
+
+def main():
+    #This is the main menu - users will be able to select from the options
+    #and the program will run the relevant function
+    print("\nPlease select from the following options:")
+    print("1. Add a Task")
+    print("2. View all Tasks")
+    print("3. Remove a task")
+    print("4. View all completed tasks")
+    print("5. Sort all tasks")
+    print("6. Update a task")
+    print("7. Filter tasks by subject")
+    print("8. Exit") #all of this will simply print a menu for the user to choose from 
+    choice = input("Enter your choice: ")
+    if choice == "1":
+        addTask() #if 1 is selected then it will run the addTask function
+    elif choice == "2":
+        viewTasks() #if 2 is selected then it will run the viewTasks function
+    elif choice == "3":
+        RemoveTask() #if 3 is selected then it will run the RemoveTask function
+    elif choice == "4":
+        viewCompletedTasks() #if 4 is selected then it will run the viewCompletedTasks routine
+    elif choice == "5":
+        sortTasks() #if 5 is selected then it will run the sortTasks routine
+    elif choice == "6":
+        updateTask() #if 6 is selected then it will run the updateTask routine
+    elif choice == "7":
+        filterTasks() #if 7 is selected then it will run the filterTasks routine
+    elif choice == "8":
+        exit()
+        conn.close() #if 8 is selected then it will close the program
+    else:
+        print("Invalid choice")
+    main()
+
+if __name__ == "__main__":
+    #This will run the main menu within the 'main' function
+    print("\nWelcome to the task list")
+    #Create table if it does not already exist
+    createTable()
+    #This will check to see if table is empty - if it is, it will reset the autoincrement
+    query = """SELECT * FROM tasks"""
+    cursor.execute(query)
+    results = cursor.fetchall()
+    if results == []:
+        query = """UPDATE SQLITE_SEQUENCE SET seq = 0 WHERE name = 'tasks'"""
+        cursor.execute(query)
+    else:
+        pass
+    main()
