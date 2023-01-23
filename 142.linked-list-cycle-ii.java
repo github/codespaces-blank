@@ -77,9 +77,63 @@
  *     }
  * }
  */
+// Solution 1: HashSet
 public class Solution {
     public ListNode detectCycle(ListNode head) {
-        
+        Set<ListNode> seen = new HashSet<>();
+        while (head != null) {
+            if (!seen.add(head)) {
+                return head;
+            }
+            head = head.next;
+        }
+
+        return null;
+    }
+}
+
+// Solution 2
+public class Solution {
+    public ListNode detectCycle(ListNode head) {
+        if (head == null || head.next == null) {
+            return null;
+        }
+
+        // If there is a cycle, the fast/slow pointers will intersect at some
+        // node. Otherwise, there is no cycle, so we cannot find an entrance to
+        // a cycle.
+        ListNode intersect = getIntersect(head);
+        if (intersect == null) {
+            return null;
+        }
+
+        // To find the entrance to the cycle, we have two pointers traverse at
+        // the same speed -- one from the front of the list, and the other from
+        // the point of intersection.
+        ListNode point1 = head;
+        ListNode point2 = intersect;
+        while (point1 != point2) {
+            point1 = point1.next;
+            point2 = point2.next;
+        }
+        return point1;
+    }
+
+    private ListNode getIntersect(ListNode head) {
+        ListNode slow = head;
+        ListNode fast = head;
+
+        // A fast pointer will either loop around a cycle and meet the slow
+        // pointer or reach the `null` at the end of a non-cyclic list.
+        while (fast.next != null && fast.next.next != null) {
+            fast = fast.next.next;
+            slow = slow.next;
+            if (fast == slow) {
+                return fast;
+            }
+        }
+
+        return null;
     }
 }
 // @lc code=end
