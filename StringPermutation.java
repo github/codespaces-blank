@@ -44,5 +44,5 @@ class StringPermutation {
                 + StringPermutation.findPermutation("bcdxabcdy", "bcdyabcdx"));
         System.out.println("Permutation exist: "
                 + StringPermutation.findPermutation("aaacb", "abc"));
-    } 
+    }  
 }
