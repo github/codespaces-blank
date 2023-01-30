@@ -1,1 +1,1 @@
-
+Hello everyone in the computer world Im glad to be here with all of you. The project I have been working on started New years eve 2022. The project is titled "Musiccitydiamond Global". I am working on an art collection including 12 pieces hand painted diamonds on canvas using multiple types of paints&brushes trying new things. My main focus is showing the world that I care. I love the world, the stars, the universe and my GOD. I respect all cultural beliefs and care deeply about humanity. 
