@@ -1,0 +1,55 @@
+Written #1
+
+
+1A
+
+The loop is NOT an infinite loop.
+
+There would NOT be any error.
+
+The program would print the following:
+Danger, Will Robinson!
+Danger, Will Robinson!
+Danger, Will Robinson!
+
+
+1B
+
+The loop is NOT infinite.
+
+There would NOT be any error.
+
+The loop will not be executed because 'level' is not greater then 'danger'
+The program would print the following:
+Lost in Space!
+
+
+1C
+
+The loop is an infinite loop.
+
+There would NOT be any error.
+
+The loop will continue to print infinite lines of "Jupiter-2" as 'level' is not never updated and will remain lesser then danger always.
+The program would print the following:
+Jupiter-2 Jupiter-2 Jupiter-2 Jupiter-2 Jupiter-2 Jupiter-2 Jupiter-2 Jupiter-2 Jupiter-2 Jupiter-2 ...... infinitely
+
+
+
+
+
+Written #2
+
+
+2A
+
+#Option 1 would correctly prompt the user.
+This is because of the boolean operator 'AND' which makes the statement true IF ANY ONLY IF day is not "Sat" or "Sun". Otherwise, it will skip the line inside.
+And so, it will print: Thank you!
+
+
+2B
+
+In Option 2 the while loop can be false IF AND ONLY IF day is SAT and SUN both.
+Hence, it is like an infinte loop, because it will continue to execute the line till the while loop is false.
+2. It thinks good inputs (like “Sat”) are invalid.
