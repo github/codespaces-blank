@@ -1,8 +1,6 @@
 import hw4data as hw4
 
-
-def decode(list):
-
+def decode(data):
     """
     # initiate a counter
     d, i = 0
@@ -26,12 +24,12 @@ def decode(list):
 
     # while i is less than list length,
     i = 0
-    while i < len(list):
+    while i < len(data):
         # append copies of the item in list[i]
         # list [i+1] times
         j = 0
-        while j < list[i+1]:
-            decoded_data.append(list[i])
+        while j < data[i+1]:
+            decoded_data.append(data[i])
             j = j + 1
         # jump to next even number item in list
         i = i + 2
@@ -40,6 +38,8 @@ def decode(list):
 
 
 def main():
+    """_summary_ This is the main function that calls the decode function
+    """
 
     # can i use a while loop here to iterate all data sets?
     decoded_data0 = decode(hw4.DATA0)
