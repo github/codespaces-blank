@@ -1,3 +1,10 @@
+"""
+CS 5001
+Homework 04
+Pranchal Shah
+
+"""
+
 import hw4data as hw4
 
 def decode(data):
