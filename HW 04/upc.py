@@ -1,4 +1,21 @@
 def is_valid_upc(list_of_integers : list)-> bool:
+    """_summary_ 
+    This function checks if a UPC is valid or not
+    Based on the algorithm described here:
+    https://northeastern.instructure.com/courses/136697/assignments/1676739
+
+    Args:
+        list_of_integers (list): list of integers or the UPC number
+
+    Returns:
+        bool: True if the UPC is valid, False otherwise
+    """
+
+    # the exceptions
+    if len(list_of_integers) < 2:
+        return False
+    elif all(digit ==0 for digit in list_of_integers):
+        return False
 
     # firsty, reverse the number:
     # use list slicing
@@ -18,13 +35,8 @@ def is_valid_upc(list_of_integers : list)-> bool:
         sum_of_odd = sum_of_odd + (list_of_integers[i] * 3)
         i = i + 2
 
+    # step 3: add the two sums
     sum_of_upc = sum_of_even + sum_of_odd
-    #return sum_of_upc % 10 == 0
-    return sum_of_upc
 
-def main():
-    abc = is_valid_upc([1,2,3,4,5,6,7,8,9])
-    print(abc)
-
-
-main()
+    # return true if the sum is divisible by 10
+    return sum_of_upc % 10 == 0
