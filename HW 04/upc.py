@@ -1,3 +1,11 @@
+""""
+CS 5001
+Homework 04
+Pranchal Shah
+
+This program uses 
+"""
+
 def is_valid_upc(list_of_integers : list)-> bool:
     """_summary_ 
     This function checks if a UPC is valid or not
