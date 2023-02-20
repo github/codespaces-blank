@@ -6,7 +6,7 @@ Pranchal Shah
 This program uses 
 """
 
-def is_valid_upc(list_of_integers : list)-> bool:
+def is_valid_upc(list_of_integers: list) -> bool:
     """_summary_ 
     This function checks if a UPC is valid or not
     Based on the algorithm described here:
@@ -22,7 +22,7 @@ def is_valid_upc(list_of_integers : list)-> bool:
     # the exceptions
     if len(list_of_integers) < 2:
         return False
-    elif all(digit ==0 for digit in list_of_integers):
+    elif all(digit == 0 for digit in list_of_integers):
         return False
 
     # firsty, reverse the number:
@@ -32,13 +32,13 @@ def is_valid_upc(list_of_integers : list)-> bool:
     list_of_integers = list_of_integers[::-1]
 
     # step 1: add the even digits
-    sum_of_even, i = 0,0
+    sum_of_even, i = 0, 0
     while i < len(list_of_integers):
         sum_of_even = sum_of_even + list_of_integers[i]
         i = i + 2
 
     # step 2: multiply odd digits by 3 and add them
-    i,sum_of_odd = 1,0
+    i, sum_of_odd = 1, 0
     while i < len(list_of_integers):
         sum_of_odd = sum_of_odd + (list_of_integers[i] * 3)
         i = i + 2

@@ -16,7 +16,7 @@ def create_deck() -> list:
         list: A deck of cards in a list
     """
     suits = ["s", "h", "d", "c"]
-    values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
+    values = ["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"]
     deck = []
 
     # for each value in list "values"
@@ -27,7 +27,6 @@ def create_deck() -> list:
             deck.append(card)
 
     return deck
-
 
 
 def shuffle(cards: list) -> list:
@@ -44,8 +43,8 @@ def shuffle(cards: list) -> list:
     shuffled_cards = []
     random_list = []
 
-    #initiate a counter
-    i,j = 0,0
+    # initiate a counter
+    i, j = 0, 0
 
     # firstly, create a list of random numbers
     # from 0 to the length of the cards list = 52
@@ -69,20 +68,20 @@ def shuffle(cards: list) -> list:
     return shuffled_cards
 
 
-
-def deal(number_of_hands : int, number_of_cards : int, cards : list) -> list:
+def deal(number_of_hands: int, number_of_cards: int, cards: list) -> list:
     """_summary_ 
     this function deals a number of cards to a number of hands.
 
     Args:
         number_of_hands (int): number of hands to deal to must be 1..4
-        number_of_cards (int): number of cards to deal in each hand must be 0..13
+        number_of_cards (int): number of cards to deal in each hand 
+                               must be 0..13
         cards (list): list of cards, in any order to deal from
 
     Returns:
         list: list of lists, each containing the cards dealt to a hand
     """
-    i,j,k = 0,0,0
+    i, j, k = 0, 0, 0
     dealt_cards = []
 
     # create a list to store remainig cards
@@ -119,7 +118,7 @@ def deal(number_of_hands : int, number_of_cards : int, cards : list) -> list:
                     if i == (number_of_hands - 1):
                         del remaining_cards[0]
                     else:
-                        if j == 0 :
+                        if j == 0:
                             base_number = 0
                             del remaining_cards[base_number]
                         elif j == 1:
@@ -138,9 +137,11 @@ def deal(number_of_hands : int, number_of_cards : int, cards : list) -> list:
                 i = i + 1
             return (dealt_cards, remaining_cards)
         else:
-            print("Please enter a number of cards less than or equal to 13")
+            print("Invalid input arguments")
+            return None
     else:
-        print("Please enter a number of hands less than or equal to 4")
+        print("Invalid input arguments")
+        return None
 
 
 def main():
@@ -151,9 +152,9 @@ def main():
     print(f"Original Deck: \n{deck}")
 
     shuffled_deck = shuffle(deck)
-    print(f" Shuffled Deck: \n{shuffled_deck}")
+    # print(f" Shuffled Deck: \n{shuffled_deck}")
 
-    dealt_hands, remaining_cards = deal(4,12,shuffled_deck)
+    dealt_hands, remaining_cards = deal(1, 2, deck)
     print(f"Dealt Hands: \n{dealt_hands}")
     print(f"Remaining cards: \n{remaining_cards}")
 
