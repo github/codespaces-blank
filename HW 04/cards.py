@@ -108,9 +108,10 @@ def deal(number_of_hands: int, number_of_cards: int, cards: list) -> list:
 
                 while j < number_of_cards:
                     # append the card at index k to the new list
-                    # first loop would be   1,5,9
-                    # second loop would be  2,6,10
-                    # third loop would be   3,7,11
+                    # first loop would be   0,4,8,12
+                    # second loop would be  1,5,9,13
+                    # third loop would be   2,6,10,14
+                    # fourth loop would be  3,7,11,15
                     new_list.append(cards[k])
 
                     # remove the card at index k from the remaining cards list
