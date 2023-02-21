@@ -28,7 +28,6 @@ def create_deck() -> list:
 
     return deck
 
-
 def shuffle(cards: list) -> list:
     """_summary_ This function shuffles a deck of cards, 
     and returns a new list of cards in the shuffled order
@@ -65,7 +64,6 @@ def shuffle(cards: list) -> list:
         j = j + 1
     return shuffled_cards
 
-
 def deal(number_of_hands: int, number_of_cards: int, cards: list) -> list:
     """_summary_ 
     this function deals a number of cards to a number of hands.
@@ -77,10 +75,9 @@ def deal(number_of_hands: int, number_of_cards: int, cards: list) -> list:
         cards (list): list of cards, in any order to deal from
 
     Returns:
-        dealt_hands (list of lists): list of lists, each containing the cards dealt to a hand
+        dealt_hands (list of lists): each containing the cards dealt to a hand
         cards (list) : list of cards, remaining in the deck
-    """ 
-    # check if the number of hands is less than or equal to 4
+    """     # check if the number of hands is less than or equal to 4
     if number_of_hands > 4 or number_of_cards > 13:
         print("Invalid input arguments")
         return None
@@ -97,7 +94,7 @@ def deal(number_of_hands: int, number_of_cards: int, cards: list) -> list:
             dealt_hands[i].append(cards[0])
             cards.pop(0)
 
-    return (dealt_hands, cards)
+    return dealt_hands
 
 
 def main():
@@ -108,11 +105,11 @@ def main():
     print(f"Original Deck is: \n{deck}")
 
     shuffled_deck = shuffle(deck)
-    #print(f" The shuffled Deck is: \n{shuffled_deck}")
+    print(f" The shuffled Deck is: \n{shuffled_deck}")
 
-    dealt_hands, remaining_cards = deal(4, 3, deck)
+    dealt_hands = deal(4, 3, deck)
     print(f"Dealt Hands: \n{dealt_hands}")
-    print(f"Cards left in deck: \n{remaining_cards}")
+    print(f"Cards left in deck: \n{deck}")
 
 
 if __name__ == "__main__":
