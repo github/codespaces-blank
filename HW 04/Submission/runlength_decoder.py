@@ -26,7 +26,7 @@ def decode(data) -> list:
     # this loop iterates through the encoded list
     while i < len(data):
         j = 0
-        
+
         # if the next item in the list is not an integer
         if not isinstance(data[i + 1], int):
             print("The next item in the list is not an integer")
@@ -56,7 +56,7 @@ def main():
     decoded_data5 = decode(hw4.DATA5)
 
     all_decoded_data = decoded_data0 + decoded_data1 + decoded_data2 \
-                       + decoded_data3 + decoded_data4 + decoded_data5
+        + decoded_data3 + decoded_data4 + decoded_data5
     single_string = "".join(all_decoded_data)
 
     print(single_string)

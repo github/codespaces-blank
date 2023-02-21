@@ -49,7 +49,7 @@ def shuffle(cards: list) -> list:
     # This loop, create a list of random numbers
     while i < len(cards):
 
-        # generate a list of random number
+        # generate a random number
         num = random.randrange(len(cards))
 
         # to avoid duplicates
@@ -87,10 +87,13 @@ def deal(number_of_hands: int, number_of_cards: int, cards: list) -> list:
     i = 0
     dealt_cards = []
     # create a list to store remainig cards
+    
     remaining_cards = cards.copy()
     total_cards = number_of_hands * number_of_cards
-
+                    
     # this loop slices the cards list - into a list of hand sublist
+    # try giving one card at a time
+    
     while i < number_of_hands:
         hand_sublist = cards[i: i + (total_cards): number_of_hands]
         # remove the cards from the remaining cards list
@@ -101,21 +104,21 @@ def deal(number_of_hands: int, number_of_cards: int, cards: list) -> list:
         i = i + 1
 
     return (dealt_cards, remaining_cards)
-
+        
 
 def main():
     """_summary_ 
     This is the main function that calls the create_deck function
     """
     deck = create_deck()
-    print(f"Original Deck: \n{deck}")
+    print(f"Original Deck is: \n{deck}")
 
     shuffled_deck = shuffle(deck)
-    print(f" Shuffled Deck: \n{shuffled_deck}")
+    print(f" The shuffled Deck is: \n{shuffled_deck}")
 
     dealt_hands, remaining_cards = deal(1, 12, shuffled_deck)
     print(f"Dealt Hands: \n{dealt_hands}")
-    print(f"Remaining cards: \n{remaining_cards}")
+    print(f"Cards left in deck: \n{remaining_cards}")
 
 
 if __name__ == "__main__":
