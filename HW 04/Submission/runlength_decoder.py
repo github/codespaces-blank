@@ -47,7 +47,7 @@ def main():
     This is the main function that calls the decode function
     """
 
-    # can i use a while loop here to iterate all data sets?
+    # decoded data from hw4data.py
     decoded_data0 = decode(hw4.DATA0)
     decoded_data1 = decode(hw4.DATA1)
     decoded_data2 = decode(hw4.DATA2)
@@ -55,8 +55,11 @@ def main():
     decoded_data4 = decode(hw4.DATA4)
     decoded_data5 = decode(hw4.DATA5)
 
+    # combine all decoded data into a single list
     all_decoded_data = decoded_data0 + decoded_data1 + decoded_data2 \
         + decoded_data3 + decoded_data4 + decoded_data5
+
+    # convert list to string
     single_string = "".join(all_decoded_data)
 
     print(single_string)

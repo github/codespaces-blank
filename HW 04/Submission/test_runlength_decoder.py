@@ -26,9 +26,13 @@ def main():
     """_summary_
     This is the main function that calls the test_rl_decoder function
     """
+    # normal test with encoding done right
     test_rl_decoder(['P', 2, 'Q', 3, 'J', 1],['P', 'P', 'Q', 'Q', 'Q', 'J'])
+    # When integer is zero 
     test_rl_decoder(['A', 0], [])
+    # When list has no integers
     test_rl_decoder(['A','B','C'],['A','B','C'])
+    # complex list with multiple integers
     test_rl_decoder(['P', 2, 'A', 0, 'b', 3],['P', 'P', 'b', 'b', 'b'])
 
 
