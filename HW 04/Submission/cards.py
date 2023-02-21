@@ -98,7 +98,8 @@ def deal(number_of_hands: int, number_of_cards: int, cards: list) -> list:
 
 
 def main():
-    """_summary_ 
+    """
+    _summary_ 
     This is the main function that calls the create_deck function
     """
     deck = create_deck()
