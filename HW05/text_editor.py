@@ -21,5 +21,10 @@ def insert_text(t_original: str, t_insert: str, position: int)-> str:
     Returns:
         str: _description_
     """
-    split_text = t_original.split(None, position)
-    return split_text[0] + " " + t_insert + " " + split_text[1]
+    t_split = t_original.split(" ")
+    split_1 = " ".join (t_split[:position])
+    split_2 = " ".join (t_split[position:])
+    if position < 0:
+        return t_insert + " " + t_original
+    return split_1 + " " + t_insert + " " + split_2
+    
