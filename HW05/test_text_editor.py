@@ -1,3 +1,9 @@
+"""
+CS - 5001
+Pranchal Shah
+HW 05
+This is a test file that tests each function in text_editor.py
+"""
 import text_editor as t_editor
 
 def test_append_text(case_number: int, t_original: str,
@@ -82,17 +88,15 @@ def main():
     t_original = "I like apples."
     t_new = "oranges"
     # Ideal case
-    test_substitute_text(0, t_original, "apples", t_new, "I like oranges")
+    test_substitute_text(0, t_original, "apples", t_new, "I like oranges.")
     # Sub not in original
-    test_substitute_text(1, t_original, "bananas", t_new, "I like apples")
+    test_substitute_text(1, t_original, "bananas", t_new, "I like apples.")
     # Empty original
     test_substitute_text(2, "", "apples", t_new, "")
     # Empty new
-    test_substitute_text(3, t_original, "apples" , " ", "I like ")
+    test_substitute_text(3, t_original, "apples" , "", "I like .")
     # Case senstive
     test_substitute_text(4, t_original, "Apples", t_new, "I like apples.")
-    
-    
 
 if __name__ == "__main__":
     main()

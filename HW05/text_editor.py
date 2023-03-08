@@ -6,6 +6,27 @@ This program is a text editor that can append, insert,
 and substitute text.
 """
 
+def custom_join(t_list: list)-> str:
+    """_summary_
+
+    Args:
+        t_list (list): _description_
+
+    Returns:
+        str: _description_
+    """
+    joint_text = ""
+    for word in t_list:
+        if not joint_text:
+            joint_text = joint_text + word
+        else:
+            if word != ".":
+                joint_text = joint_text + " " + word
+            else:
+                joint_text = joint_text + word
+    return joint_text
+
+
 def split_text(t_original: str) -> list:
     """ 
     This function splits the text into a list of words, based on
@@ -66,7 +87,7 @@ def insert_text(t_original: str, t_insert: str, position: int)-> str:
     Returns:
         str: _description_
     """
-    t_split = t_original.split(" ")
+    t_split = split_text(t_original)
     split_1 = " ".join (t_split[:position])
     split_2 = " ".join (t_split[position:])
     if position < 0:
@@ -85,7 +106,7 @@ def substitute_text(t_original: str, t_sub: str, t_new: str)-> str:
         str: _description_
     """
     i = 0
-    t_split = t_original.split()
+    t_split = split_text(t_original)
     # learn't that for loop iterates
     # over a copy of the list
     # hence, we use while loop
@@ -94,4 +115,4 @@ def substitute_text(t_original: str, t_sub: str, t_new: str)-> str:
             t_split[i] = t_new
         i += 1
 
-    return " ".join(t_split)
+    return custom_join(t_split)
