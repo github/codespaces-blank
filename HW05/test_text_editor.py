@@ -82,8 +82,8 @@ def main():
     test_insert_text(3, t_original, t_insert, 5, "I like apples ###")
     # Negative position
     test_insert_text(4, t_original, t_insert, -1, "### I like apples")
-    
-    
+
+
     print("\n\n--------------- Test Cases for substitute_text ---------------")
     t_original = "I like apples."
     t_new = "oranges"

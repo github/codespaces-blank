@@ -7,13 +7,17 @@ and substitute text.
 """
 
 def custom_join(t_list: list)-> str:
-    """_summary_
+    """
+    This function joins a list of words into a string. 
+    DOES NOT ADD A SPACE when joining "."
+    Which is exactly different from the join() function in python.
 
     Args:
-        t_list (list): _description_
+        t_list (list): list of words split from the original text
 
     Returns:
-        str: _description_
+        joint_text (str): text joined from the list of words, without space
+                           before "."
     """
     joint_text = ""
     for word in t_list:
@@ -26,8 +30,7 @@ def custom_join(t_list: list)-> str:
                 joint_text = joint_text + word
     return joint_text
 
-
-def split_text(t_original: str) -> list:
+def custom_split(t_original: str) -> list:
     """ 
     This function splits the text into a list of words, based on
     [" ", ".", "\n", "\t"] as delimiters. I had to create this becasue
@@ -87,7 +90,7 @@ def insert_text(t_original: str, t_insert: str, position: int)-> str:
     Returns:
         str: _description_
     """
-    t_split = split_text(t_original)
+    t_split = custom_split(t_original)
     split_1 = " ".join (t_split[:position])
     split_2 = " ".join (t_split[position:])
     if position < 0:
@@ -106,7 +109,7 @@ def substitute_text(t_original: str, t_sub: str, t_new: str)-> str:
         str: _description_
     """
     i = 0
-    t_split = split_text(t_original)
+    t_split = custom_split(t_original)
     # learn't that for loop iterates
     # over a copy of the list
     # hence, we use while loop
