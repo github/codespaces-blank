@@ -141,4 +141,26 @@ def scramble_text(t_original: str)-> str:
         else:
             result = result + char
     return result
-    
+
+
+def unscramble_text(t_original: str)-> str:
+    """_summary_
+
+    Args:
+        t_original (str): _description_
+
+    Returns:
+        str: _description_
+    """
+    result  = ''
+    for char in t_original:
+        ascii_number = ord(char)
+        if 64 < ascii_number < 91 or 96 < ascii_number < 123:
+            if (ascii_number - 2) < 65:
+                new_char = chr(ascii_number + 24)
+            else:
+                new_char = chr(ascii_number - 2)
+            result = result + new_char
+        else:
+            result = result + char
+    return result    
