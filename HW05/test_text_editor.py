@@ -56,6 +56,22 @@ def test_substitute_text(case_number: int, t_original: str,
     print (f"\nSubstitute Text, Test Case {case_number}:\
            \nOut:{t_actual}\nExp:{t_expected}")
 
+def test_scramble_text(case_number: int, t_original: str, t_expected: str)-> str:
+    """_summary_
+
+    Args:
+        case_number (int): _description_
+        t_original (str): _description_
+        t_expected (str): _description_
+
+    Returns:
+        str: _description_
+    """
+    t_actual = t_editor.scramble_text(t_original)
+    print (f"\nScramble Text, Test Case {case_number}:\
+           \nOut:{t_actual}\nExp:{t_expected}")
+    
+    
 def main():
     """
     _summary_
@@ -98,5 +114,18 @@ def main():
     # Case senstive
     test_substitute_text(4, t_original, "Apples", t_new, "I like apples.")
 
+
+    print("\n\n--------------- Test Cases for scramble_text ---------------")
+    # Ideal case
+    test_scramble_text(0,"abcd", "cdef")
+    # case sensitive
+    test_scramble_text(1,"aBcD", "cDeF")
+    # Multiple character types
+    test_scramble_text(2,"[a1*b2*c3],[p$*q&*r!]", "[c1*d2*e3],[r$*s&*t!]")
+    # Wrapping around
+    test_scramble_text(3,"CS:5001: Python", "EU:5001: Ravjqp")
+    # Empty string
+    test_scramble_text(4," ", " ")
+    
 if __name__ == "__main__":
     main()
