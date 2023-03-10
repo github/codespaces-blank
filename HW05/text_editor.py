@@ -30,7 +30,7 @@ def custom_join(t_list: list)-> str:
                 joint_text = joint_text + word
     return joint_text
 
-def custom_split(t_original: str) -> list:
+def custom_split(t_original: str, include_annotations: bool) -> list:
     """ 
     This function splits the text into a list of words, based on
     [" ", ".", "\n", "\t"] as delimiters. I had to create this becasue
@@ -43,34 +43,39 @@ def custom_split(t_original: str) -> list:
     Returns:
         split_list (list): List has split words based on delimiters
     """
-    i, j = 0, 0
-    split_list = []
+    #include THIS IN THE DOCSTRIGN
+    if include_annotations:
+        i, j = 0, 0
+        split_list = []
 
-    # this loop runs = len of string
-    while i < len(t_original):
+        # this loop runs = len of string
+        while i < len(t_original):
 
-        # if the character is a delimiter
-        if t_original[i] in [" ", ".", "\n", "\t"]:
-            # create a word from j to i
-            split_word = t_original[j:i]
+            # if the character is a delimiter
+            if t_original[i] in [" ", ".", "\n", "\t"]:
+                # create a word from j to i
+                split_word = t_original[j:i]
 
-            # append only if it is not empty string
-            if split_word != "":
-                split_list.append(split_word)
-            # append the delimiter if it is a period
-            if t_original[i] == ".":
-                split_list.append(".")
+                # append only if it is not empty string
+                if split_word != "":
+                    split_list.append(split_word)
+                # append the delimiter if it is a period
+                if t_original[i] == ".":
+                    split_list.append(".")
 
-            # update j to i + 1 to start a new word and not include the delimiter
-            j = i + 1
-        i += 1
+                # update j to i + 1 to start a new word and not include the delimiter
+                j = i + 1
+            i += 1
 
-    # Check if there is any word remaining after the last delimiter
-    if j < len(t_original):
-        split_word = t_original[j:]
-        split_list.append(split_word)
+        # Check if there is any word remaining after the last delimiter
+        if j < len(t_original):
+            split_word = t_original[j:]
+            split_list.append(split_word)
 
-    return split_list
+        return split_list
+    
+    else:
+        return t_original.split()
 
 def append(current_text: str, new_text: str)-> str:
     """_summary_
@@ -82,7 +87,18 @@ def append(current_text: str, new_text: str)-> str:
     Returns:
         str: _description_
     """
-    return current_text + " " + new_text
+    # if empty, no need to add space
+    if not current_text:
+        return new_text
+    elif new_text != "":
+        # if already has space, no need to add space
+        if new_text[0] == " ":
+            return current_text + new_text
+        # if not - add space
+        else:
+            return current_text + " " + new_text
+    elif new_text == "":
+        return current_text
 
 def add(current_text: str, new_text: str, start: int)-> str:
     """_summary_
@@ -95,12 +111,18 @@ def add(current_text: str, new_text: str, start: int)-> str:
     Returns:
         str: _description_
     """
-    t_split = custom_split(current_text)
-    split_1 = " ".join (t_split[:start])
-    split_2 = " ".join (t_split[start:])
-    if start < 0:
-        return new_text + " " + current_text
-    return split_1 + " " + new_text + " " + split_2
+    t_split = custom_split(current_text, False)
+    if start >= len(t_split):
+        return current_text + " " + new_text
+    else:
+        split_1 = custom_join(t_split[:start])
+        split_2 = custom_join(t_split[start:])
+        if start < 0:
+            return new_text + " " + current_text
+        elif start == 0:
+            return new_text + " " + current_text
+        else:
+            return split_1 + " " + new_text + " " + split_2
 
 def substitute(current_text: str, word: str, new_word: str)-> str:
     """_summary_
@@ -114,7 +136,7 @@ def substitute(current_text: str, word: str, new_word: str)-> str:
         str: _description_
     """
     i = 0
-    t_split = custom_split(current_text)
+    t_split = custom_split(current_text, True)
     # learn't that for loop iterates
     # over a copy of the list
     # hence, we use while loop

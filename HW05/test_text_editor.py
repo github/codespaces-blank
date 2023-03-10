@@ -96,7 +96,9 @@ def main():
     # Empty append
     test_append(1,"Hello World", "", "Hello World")
     # Empty original
-    test_append(2,"", "to CS-5001", " to CS-5001")
+    test_append(2,"", "to CS-5001", "to CS-5001")
+    # Gradescope test case
+    test_append(3,"this is a", " scooby doo!", "this is a scooby doo!")
 
 
     print("\n\n------------------ Test Cases for insert ------------------")
@@ -105,13 +107,16 @@ def main():
     # Ideal case
     test_add(0, t_original, t_insert, 1, "I ### like apple")
     # Insert at beginning
-    test_add(1, t_original, t_insert, 0, " ### I like apples")
+    test_add(1, t_original, t_insert, 0, "### I like apples")
     # Insert at end
     test_add(2, t_original, t_insert, 3, "I like apples ###")
     # Greater than 3
     test_add(3, t_original, t_insert, 5, "I like apples ###")
     # Negative position
     test_add(4, t_original, t_insert, -1, "### I like apples")
+    # Gradescope test case
+    test_add(5, "This is a long long sentence. It has some long words.", \
+             "beware the ring", 11, "This is a long long sentence. beware the ring It has some long words.")
 
 
     print("\n\n--------------- Test Cases for substitute ---------------")
