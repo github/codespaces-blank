@@ -25,10 +25,10 @@ def custom_join(t_list: list) -> str:
         if not joint_text:
             joint_text = joint_text + t_list[i]
         else:
-            # if t_list[i-1] == " ":
-            #     joint_text = joint_text + t_list[i]
-            #     i += 1
-            if t_list[i] != ".":
+            if t_list[i-1] == " ":
+                joint_text = joint_text + t_list[i]
+                i += 1
+            elif t_list[i] != ".":
                 joint_text = joint_text + " " + t_list[i]
             else:
                 joint_text = joint_text + t_list[i]
