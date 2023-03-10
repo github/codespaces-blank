@@ -20,7 +20,7 @@ def test_append(case_number: int, t_original: str,
     """
     t_actual = t_editor.append(t_original, t_append)
     print (f"\nAppend text, Test Case {case_number}:\
-           \nOut:{t_actual}\nExp:{t_expected}")
+           \nOut:'{t_actual}'\nExp:'{t_expected}'")
 
 def test_add(case_number: int, t_original: str,
                      t_insert: str, position: int, t_expected: str)-> str:
@@ -99,6 +99,8 @@ def main():
     test_append(2,"", "to CS-5001", "to CS-5001")
     # Gradescope test case
     test_append(3,"this is a", " scooby doo!", "this is a scooby doo!")
+    # Gradescope test case 2
+    test_append(4,"this is a", "scooby doo!", "this is a scooby doo!")
 
 
     print("\n\n------------------ Test Cases for insert ------------------")
@@ -132,6 +134,9 @@ def main():
     test_substitute(3, t_original, "apples" , "", "I like .")
     # Case senstive
     test_substitute(4, t_original, "Apples", t_new, "I like apples.")
+    # Gradescope test case
+    test_substitute(5,"This is a long long sentence. It has some long words.", "This", "  ", \
+                    " is a long long sentence. It has some long words.")
 
 
     print("\n\n--------------- Test Cases for scramble ---------------")

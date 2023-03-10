@@ -6,7 +6,7 @@ This program is a text editor that can append, insert,
 and substitute text.
 """
 
-def custom_join(t_list: list)-> str:
+def custom_join(t_list: list) -> str:
     """
     This function joins a list of words into a string. 
     DOES NOT ADD A SPACE when joining "."
@@ -20,15 +20,27 @@ def custom_join(t_list: list)-> str:
                            before "."
     """
     joint_text = ""
-    for word in t_list:
+    i = 0
+    while i < len(t_list):
         if not joint_text:
-            joint_text = joint_text + word
+            joint_text = joint_text + t_list[i]
         else:
-            if word != ".":
-                joint_text = joint_text + " " + word
+            if t_list[i-1] == " ":
+                joint_text = joint_text + t_list[i]
+            if t_list[i] != ".":
+                joint_text = joint_text + " " + t_list[i]
             else:
-                joint_text = joint_text + word
+                joint_text = joint_text + t_list[i]
     return joint_text
+    # for word in t_list:
+    #     if not joint_text:
+    #         joint_text = joint_text + word
+    #     else:
+    #         if word != ".":
+    #             joint_text = joint_text + " " + word
+    #         else:
+    #             joint_text = joint_text + word
+    # return joint_text
 
 def custom_split(t_original: str, include_annotations: bool) -> list:
     """ 
@@ -43,7 +55,7 @@ def custom_split(t_original: str, include_annotations: bool) -> list:
     Returns:
         split_list (list): List has split words based on delimiters
     """
-    #include THIS IN THE DOCSTRIGN
+    # include THIS IN THE DOCSTRIGN
     if include_annotations:
         i, j = 0, 0
         split_list = []
@@ -77,7 +89,7 @@ def custom_split(t_original: str, include_annotations: bool) -> list:
     else:
         return t_original.split()
 
-def append(current_text: str, new_text: str)-> str:
+def append(current_text: str, new_text: str) -> str:
     """_summary_
 
     Args:
@@ -87,20 +99,24 @@ def append(current_text: str, new_text: str)-> str:
     Returns:
         str: _description_
     """
-    # if empty, no need to add space
+    # 1. if empty, no need to add space
     if not current_text:
         return new_text
     elif new_text != "":
-        # if already has space, no need to add space
+        # 2. if new_text has space
         if new_text[0] == " ":
             return current_text + new_text
-        # if not - add space
+        # 3. if current_text has space
+        elif current_text[-1] == " ":
+            return current_text + new_text
+        # 4. if both have no space
         else:
             return current_text + " " + new_text
+    # 5. if new_text is empty
     elif new_text == "":
         return current_text
 
-def add(current_text: str, new_text: str, start: int)-> str:
+def add(current_text: str, new_text: str, start: int) -> str:
     """_summary_
 
     Args:
@@ -124,7 +140,7 @@ def add(current_text: str, new_text: str, start: int)-> str:
         else:
             return split_1 + " " + new_text + " " + split_2
 
-def substitute(current_text: str, word: str, new_word: str)-> str:
+def substitute(current_text: str, word: str, new_word: str) -> str:
     """_summary_
 
     Args:
@@ -142,12 +158,15 @@ def substitute(current_text: str, word: str, new_word: str)-> str:
     # hence, we use while loop
     while i < len(t_split):
         if t_split[i] == word:
-            t_split[i] = new_word
+            if new_word == "  ":
+                t_split[i] = " "
+            else:
+                t_split[i] = new_word
         i += 1
 
     return custom_join(t_split)
 
-def scramble(current_text: str)-> str:
+def scramble(current_text: str) -> str:
     """_summary_
 
     Args:
