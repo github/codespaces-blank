@@ -22,7 +22,7 @@ def test_append(case_number: int, t_original: str,
     print (f"\nAppend text, Test Case {case_number}:\
            \nOut:{t_actual}\nExp:{t_expected}")
 
-def test_insert(case_number: int, t_original: str,
+def test_add(case_number: int, t_original: str,
                      t_insert: str, position: int, t_expected: str)-> str:
     """_summary_
 
@@ -103,15 +103,15 @@ def main():
     t_original = "I like apples"
     t_insert = "###"
     # Ideal case
-    test_insert(0, t_original, t_insert, 1, "I ### like apple")
+    test_add(0, t_original, t_insert, 1, "I ### like apple")
     # Insert at beginning
-    test_insert(1, t_original, t_insert, 0, " ### I like apples")
+    test_add(1, t_original, t_insert, 0, " ### I like apples")
     # Insert at end
-    test_insert(2, t_original, t_insert, 3, "I like apples ###")
+    test_add(2, t_original, t_insert, 3, "I like apples ###")
     # Greater than 3
-    test_insert(3, t_original, t_insert, 5, "I like apples ###")
+    test_add(3, t_original, t_insert, 5, "I like apples ###")
     # Negative position
-    test_insert(4, t_original, t_insert, -1, "### I like apples")
+    test_add(4, t_original, t_insert, -1, "### I like apples")
 
 
     print("\n\n--------------- Test Cases for substitute ---------------")

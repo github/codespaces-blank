@@ -65,6 +65,11 @@ def custom_split(t_original: str) -> list:
             j = i + 1
         i += 1
 
+    # Check if there is any word remaining after the last delimiter
+    if j < len(t_original):
+        split_word = t_original[j:]
+        split_list.append(split_word)
+
     return split_list
 
 def append(current_text: str, new_text: str)-> str:
