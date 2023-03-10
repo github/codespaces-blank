@@ -38,7 +38,7 @@ def test_add(case_number: int, t_original: str,
     print (f"\nInsert Text, Test Case {case_number}:\
            \nOut:{t_actual}\nExp:{t_expected}")
 
-def test_substitute(case_number: int, t_original: str, 
+def test_substitute(case_number: int, t_original: str,
                          t_sub: str, t_new: str, t_expected: str)-> str:
     """_summary_
 
@@ -166,6 +166,6 @@ def main():
     test_unscramble(4,"AaBb", "YyZz")
     # Empty string
     test_unscramble(5," ", " ")
-        
+
 if __name__ == "__main__":
     main()

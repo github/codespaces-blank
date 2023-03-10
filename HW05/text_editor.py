@@ -25,22 +25,15 @@ def custom_join(t_list: list) -> str:
         if not joint_text:
             joint_text = joint_text + t_list[i]
         else:
-            if t_list[i-1] == " ":
-                joint_text = joint_text + t_list[i]
+            # if t_list[i-1] == " ":
+            #     joint_text = joint_text + t_list[i]
+            #     i += 1
             if t_list[i] != ".":
                 joint_text = joint_text + " " + t_list[i]
             else:
                 joint_text = joint_text + t_list[i]
+        i += 1
     return joint_text
-    # for word in t_list:
-    #     if not joint_text:
-    #         joint_text = joint_text + word
-    #     else:
-    #         if word != ".":
-    #             joint_text = joint_text + " " + word
-    #         else:
-    #             joint_text = joint_text + word
-    # return joint_text
 
 def custom_split(t_original: str, include_annotations: bool) -> list:
     """ 
@@ -85,7 +78,7 @@ def custom_split(t_original: str, include_annotations: bool) -> list:
             split_list.append(split_word)
 
         return split_list
-    
+
     else:
         return t_original.split()
 
