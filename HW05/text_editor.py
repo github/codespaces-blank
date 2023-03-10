@@ -67,7 +67,7 @@ def custom_split(t_original: str) -> list:
 
     return split_list
 
-def append_text(t_original: str, t_append: str)-> str:
+def append(current_text: str, new_text: str)-> str:
     """_summary_
 
     Args:
@@ -77,9 +77,9 @@ def append_text(t_original: str, t_append: str)-> str:
     Returns:
         str: _description_
     """
-    return t_original + " " + t_append
+    return current_text + " " + new_text
 
-def insert_text(t_original: str, t_insert: str, position: int)-> str:
+def add(current_text: str, new_text: str, start: int)-> str:
     """_summary_
 
     Args:
@@ -90,14 +90,14 @@ def insert_text(t_original: str, t_insert: str, position: int)-> str:
     Returns:
         str: _description_
     """
-    t_split = custom_split(t_original)
-    split_1 = " ".join (t_split[:position])
-    split_2 = " ".join (t_split[position:])
-    if position < 0:
-        return t_insert + " " + t_original
-    return split_1 + " " + t_insert + " " + split_2
+    t_split = custom_split(current_text)
+    split_1 = " ".join (t_split[:start])
+    split_2 = " ".join (t_split[start:])
+    if start < 0:
+        return new_text + " " + current_text
+    return split_1 + " " + new_text + " " + split_2
 
-def substitute_text(t_original: str, t_sub: str, t_new: str)-> str:
+def substitute(current_text: str, word: str, new_word: str)-> str:
     """_summary_
 
     Args:
@@ -109,18 +109,18 @@ def substitute_text(t_original: str, t_sub: str, t_new: str)-> str:
         str: _description_
     """
     i = 0
-    t_split = custom_split(t_original)
+    t_split = custom_split(current_text)
     # learn't that for loop iterates
     # over a copy of the list
     # hence, we use while loop
     while i < len(t_split):
-        if t_split[i] == t_sub:
-            t_split[i] = t_new
+        if t_split[i] == word:
+            t_split[i] = new_word
         i += 1
 
     return custom_join(t_split)
 
-def scramble_text(t_original: str)-> str:
+def scramble(current_text: str)-> str:
     """_summary_
 
     Args:
@@ -130,10 +130,10 @@ def scramble_text(t_original: str)-> str:
         str: _description_
     """
     result  = ''
-    for char in t_original:
+    for char in current_text:
         ascii_number = ord(char)
         if 64 < ascii_number < 91 or 96 < ascii_number < 123:
-            if (ascii_number + 2) > 122:
+            if (ascii_number + 2) > 122 or 90 < (ascii_number + 2) < 97 :
                 new_char = chr(ascii_number - 24)
             else:
                 new_char = chr(ascii_number + 2)
@@ -142,8 +142,7 @@ def scramble_text(t_original: str)-> str:
             result = result + char
     return result
 
-
-def unscramble_text(t_original: str)-> str:
+def unscramble(current_text: str)-> str:
     """_summary_
 
     Args:
@@ -153,14 +152,15 @@ def unscramble_text(t_original: str)-> str:
         str: _description_
     """
     result  = ''
-    for char in t_original:
+    for char in current_text:
         ascii_number = ord(char)
         if 64 < ascii_number < 91 or 96 < ascii_number < 123:
-            if (ascii_number - 2) < 65:
+            if 90 < (ascii_number - 2) < 97 or (ascii_number - 2) < 65:
                 new_char = chr(ascii_number + 24)
             else:
                 new_char = chr(ascii_number - 2)
             result = result + new_char
         else:
             result = result + char
-    return result    
+    return result
+   
