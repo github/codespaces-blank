@@ -20,7 +20,7 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "yarn install",
+	"postCreateCommand": "RUN apt-get update && apt-get install gnupg2 -y"
 
 	// Configure tool-specific properties.
 	// "customizations": {
