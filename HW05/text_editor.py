@@ -21,18 +21,22 @@ def custom_join(t_list: list) -> str:
     """
     joint_text = ""
     i = 0
+    # this loop runs = len of list
     while i < len(t_list):
+        # for the first iteration - no need to add space
         if not joint_text:
             joint_text = joint_text + t_list[i]
+            i += 1
+        # after the first iteration
         else:
-            if t_list[i-1] == " ":
-                joint_text = joint_text + t_list[i]
-                i += 1
-            elif t_list[i] != ".":
+            # if the word is NOT A period - add space
+            if t_list[i] != ".":
                 joint_text = joint_text + " " + t_list[i]
+            # if the word is a period - DO NOT add space
             else:
                 joint_text = joint_text + t_list[i]
         i += 1
+
     return joint_text
 
 def custom_split(t_original: str, include_annotations: bool) -> list:
@@ -44,11 +48,11 @@ def custom_split(t_original: str, include_annotations: bool) -> list:
     
     Args:
         t_original (str): Original text to be split
+        include_annotations (bool): If True, include annotations in the split
 
     Returns:
         split_list (list): List has split words based on delimiters
     """
-    # include THIS IN THE DOCSTRIGN
     if include_annotations:
         i, j = 0, 0
         split_list = []
@@ -79,18 +83,21 @@ def custom_split(t_original: str, include_annotations: bool) -> list:
 
         return split_list
 
+    # if we do not want to include annotations
     else:
         return t_original.split()
 
 def append(current_text: str, new_text: str) -> str:
-    """_summary_
-
+    """
+    This function appends the new string to the current string.
+    Adds a space between the two strings if both strings do not.
+    
     Args:
-        t_original (str): _description_
-        t_append (str): _description_
+        current_text (str): Original string to which new string is to be appended
+        new_text (str): Text to be appended to the original string
 
     Returns:
-        str: _description_
+        current_text (str): String with new text appended
     """
     # 1. if empty, no need to add space
     if not current_text:
@@ -110,39 +117,53 @@ def append(current_text: str, new_text: str) -> str:
         return current_text
 
 def add(current_text: str, new_text: str, start: int) -> str:
-    """_summary_
-
+    """
+    This function inserts the "new string" at the "specified position".
+    if the new string is added at the beginning (0) - space only on the right
+    if position < 0, appends to the front of the string & space only on right
+    else adds space on both sides of new string.
+    
     Args:
-        original_text (str): _description_
-        new_text (str): _description_
-        position (int): _description_
+        current_text (str): Original text to which new text is to be added
+        new_text (str): New peice of text to be added to the original text
+        start (int): position at which new text is to be added
 
     Returns:
         str: _description_
     """
+    # split the text into a list of words
+    # keeping the annotations seperately
     t_split = custom_split(current_text, False)
+    
+    # if start is greater than length of list, add it to the end
     if start >= len(t_split):
         return current_text + " " + new_text
     else:
         split_1 = custom_join(t_split[:start])
         split_2 = custom_join(t_split[start:])
+        # if start is negative, add it to the front, space only on right
         if start < 0:
             return new_text + " " + current_text
+        # if start is 0, add it to the front, space only on left
         elif start == 0:
             return new_text + " " + current_text
+        # if positon above 0, add space on both sides
         else:
             return split_1 + " " + new_text + " " + split_2
 
 def substitute(current_text: str, word: str, new_word: str) -> str:
-    """_summary_
+    """
+    This function substitutes the "word" with the "new word" in the "original text".
+    It iterates over all the words in the text and 
+    replaces the word with the new word.
 
     Args:
-        t_original (str): _description_
-        t_sub (str): _description_
-        t_new (str): _description_
+        current_text (str): Original text in which the word is to be replaced
+        word (str): string to be replaced
+        new_word (str): string to be replaced with
 
     Returns:
-        str: _description_
+        (str): Version of original text with the word replaced with the new word
     """
     i = 0
     t_split = custom_split(current_text, True)
@@ -150,6 +171,7 @@ def substitute(current_text: str, word: str, new_word: str) -> str:
     # over a copy of the list
     # hence, we use while loop
     while i < len(t_split):
+        # if the word is found
         if t_split[i] == word:
             if new_word == "  ":
                 t_split[i] = " "
