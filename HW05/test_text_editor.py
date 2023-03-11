@@ -3,92 +3,123 @@ CS - 5001
 Pranchal Shah
 HW 05
 This is a test file that tests each function in text_editor.py
+It creats five functions to test each function in text_editor.py
 """
 import text_editor as t_editor
 
-def test_append(case_number: int, t_original: str,
-                     t_append: str, t_expected: str)-> str:
-    """_summary_
+def test_append(case_number: int, current_text: str,
+                     new_text: str, text_expected: str)-> str:
+    """
+    This function tests the append feature of the text editor program.
+    It takes in a current text, a new text to be appended, and the expected
+    resulting text. The function then calls the append function of the text
+    editor program and prints the actual result with the expected result.
 
     Args:
-        t_original (str): _description_
-        t_append (str): _description_
-        expected (str): _description_
+        case_number (int): A unique identifier for the test case
+        current_text (str): The original text that the new text will be appended to
+        new_text (str): The text to be appended to the current text
+        text_expected (str): The expected result after appending the new text
 
     Returns:
-        str: _description_
+        None. The function prints the actual and expected results for the test case.
     """
-    t_actual = t_editor.append(t_original, t_append)
+    t_actual = t_editor.append(current_text, new_text)
     print (f"\nAppend text, Test Case {case_number}:\
-           \nOut:'{t_actual}'\nExp:'{t_expected}'")
+           \nOut:'{t_actual}'\nExp:'{text_expected}'")
 
-def test_add(case_number: int, t_original: str,
-                     t_insert: str, position: int, t_expected: str)-> str:
-    """_summary_
+def test_add(case_number: int, current_text: str,
+                     new_text: str, position: int, text_expected: str)-> str:
+    """
+    This function tests the insert feature of the text editor program.
+    It takes in the current_text, the text to be inserted,
+    the position to insert the text, and the expected resulting text.
+    The function then calls the add function of the text editor program
+    and prints the actual result with the expected result.
 
     Args:
-        t_original (str): _description_
-        t_insert (str): _description_
-        position (int): _description_
+        case_number (int): A unique identifier for the test case
+        current_text (str): The original text before inserting the new text
+        new_text (str): The text to be inserted into the original text
+        position (int): The position in the original text to insert the new text
+        text_expected (str): The expected result after inserting the new text
 
     Returns:
-        str: _description_
+        None. The function prints the actual and expected results for the test case.
     """
-    t_actual = t_editor.add(t_original, t_insert, position)
+    t_actual = t_editor.add(current_text, new_text, position)
     print (f"\nInsert Text, Test Case {case_number}:\
-           \nOut:{t_actual}\nExp:{t_expected}")
+           \nOut:{t_actual}\nExp:{text_expected}")
 
-def test_substitute(case_number: int, t_original: str,
-                         t_sub: str, t_new: str, t_expected: str)-> str:
-    """_summary_
+def test_substitute(case_number: int, current_text: str,
+                         word: str, new_word: str, text_expected: str)-> str:
+    """
+    This function tests the substitute function of the text editor program.
+    It takes in the current text, the word to be replaced, the new word to replace it,
+    and the expected resulting text. The function then calls the substitute function
+    of the text editor program and compares the actual result with the expected result.
 
     Args:
-        case_number (int): _description_
-        t_original (str): _description_
-        t_sub (str): _description_
-        t_new (str): _description_
-        t_expected (str): _description_
+        case_number (int): A unique identifier for the test case
+        current_text (str): The current text before substituting the word
+        word (str): The word to be replaced in the current text
+        new_word (str): The new word to replace the old word in the current text
+        text_expected (str): The expected result after substituting the word
 
     Returns:
-        str: _description_
+        None. The function prints the actual and expected results for the test case.  
     """
-    t_actual = t_editor.substitute(t_original, t_sub, t_new)
+    t_actual = t_editor.substitute(current_text, word, new_word)
     print (f"\nSubstitute Text, Test Case {case_number}:\
-           \nOut:{t_actual}\nExp:{t_expected}")
+           \nOut:{t_actual}\nExp:{text_expected}")
 
-def test_scramble(case_number: int, t_original: str, t_expected: str)-> str:
-    """_summary_
+def test_scramble(case_number: int, current_text: str, text_expected: str)-> str:
+    """
+    This function tests the scramble function of the text editor program.
+    It takes in the current text and the expected resulting text after scrambling.
+    The function then calls the scramble function of the text editor program
+    and compares the actual result with the expected result.
 
     Args:
-        case_number (int): _description_
-        t_original (str): _description_
-        t_expected (str): _description_
+        case_number (int): A unique identifier for the test case
+        current_text (str): The current text before scrambling
+        text_expected (str): The expected result after scrambling the text
 
     Returns:
-        str: _description_
+        None. The function prints the actual and expected results for the test case.
     """
-    t_actual = t_editor.scramble(t_original)
+    t_actual = t_editor.scramble(current_text)
     print (f"\nUn-Scramble Text, Test Case {case_number}:\
-           \nOut:{t_actual}\nExp:{t_expected}")
+           \nOut:{t_actual}\nExp:{text_expected}")
 
-def test_unscramble(case_number: int, t_original: str, t_expected: str)-> str:
-    """_summary_
+def test_unscramble(case_number: int, current_text: str, text_expected: str)-> str:
+    """
+    This function tests the `unscramble` method of the text editor.
 
     Args:
-        case_number (int): _description_
-        t_original (str): _description_
-        t_expected (str): _description_
+        case_number (int): The index of the test case.
+        current_text (str): The original text before scrambling.
+        text_expected (str): The expected unscrambled text.
 
     Returns:
-        str: _description_
+        str: A string representing the result of the test case.
     """
-    t_actual = t_editor.unscramble(t_original)
+    t_actual = t_editor.unscramble(current_text)
     print (f"\nScramble Text, Test Case {case_number}:\
-           \nOut:{t_actual}\nExp:{t_expected}")
+           \nOut:{t_actual}\nExp:{text_expected}")
 
 def main():
     """
-    _summary_
+    This function is used to test the functionality of the string editing methods
+    'append', 'insert', 'substitute', 'scramble', and 'unscramble'. The function
+    calls each of these methods and passes in various test cases to ensure that
+    the methods are working as intended. Each test case is numbered for easy reference.
+
+    Args:
+        None
+
+    Returns:
+        None
     """
     print("------------------ Test Cases for append ------------------")
     # Ideal case

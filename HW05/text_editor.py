@@ -3,7 +3,8 @@ CS - 5001
 Pranchal Shah
 HW 05
 This program is a text editor that can append, insert, 
-and substitute text.
+substitute text, scramble and unscramble text.
+It also includes two helper functions custom_join() and custom_split()
 """
 
 def custom_join(t_list: list) -> str:
@@ -142,10 +143,7 @@ def add(current_text: str, new_text: str, start: int) -> str:
         split_1 = custom_join(t_split[:start])
         split_2 = custom_join(t_split[start:])
         # if start is negative, add it to the front, space only on right
-        if start < 0:
-            return new_text + " " + current_text
-        # if start is 0, add it to the front, space only on left
-        elif start == 0:
+        if start <= 0:
             return new_text + " " + current_text
         # if positon above 0, add space on both sides
         else:
@@ -173,29 +171,35 @@ def substitute(current_text: str, word: str, new_word: str) -> str:
     while i < len(t_split):
         # if the word is found
         if t_split[i] == word:
-            if new_word == "  ":
-                t_split[i] = " "
-            else:
-                t_split[i] = new_word
+            t_split[i] = new_word
         i += 1
 
     return custom_join(t_split)
 
 def scramble(current_text: str) -> str:
-    """_summary_
-
+    """
+    This function scrambles the text by shifting the letters by ascii + 2.
+    If the letter is a-z, it shifts it by 2.
+    If the letter is A-Z, it shifts it by 2.
+    if the letter is outside a-z or A-Z, wraps around to the beginning.
+    
     Args:
-        t_original (str): _description_
+        current_text (str): Text which is to be scrambled
 
     Returns:
-        str: _description_
+        result (str): Scrambled text
     """
     result  = ''
     for char in current_text:
+        # get the ascii number for the character
         ascii_number = ord(char)
+        # check if the char ascii is inside the range of a-z or A-Z
         if 64 < ascii_number < 91 or 96 < ascii_number < 123:
+            # if the new char (ascii + 2) is outside the range of a-z or A-Z
+            # wrap around to the beginning
             if (ascii_number + 2) > 122 or 90 < (ascii_number + 2) < 97 :
                 new_char = chr(ascii_number - 24)
+            # if inside the range, shift by 2
             else:
                 new_char = chr(ascii_number + 2)
             result = result + new_char
@@ -204,18 +208,25 @@ def scramble(current_text: str) -> str:
     return result
 
 def unscramble(current_text: str)-> str:
-    """_summary_
+    """
+    This function unscrambles the text scrambled by function scramble.
+    by shifting the letters by ascii - 2.
+    if the letter is a-z or A-Z, it shifts back by 2.
 
     Args:
-        t_original (str): _description_
+        current_text (str): text scrambled by function scramble, or 
+                            text which is to be unscrambled
 
     Returns:
-        str: _description_
+        result (str): Unscrambled text
     """
     result  = ''
     for char in current_text:
         ascii_number = ord(char)
+        # check if the char ascii is inside the range of a-z or A-Z
         if 64 < ascii_number < 91 or 96 < ascii_number < 123:
+            # if new char is outside the range of a-z or A-Z
+            # Wrap around to the end
             if 90 < (ascii_number - 2) < 97 or (ascii_number - 2) < 65:
                 new_char = chr(ascii_number + 24)
             else:

@@ -1,10 +1,16 @@
 import text_editor as t_editor
 
 def main():
+    """
+    This is a program for a simple text editor. 
+    It provides a menu of options for the user to manipulate a string of text, 
+    including appending, inserting, substituting, scrambling, unscrambling, and printing the text. 
+    The program continues to prompt the user for input until they choose to quit.
+    """
     current_text = ""
     scrambled_text = ""
     while True:
-        print("\n-------Main Menu:-------")
+        print("\n_______Main Menu:________")
         print("a. Start with blank text.")
         print("b. Append to current text")
         print("c. Add text to current text at a specified position.")
@@ -13,8 +19,9 @@ def main():
         print("f. Unscramble current text.")
         print("g. Print current text.")
         print("h. Quit")
+        print("__________________________")
 
-        user_input = str(input("Please select a option:"))
+        user_input = str(input("\nPlease select a option:"))
 
         if user_input == "a":
             current_text = str(input("Please enter the text you want to start with: "))
@@ -49,12 +56,12 @@ def main():
             print(f"The current text is: {current_text}")
 
         elif user_input == "h":
+            print("Exiting program.")
             break
         else:
             print("Please enter a valid option.")
 
 
-    print("Exiting program.")
 
 if __name__ == "__main__":
     main()
