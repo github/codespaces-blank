@@ -10,7 +10,8 @@
 		"ghcr.io/devcontainers/features/node:1": {},
 		"ghcr.io/devcontainers-contrib/features/direnv-asdf:2": {},
 		"ghcr.io/withfig/features/fig:1": {},
-		"ghcr.io/trunk-io/devcontainer-feature/trunk:1": {}
+		"ghcr.io/trunk-io/devcontainer-feature/trunk:1": {},
+		"ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {}
 	},
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
@@ -20,7 +21,7 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "RUN apt-get update && apt-get install gnupg2 -y"
+	// "postCreateCommand": "apt-get update && apt-get install gnupg2 -y"
 
 	// Configure tool-specific properties.
 	// "customizations": {
