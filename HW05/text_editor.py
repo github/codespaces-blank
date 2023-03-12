@@ -27,7 +27,6 @@ def custom_join(t_list: list) -> str:
         # for the first iteration - no need to add space
         if not joint_text:
             joint_text = joint_text + t_list[i]
-            i += 1
         # after the first iteration
         else:
             # if the word is NOT A period - add space

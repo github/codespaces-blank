@@ -71,7 +71,7 @@ def test_substitute(case_number: int, current_text: str,
     """
     t_actual = t_editor.substitute(current_text, word, new_word)
     print (f"\nSubstitute Text, Test Case {case_number}:\
-           \nOut:{t_actual}\nExp:{text_expected}")
+           \nOut:'{t_actual}'\nExp:'{text_expected}'")
 
 def test_scramble(case_number: int, current_text: str, text_expected: str)-> str:
     """
@@ -167,7 +167,7 @@ def main():
     test_substitute(4, t_original, "Apples", t_new, "I like apples.")
     # Gradescope test case
     test_substitute(5,"This is a long long sentence. It has some long words.", "This", "  ", \
-                    " is a long long sentence. It has some long words.")
+                    "   is a long long sentence. It has some long words.")
 
 
     print("\n\n--------------- Test Cases for scramble ---------------")
