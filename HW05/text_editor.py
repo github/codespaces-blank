@@ -72,7 +72,7 @@ def custom_split(t_original: str, include_annotations: bool) -> list:
                 if t_original[i] == ".":
                     split_list.append(".")
 
-                # update j to i + 1 to start a new word and not include the delimiter
+                # update j to i + 1 to start a new word
                 j = i + 1
             i += 1
 
@@ -93,7 +93,7 @@ def append(current_text: str, new_text: str) -> str:
     Adds a space between the two strings if both strings do not.
     
     Args:
-        current_text (str): Original string to which new string is to be appended
+        current_text (str): Original string
         new_text (str): Text to be appended to the original string
 
     Returns:
@@ -150,7 +150,7 @@ def add(current_text: str, new_text: str, start: int) -> str:
 
 def substitute(current_text: str, word: str, new_word: str) -> str:
     """
-    This function substitutes the "word" with the "new word" in the "original text".
+    This function substitutes "word" with "new word" in "original text".
     It iterates over all the words in the text and 
     replaces the word with the new word.
 
@@ -160,7 +160,7 @@ def substitute(current_text: str, word: str, new_word: str) -> str:
         new_word (str): string to be replaced with
 
     Returns:
-        (str): Version of original text with the word replaced with the new word
+        (str): Version of original text with word replaced
     """
     i = 0
     t_split = custom_split(current_text, True)
@@ -188,7 +188,7 @@ def scramble(current_text: str) -> str:
     Returns:
         result (str): Scrambled text
     """
-    result  = ''
+    result = ''
     for char in current_text:
         # get the ascii number for the character
         ascii_number = ord(char)
@@ -196,7 +196,7 @@ def scramble(current_text: str) -> str:
         if 64 < ascii_number < 91 or 96 < ascii_number < 123:
             # if the new char (ascii + 2) is outside the range of a-z or A-Z
             # wrap around to the beginning
-            if (ascii_number + 2) > 122 or 90 < (ascii_number + 2) < 97 :
+            if (ascii_number + 2) > 122 or 90 < (ascii_number + 2) < 97:
                 new_char = chr(ascii_number - 24)
             # if inside the range, shift by 2
             else:
@@ -219,7 +219,7 @@ def unscramble(current_text: str)-> str:
     Returns:
         result (str): Unscrambled text
     """
-    result  = ''
+    result = ''
     for char in current_text:
         ascii_number = ord(char)
         # check if the char ascii is inside the range of a-z or A-Z
