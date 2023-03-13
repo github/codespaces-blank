@@ -1,0 +1,18 @@
+{
+  "imports": {
+    "react-dom": "https://esm.sh/v111/*react-dom@18.2.0",
+    "react-dom/": "https://esm.sh/v111/*react-dom@18.2.0/",
+    "react": "https://esm.sh/v111/react@18.2.0",
+    "react/": "https://esm.sh/v111/react@18.2.0/",
+    "react/jsx-runtime": "https://esm.sh/v111/react@18.2.0/jsx-runtime",
+    "mdx-js/mdx": "https://esm.sh/v111/@mdx-js/mdx@2.3.0",
+    "rehype-highlight": "https://esm.sh/v111/rehype-highlight@6.0.0",
+    "remark-gfm": "https://esm.sh/remark-gfm@3.0.1"
+  },
+  "scopes": {
+    "https://esm.sh/v111/": {
+      "loose-envify": "https://esm.sh/v111/loose-envify@1.4.0",
+      "scheduler": "https://esm.sh/v111/scheduler@0.23.0"
+    }
+  }
+}
