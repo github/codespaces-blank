@@ -206,7 +206,7 @@ def scramble(current_text: str) -> str:
             result = result + char
     return result
 
-def unscramble(current_text: str)-> str:
+def unscramble(current_text: str) -> str:
     """
     This function unscrambles the text scrambled by function scramble.
     by shifting the letters by ascii - 2.

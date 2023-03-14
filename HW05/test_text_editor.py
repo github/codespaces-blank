@@ -29,7 +29,7 @@ def test_append(case_number: int, current_text: str,
            \nOut:'{t_actual}'\nExp:'{text_expected}'")
 
 def test_add(case_number: int, current_text: str,
-            new_text: str, position: int, text_expected: str) -> str:
+             new_text: str, position: int, text_expected: str) -> str:
     """
     This function tests the insert feature of the text editor program.
     It takes in the current_text, the text to be inserted,
@@ -73,7 +73,8 @@ def test_substitute(case_number: int, current_text: str,
     print(f"\nSubstitute Text, Test Case {case_number}:\
          \nOut:'{t_actual}'\nExp:'{text_expected}'")
 
-def test_scramble(case_number: int, current_text: str, text_expected: str) -> str:
+def test_scramble(case_number: int, current_text: str, 
+                  text_expected: str) -> str:
     """
     This function tests the scramble function of the text editor program.
     It takes in current text and expected resulting text after scrambling.
@@ -92,7 +93,7 @@ def test_scramble(case_number: int, current_text: str, text_expected: str) -> st
     print(f"\nUn-Scramble Text, Test Case {case_number}:\
          \nOut:{t_actual}\nExp:{text_expected}")
 
-def test_unscramble(case_number: int, current_text: str, \
+def test_unscramble(case_number: int, current_text: str,
                     text_expected: str) -> str:
     """
     This function tests the `unscramble` method of the text editor.
@@ -136,34 +137,35 @@ def main():
     test_append(4, "this is a", "scooby doo!", "this is a scooby doo!")
 
     print("\n\n------------------ Test Cases for insert ------------------")
-    t_original = "I like apples"
+    current_text = "I like apples"
     t_insert = "###"
     # Ideal case
-    test_add(0, t_original, t_insert, 1, "I ### like apple")
+    test_add(0, current_text, t_insert, 1, "I ### like apple")
     # Insert at beginning
-    test_add(1, t_original, t_insert, 0, "### I like apples")
+    test_add(1, current_text, t_insert, 0, "### I like apples")
     # Insert at end
-    test_add(2, t_original, t_insert, 3, "I like apples ###")
+    test_add(2, current_text, t_insert, 3, "I like apples ###")
     # Greater than 3
-    test_add(3, t_original, t_insert, 5, "I like apples ###")
+    test_add(3, current_text, t_insert, 5, "I like apples ###")
     # Negative position
-    test_add(4, t_original, t_insert, -1, "### I like apples")
+    test_add(4, current_text, t_insert, -1, "### I like apples")
 
     print("\n\n--------------- Test Cases for substitute ---------------")
-    t_original = "I like apples."
+    current_text = "I like apples."
     t_new = "oranges"
+    long_text = "This is a long long sentence. It has some long words."
     # Ideal case
-    test_substitute(0, t_original, "apples", t_new, "I like oranges.")
+    test_substitute(0, current_text, "apples", t_new, "I like oranges.")
     # Sub not in original
-    test_substitute(1, t_original, "bananas", t_new, "I like apples.")
+    test_substitute(1, current_text, "bananas", t_new, "I like apples.")
     # Empty original
     test_substitute(2, "", "apples", t_new, "")
     # Empty new
-    test_substitute(3, t_original, "apples" , "", "I like .")
+    test_substitute(3, current_text, "apples" , "", "I like .")
     # Case senstive
-    test_substitute(4, t_original, "Apples", t_new, "I like apples.")
+    test_substitute(4, current_text, "Apples", t_new, "I like apples.")
     # Gradescope test case
-    test_substitute(5,"This is a long long sentence. It has some long words.", "This", "  ", \
+    test_substitute(5, long_text, "This", "  ",
                     "   is a long long sentence. It has some long words.")
 
     print("\n\n--------------- Test Cases for scramble ---------------")
