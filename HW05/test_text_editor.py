@@ -161,7 +161,7 @@ def main():
     # Empty original
     test_substitute(2, "", "apples", t_new, "")
     # Empty new
-    test_substitute(3, current_text, "apples" , "", "I like .")
+    test_substitute(3, current_text, "apples", "", "I like .")
     # Case senstive
     test_substitute(4, current_text, "Apples", t_new, "I like apples.")
     # Gradescope test case
