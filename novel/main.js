@@ -77,4 +77,10 @@ ${strBody}
 };
 
 console.log("Will run on port 3000");
-await serve(handler, {port: 3000});
+const server = serve(handler, {port: 3000});
+
+for await (const req of server) {
+    req.respond({
+        body: 'Hello, World!'
+    });
+}
