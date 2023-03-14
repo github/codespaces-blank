@@ -52,6 +52,12 @@ const handler = async (request) => {
 ${w3css}
 ${fontawesome}
 ${hljs}
+<style>
+a {
+    color: blue;
+    text-decoration: none;
+}
+</style>
 </head>
 <body>
 <main class="w3-main w3-padding">
