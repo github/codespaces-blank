@@ -1,4 +1,4 @@
-FROM hayd/deno:latest
+FROM denoland/deno:latest
 
 EXPOSE 3000
 
@@ -6,6 +6,6 @@ WORKDIR /app
 
 ADD . /app
 
-RUN deno cache main.js
+RUN deno cache --unstable main.jsx
 
-CMD ["run", "--allow-net", "main.js"]
+CMD ["run", "--allow-net", "--allow-read", "--allow-write", "--unstable", "main.jsx"]

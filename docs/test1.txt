@@ -1,0 +1,23 @@
+# Step By Step
+
+1. Bereskan aplikasi di lokal.
+2. Build aplikasi tersebut melalui docker-compose build/up
+3. Login ke dalam dockerhub:
+    docker login --username=adilima
+
+Dalam hal ini harus dicatat di sini supaya jangan lupa, passwd = eveline-0858
+
+Setelah berhasil masuk, lakukan hal berikut:
+
+- Cari Id dari image yang baru dibuat melalui `docker images`. Dalam contoh ini,
+  yang terakhir adalah "ba7be64ca16b". Tag image dengan Id terkait menjadi "adilima/md-server",
+  yang sesuai dengan nama di repository.
+  docker tag ba7be64ca16b adilima/md-server:latest
+  Tanpa memasukkan "latest" juga memang akan memakai latest.
+
+Saya membuat image ini dengan banyak kesulitan, karena sebelumnya memakai Deno dari hayd/deno.
+Sekarang sudah diganti menjadi "denoland/deno", yang memang official, jadi mustinya problem
+yang sebelumnya ada menjadi hilang.
+
+Kita harus percaya bahwa "denoland/deno" akan terus diperbaharui karena official.
+

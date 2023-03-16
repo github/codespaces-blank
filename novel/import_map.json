@@ -4,7 +4,7 @@
     "react-dom/": "https://esm.sh/v111/*react-dom@18.2.0/",
     "react": "https://esm.sh/v111/react@18.2.0",
     "react/": "https://esm.sh/v111/react@18.2.0/",
-    "react/jsx-runtime": "https://esm.sh/v111/react@18.2.0/jsx-runtime",
+    "react/jsx-runtime": "https://esm.sh/stable/react@18.2.0/es2022/jsx-runtime.js",
     "mdx-js/mdx": "https://esm.sh/v111/@mdx-js/mdx@2.3.0",
     "rehype-highlight": "https://esm.sh/v111/rehype-highlight@6.0.0",
     "remark-gfm": "https://esm.sh/remark-gfm@3.0.1"

@@ -3,6 +3,6 @@ version: '3'
 services:
   web:
     build: .
-    container_name: novel
+    container_name: md-server
     ports:
       - "3000:3000"
