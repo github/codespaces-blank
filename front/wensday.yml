@@ -1,0 +1,5 @@
+$schema: https://azuremlschemas.azureedge.net/latest/model.schema.json
+#enter name for your model
+name: wensday
+# To register a model, specify the path for the saved model
+path: "*"
