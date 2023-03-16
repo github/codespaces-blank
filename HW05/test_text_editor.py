@@ -125,16 +125,16 @@ def main():
         None
     """
     print("------------------ Test Cases for append ------------------")
-    # Ideal case
+    # Ideal case - two non-empty strings
     test_append(0, "Welcome", "to CS-5001", "Welcome to CS-5001")
     # Empty append
-    test_append(1, "Hello World", "", "Hello World")
-    # Empty original
+    test_append(1, "This is a sentence.", "", "This is a sentence.")
+    # Appending to an empty string
     test_append(2, "", "to CS-5001", "to CS-5001")
-    # Gradescope test case
-    test_append(3, "this is a", " scooby doo!", "this is a scooby doo!")
-    # Gradescope test case 2
-    test_append(4, "this is a", "scooby doo!", "this is a scooby doo!")
+    # Test appending with leading/trailing spaces
+    test_append(3, "Python is", " fun, right?", "Python is fun, right?")
+    # Test appending with leading/trailing spaces
+    test_append(4, "this is a", " scooby doo!", "this is a scooby doo!")
 
     print("\n\n------------------ Test Cases for insert ------------------")
     current_text = "I like apples"
@@ -155,13 +155,13 @@ def main():
     t_new = "oranges"
     long_text = "This is a long long sentence. It has some long words."
     # Ideal case
-    test_substitute(0, current_text, "apples", t_new, "I like oranges.")
+    test_substitute(0, current_text, "apples.", t_new, "I like oranges")
     # Sub not in original
     test_substitute(1, current_text, "bananas", t_new, "I like apples.")
     # Empty original
     test_substitute(2, "", "apples", t_new, "")
     # Empty new
-    test_substitute(3, current_text, "apples", "", "I like .")
+    test_substitute(3, current_text, "apples.", "", "I like ")
     # Case senstive
     test_substitute(4, current_text, "Apples", t_new, "I like apples.")
     # Gradescope test case
@@ -169,28 +169,28 @@ def main():
                     "   is a long long sentence. It has some long words.")
 
     print("\n\n--------------- Test Cases for scramble ---------------")
-    # Ideal case
+    # Test scrambling lowercase letters
     test_scramble(0, "abcd", "cdef")
-    # case sensitive
+    # Test scrambling mixed case letters
     test_scramble(1, "aBcD", "cDeF")
     # Multiple character types
     test_scramble(2, "[a1*b2*c3],[p$*q&*r!]", "[c1*d2*e3],[r$*s&*t!]")
     # Wrapping around
-    test_scramble(3, "CS:5001: Python", "EU:5001: Ravjqp")
+    test_scramble(3, "CS5001: Python is great!", "EU5001: Ravjqp ku itcgv!")
     # More Wrapping around
     test_scramble(4, "YyZz", "AaBb")
     # Empty string
     test_scramble(5, " ", " ")
 
     print("\n\n--------------- Test Cases for unscramble ---------------")
-    # Ideal case
+    # Test unscrambling lowercase letters
     test_unscramble(0, "cdef", "abcd")
-    # case sensitive
+    # Test unscrambling mixed case letters
     test_unscramble(1, "cDeF", "aBcD")
     # Multiple character types
     test_unscramble(2, "[c1*d2*e3],[r$*s&*t!]", "[a1*b2*c3],[p$*q&*r!]")
     # Wrapping around
-    test_unscramble(3, "EU:5001: Ravjqp", "CS:5001: Python")
+    test_unscramble(3, "EU5001: Ravjqp ku itcgv!", "CS5001: Python is great!")
     # More wrapping
     test_unscramble(4, "AaBb", "YyZz")
     # Empty string

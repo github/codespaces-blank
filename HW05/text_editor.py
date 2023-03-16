@@ -163,7 +163,7 @@ def substitute(current_text: str, word: str, new_word: str) -> str:
         (str): Version of original text with word replaced
     """
     i = 0
-    t_split = custom_split(current_text, True)
+    t_split = current_text.split(" ")
     # learn't that for loop iterates
     # over a copy of the list
     # hence, we use while loop
@@ -173,7 +173,7 @@ def substitute(current_text: str, word: str, new_word: str) -> str:
             t_split[i] = new_word
         i += 1
 
-    return custom_join(t_split)
+    return " ".join(t_split)
 
 def scramble(current_text: str) -> str:
     """
