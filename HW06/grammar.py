@@ -8,12 +8,7 @@ import turtle
 def get_grammar(grammar_string: str)->dict:
     """
     This function takes contents of grammer file and 
-    returns a dictionary that contains entries for the following:
-    symbols: sequence of symbols
-    start: starting sequence
-    angle: angle in degrees
-    drawX: distance to move forward
-    iterations: number of iterations to run
+    returns a dictionary that contains entries for each key
     
     ValueError if the file is not formatted correctly
 
@@ -42,7 +37,9 @@ def get_grammar(grammar_string: str)->dict:
 
 
 def produce(grammar: dict)->str:
-    """_summary_
+    """
+    This function uses the dictionary returned by get_grammar
+    starting with the start sequence and applying the rules to expand
 
     Args:
         grammar (dict): _description_
@@ -50,7 +47,17 @@ def produce(grammar: dict)->str:
     Returns:
         str: _description_
     """
-    
+    expanded_symbol = ""
+    for key in grammar:
+        if key.startswith("rule"):
+            parts = key.split("rule")
+            variable = parts[-1]
+            for symbol in grammar["symbols"]:
+                if variable == symbol:
+                    expanded_symbol = expanded_symbol + grammar[key]
+                    print (expanded_symbol)
+                else:
+                    expanded_symbol = expanded_symbol + symbol
     
 def draw(grammar: dict, sequence: str)->turtle:
     """_summary_
@@ -64,11 +71,14 @@ def draw(grammar: dict, sequence: str)->turtle:
     """
     
 def main():
-    file = open("input_files/levy.txt", "r")
+    file = open("example.txt", "r")
     grammar_string = file.read()
     file.close()
-    print(get_grammar(grammar_string))
-    
+    line = get_grammar(grammar_string)
+    for key in line:
+        print(key, line[key])
+        
+    produce(line)
     
 if __name__ == "__main__":
     main()
