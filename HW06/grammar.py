@@ -3,7 +3,6 @@ CS 5001
 Pranchal Shah
 HW 06
 """
-import turtle
 
 def get_grammar(grammar_string: str)->dict:
     """
@@ -47,19 +46,34 @@ def produce(grammar: dict)->str:
     Returns:
         str: _description_
     """
-    expanded_symbol = ""
+    original_string = grammar["symbols"]
+    expanded_string = ""
+    # iterate over all symbols in original string
+    for each_symbol in original_string:
+        # flag will turn true if symbol is found in grammar
+        flag = False
+        for key in grammar:
+            if key.startswith("rule"):
+                part = key.split("rule")
+                variable = part[-1]
+                if variable == each_symbol:
+                    expanded_string = expanded_string + grammar[key]
+                    flag = True
+                    break
+        # if flag is false, symbol is not found in grammar
+        # hence, append original symbol to expanded string
+        if not flag:
+            expanded_string = expanded_string + each_symbol
+    repeated_string = ""
     for key in grammar:
-        if key.startswith("rule"):
-            parts = key.split("rule")
-            variable = parts[-1]
-            for symbol in grammar["symbols"]:
-                if variable == symbol:
-                    expanded_symbol = expanded_symbol + grammar[key]
-                    print (expanded_symbol)
-                else:
-                    expanded_symbol = expanded_symbol + symbol
-    
-def draw(grammar: dict, sequence: str)->turtle:
+        if key.startswith("iteration"):
+            repeat = int(grammar[key])
+            for i in range(repeat):
+                repeated_string = repeated_string + expanded_string
+    print(repeated_string)
+                
+        
+def draw(grammar: dict, sequence: str):
     """_summary_
 
     Args:
@@ -71,9 +85,9 @@ def draw(grammar: dict, sequence: str)->turtle:
     """
     
 def main():
-    file = open("example.txt", "r")
-    grammar_string = file.read()
-    file.close()
+    file_name = "example.txt"
+    with open(f"input_files/{file_name}", encoding='utf-8') as file:
+        grammar_string = file.read()
     line = get_grammar(grammar_string)
     for key in line:
         print(key, line[key])
