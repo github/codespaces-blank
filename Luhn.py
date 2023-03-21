@@ -35,9 +35,6 @@ def main():
     line3 = content_lines[2].split()
     house_number = line3[0]
     street = ' '.join(line3[1:])
-    
-    
-    
     print("First name: "+first_name, "Last name: "+last_name)
     print("Phone number: "+phone_number)
     print("House number: "+house_number, "Street: "+street)
@@ -68,3 +65,6 @@ def main():
     
 if __name__ == "__main__":
     main()
+
+
+6

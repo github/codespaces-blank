@@ -71,8 +71,9 @@ def produce(grammar: dict)->str:
             for i in range(repeat):
                 repeated_string = repeated_string + expanded_string
     print(repeated_string)
-                
-        
+    """ Raise errors if iterations not found
+    or if start not found or symbols not found """
+
 def draw(grammar: dict, sequence: str):
     """_summary_
 
@@ -84,6 +85,9 @@ def draw(grammar: dict, sequence: str):
         turtle: _description_
     """
     
+
+
+
 def main():
     file_name = "example.txt"
     with open(f"input_files/{file_name}", encoding='utf-8') as file:
@@ -91,8 +95,8 @@ def main():
     line = get_grammar(grammar_string)
     for key in line:
         print(key, line[key])
-        
+
     produce(line)
-    
+
 if __name__ == "__main__":
     main()
