@@ -1,0 +1,9 @@
+symbols +-AB
+rule A +BF-AFA-FB+
+angle 90
+rule B -AF+BFB+FA-
+draw A 0
+draw B 0
+draw F 10
+iterations 4
+start A

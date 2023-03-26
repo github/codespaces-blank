@@ -1,0 +1,8 @@
+symbols FG+-
+iterations 4
+rule F F-G+F+G-F
+rule G GG
+angle 120
+draw G 20
+draw F 20
+start F-G-G

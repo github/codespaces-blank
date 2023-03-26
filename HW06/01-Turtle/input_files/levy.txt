@@ -1,0 +1,7 @@
+symbols F-+
+start F
+rule F +F--F+
+angle 45
+draw F 4
+draw G 4
+iterations 10
