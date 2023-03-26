@@ -9,7 +9,7 @@ and sequence and draws the sequence using turtle.
 
 import turtle as t
 
-def draw(grammar: dict, sequence: str)-> exec:
+def draw(grammar: dict, sequence: str) -> exec:
     """
     If the sequence contains a symbol that does not have a drawing rule,
     then this function should simply ignore that symbol
@@ -33,13 +33,13 @@ def draw(grammar: dict, sequence: str)-> exec:
             part = key.split("draw")
             variable = part[-1]
             command = f"t.forward({grammar[key]})"
-            commands.update({variable:command})
+            commands.update({variable: command})
         # look for angle
         elif key.startswith("angle"):
             negative_angle = f"t.right({grammar[key]})"
             positive_angle = f"t.left({grammar[key]})"
-            commands.update({"-":negative_angle})
-            commands.update({"+":positive_angle})
+            commands.update({"-": negative_angle})
+            commands.update({"+": positive_angle})
 
     # -1 = last step
     for symbol in sequence:

@@ -7,7 +7,7 @@ This file contains functions that read the contents of a file
 and produce a sequence of symbols that can be used to draw.
 """
 
-def get_grammar(grammar_string: str)->dict:
+def get_grammar(grammar_string: str) -> dict:
     """
     This function takes contents of grammar file and 
     returns a dictionary that contains entries for each key
@@ -63,10 +63,13 @@ def get_grammar(grammar_string: str)->dict:
                 grammar.update({key: value})
             # if not, raise ValueError
             else:
-                raise ValueError("Invalid formatting in grammar file in line: " + each_line)
+                raise ValueError\
+                    ("Invalid formatting in grammar file in line: " + each_line)
 
-        if not symbols_present or not start_present or not iterations_present:
-            raise ValueError("The grammar file does not contain all the required commands")
+        if not symbols_present or not start_present or \
+        not iterations_present:
+            raise ValueError\
+                ("The grammar file does not contain all the required commands")
 
     except ValueError:
         # Handle the exception by printing the error message and returning an empty dictionary
@@ -74,7 +77,7 @@ def get_grammar(grammar_string: str)->dict:
 
     return grammar
 
-def produce(grammar: dict)->str:
+def produce(grammar: dict) -> str:
     """
     This function uses the dictionary returned by get_grammar
     starting with the start sequence and applying the rules to expand
@@ -113,7 +116,6 @@ def produce(grammar: dict)->str:
     except ValueError:
         return "Does not contain either a starting sequence or iterations"
 
-
     expanded_string = ""
     # start with "START symbol"
     for each_symbol in start_string:
@@ -129,7 +131,6 @@ def produce(grammar: dict)->str:
                     break
         if not flag:
             expanded_string = expanded_string + each_symbol
-
 
     # iterate over all "SYMBOLs" in original string
     for each_symbol in original_string:

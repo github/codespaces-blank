@@ -13,14 +13,14 @@ import draw_grammar
 
 def main():
     """
-    This function asks the user to input the name of a file in the above format.
+    This function asks the user to input the name of a file
     Then it runs the string through the functions and prints the results.
     """
     # try to open the file and read the contents
     # if file not found, print error message and return
     file_name = input(str("Please enter name of the file: "))
     try:
-        with open(f"input_files/{file_name}", encoding='utf-8') as file:
+        with open(f"{file_name}", encoding='utf-8') as file:
             grammar_string = file.read()
     except FileNotFoundError:
         print("File not found")
