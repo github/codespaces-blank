@@ -2,21 +2,23 @@
 CS 5001
 Pranchal Shah
 HW 06
-"""
-# 1. write pre condition for all doc-strings
-# ask TA to help you review parts of the assignment!
-# review where you lost marks in the previous assignment
-# 3. use raise and except for error handling in functions
 
-#import turtle as t
+This file contains functions that read the contents of a file 
+and produce a sequence of symbols that can be used to draw.
+"""
 
 def get_grammar(grammar_string: str)->dict:
     """
     This function takes contents of grammar file and 
     returns a dictionary that contains entries for each key
     
+    Preconditions:
+        grammar_string is a string containing contents of grammar file
+
     Raises:
         ValueError if the file is not formatted correctly
+        ValueError if the file does not contain all the required commands
+        ValueError if the file contains invalid commands
 
     Args:
         grammar_string (str): single string containing contents of file
@@ -32,7 +34,7 @@ def get_grammar(grammar_string: str)->dict:
     symbols_present = False
     start_present = False
     iterations_present = False
-    
+
     try:
         # for each part, break into keys and values
         for each_line in sep_lines:
@@ -65,10 +67,10 @@ def get_grammar(grammar_string: str)->dict:
 
         if not symbols_present or not start_present or not iterations_present:
             raise ValueError("The grammar file does not contain all the required commands")
-    
+
     except ValueError:
         # Handle the exception by printing the error message and returning an empty dictionary
-        return ("The grammar file is not formatted correctly")
+        return "The grammar file is not formatted correctly"
 
     return grammar
 
@@ -76,19 +78,42 @@ def produce(grammar: dict)->str:
     """
     This function uses the dictionary returned by get_grammar
     starting with the start sequence and applying the rules to expand
-
+    
+    Preconditions:
+        grammar is a dictionary containing all the required commands
+    
+    Raises:
+        ValueError if the grammar does not contain a starting sequence
+        ValueError if the grammar does not contain iterations
+        ValueError if the grammar does not contain start
     Args:
-        grammar (dict): _description_
+        grammar (dict): Dictionary of grammar rules
 
     Returns:
-        str: _description_
+        sequence(str): sequence of symbols produced by applying rules
     """
-    # if no starting sequence, raise ValueError
-    if not grammar["start"]:
-        raise ValueError("The dictionary does not contain a starting sequence")
-    else:
-        start_string = grammar["start"]
-    original_string = grammar["symbols"]
+    original_string = ""
+    try:
+        start_flag = False
+        iterations_flag = False
+        for each_key in grammar:
+            if each_key == "start":
+                start_string = grammar[each_key]
+                start_flag = True
+            elif each_key == "iterations":
+                iterations = grammar[each_key]
+                iterations_flag = True
+            elif each_key == "symbols":
+                original_string = grammar["symbols"]
+        if not start_flag:
+            raise ValueError
+        if not iterations_flag:
+            raise ValueError
+        # if no starting sequence, raise ValueError
+    except ValueError:
+        return "Does not contain either a starting sequence or iterations"
+
+
     expanded_string = ""
     # start with "START symbol"
     for each_symbol in start_string:
@@ -104,8 +129,8 @@ def produce(grammar: dict)->str:
                     break
         if not flag:
             expanded_string = expanded_string + each_symbol
-        
-    
+
+
     # iterate over all "SYMBOLs" in original string
     for each_symbol in original_string:
         # flag will turn true if symbol is found in grammar
@@ -122,15 +147,11 @@ def produce(grammar: dict)->str:
         # if flag is false, SYMBOL RULE is not found in grammar
         # hence, append original symbol to expanded string
         if not flag:
-            expanded_string = expanded_string + each_symbol 
+            expanded_string = expanded_string + each_symbol
 
     # repeat the expanded string = iterations times
     sequence = ""
-    for key in grammar:
-        if key.startswith("iteration"):
-            repeat = int(grammar[key])
-            for i in range(repeat):
-                sequence = sequence + expanded_string
-    print (sequence)
-    return sequence
+    for _ in range(int(iterations)):
+        sequence = sequence + expanded_string
 
+    return sequence

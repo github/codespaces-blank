@@ -1,3 +1,12 @@
+"""
+CS 5001
+Pranchal Shah
+HW 06
+
+This file contains the draw function that takes in a grammar dictionary
+and sequence and draws the sequence using turtle.
+"""
+
 import turtle as t
 
 def draw(grammar: dict, sequence: str)-> exec:
@@ -8,11 +17,11 @@ def draw(grammar: dict, sequence: str)-> exec:
     This function would not raise any exceptions.
 
     Args:
-        grammar (dict): _description_
-        sequence (str): _description_
+        grammar (dict): dictionary of grammar rules
+        sequence (str): sequence of symbols produced by produce function
 
     Returns:
-        turtle: _description_
+        exec: commands to draw the sequence
     """
     # -2 = would be to create a dictionary of commands
     # {A: 't.move(20)', B: 't.move(100)', -: 't.turn(-25)'....}
@@ -32,9 +41,6 @@ def draw(grammar: dict, sequence: str)-> exec:
             commands.update({"-":negative_angle})
             commands.update({"+":positive_angle})
 
-    for key in commands:
-        print(key, commands[key])
-    
     # -1 = last step
     for symbol in sequence:
         command = commands[f"{symbol}"]
