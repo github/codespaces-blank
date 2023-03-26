@@ -91,13 +91,13 @@ def main():
     test_get_grammar(7, "symbols F+-\n\niterations 3\n\n\nangle 90 \
                         \nrule F F+F-F-F+F\nstart F",
                         {"symbols": "F+-", "iterations": "3", "angle": "90",
-                        "ruleF": "F+F-F-F+F", "start": "F"})
+                         "ruleF": "F+F-F-F+F", "start": "F"})
 
     print("\n\n-------------------Testing produce-----------------------")
     # Ideal test case
     test_produce(0, {"symbols": "F+-", "start": "F", "angle": "90",
                      "iterations": "1", "ruleF": "F+F-F-F+F"},
-                    "F+F-F-F+FF+F-F-F+F+-")
+                 "F+F-F-F+FF+F-F-F+F+-")
     # No rules - symbols + start
     test_produce(1, {"symbols": "F+-", "start": "F", "angle": "90",
                      "iterations": "1"}, "FF+-")

@@ -64,15 +64,16 @@ def get_grammar(grammar_string: str) -> dict:
             # if not, raise ValueError
             else:
                 raise ValueError\
-                    ("Invalid formatting in grammar file in line: " + each_line)
+                     ("Invalid formatting in grammar file in line: " \
+                       + each_line)
 
         if not symbols_present or not start_present or \
-        not iterations_present:
+           not iterations_present:
             raise ValueError\
-                ("The grammar file does not contain all the required commands")
+                 ("The grammar file does not contain all the required commands")
 
     except ValueError:
-        # Handle the exception by printing the error message and returning an empty dictionary
+        # Handle the exception by printing the error message
         return "The grammar file is not formatted correctly"
 
     return grammar
