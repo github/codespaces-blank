@@ -58,19 +58,22 @@ def get_grammar(grammar_string: str) -> dict:
                 value = words[-1]
                 grammar.update({key: value})
                 iterations_present = True
-            elif key.startswith("rule") or key.startswith("draw"):
+            elif key.startswith("rule"):
                 value = words[-1]
+                key = key.split("rule")[-1]
+                grammar.update({key: value})
+            elif key.startswith("draw"):
+                value = words[-1]
+                key = key.split("draw")[-1]
                 grammar.update({key: value})
             # if not, raise ValueError
             else:
-                raise ValueError\
-                     ("Invalid formatting in grammar file in line: " \
-                       + each_line)
+                raise ValueError("Invalid formatting in line:"
+                                 + each_line)
 
         if not symbols_present or not start_present or \
            not iterations_present:
-            raise ValueError\
-                 ("The grammar file does not contain all the required commands")
+            raise ValueError("Does not contain required commands")
 
     except ValueError:
         # Handle the exception by printing the error message
