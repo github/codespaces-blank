@@ -5,7 +5,6 @@ HW 06
 This program decodes a message using a code table.
 """
 
-
 def load_code_table(code_table_as_string: str)-> dict:
     """
     Converts a code table from the format of a str to a dictionary.
@@ -13,10 +12,10 @@ def load_code_table(code_table_as_string: str)-> dict:
     Pre-conditions:
         The code table must be in a valid format, with one code per line 
         and each code separated by a single ':'
-    
+
     Args:
         code_table_as_string (str): _description_
-        
+
     Returns:
         code_dictionary (dict): A dictionary mapping codes to characters.
     """
