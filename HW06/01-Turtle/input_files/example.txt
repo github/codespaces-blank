@@ -1,0 +1,8 @@
+symbols AB+-
+start A
+rule A A+B-B+A
+rule B A+B
+angle 90
+draw A 30
+draw B 30
+iterations 3

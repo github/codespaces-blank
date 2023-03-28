@@ -1,0 +1,3 @@
+symbols F--F--F
+iterations 1
+start F--F--F--F

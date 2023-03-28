@@ -1,0 +1,27 @@
+#########################
+Written #1:
+
+#1A:
+cocopuffscocopuffs
+
+#1B:
+cocopuffspuffs
+
+#1C:
+False
+
+
+#########################
+Written #2:
+
+s[::-3]
+
+
+#########################
+Written #3
+
+3A : "so"
+
+3B : "sox"
+
+3C : "sox"
