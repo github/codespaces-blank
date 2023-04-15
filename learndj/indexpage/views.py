@@ -6,6 +6,7 @@ def index(request):
     return render(request, "index.html")
 
 def pagelist(request):
+    return render(request, "pagelist.html")
 
 def page1(request):
     return render(request, "placeholder.html")
