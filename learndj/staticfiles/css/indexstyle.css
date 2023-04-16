@@ -1,0 +1,14 @@
+body{
+    margin-left: 0;
+    margin-right: 0;
+}
+
+
+.head{
+    color: cyan;
+    text-align: center;
+    border-bottom: 2px solid black;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+}

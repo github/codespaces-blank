@@ -1,14 +1,15 @@
 <!DOCTYPE html>
+{% load static %}
 
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/indexstyle.css' %}">
     <title>A Django website</title>
 </head>
 <body>
-    <h1>Hello</h1>
+    <div class="heading"> <h1 class="head">Hello</h1></div>
     <p>This is my website</p>
-    <p><a href="https://sfs-raid-fluffy-fortnight-57x5pjp9jrxh49jr-8000.preview.app.github.dev/pages">Click </a>
-    here for some pages</p>
+    <a href="{% url 'pagelist' %}">List of Pages</a>
 
 </body>
