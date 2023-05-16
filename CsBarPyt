@@ -1,0 +1,8 @@
+print("Menghitung Bujur Sangkar")
+
+sisi = int(input("Panjang Sisi ="")) 
+
+luas = sisi * sisi
+keliling = 4 * sisi
+
+print("
