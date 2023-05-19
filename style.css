@@ -1,0 +1,22 @@
+#text-container {
+    width: 900px;
+    height: 160px;
+    position: relative;
+    overflow: hidden;
+    background-color: #f0f0f0;
+  }
+
+  #text-container span {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 0.5s;
+    font-size: 28px;
+    color: #000000;
+    text-align: center;
+  }
+
+  #hidden-text {
+    display: none;
+  }
