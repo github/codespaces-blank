@@ -1,0 +1,22 @@
+query user($org: String!, $login: String = null, $after: String = null) {
+  organization(login: $org) {
+    samlIdentityProvider {
+      externalIdentities(login: $login, first: 100, after: $after) {
+        nodes {
+          guid
+          samlIdentity {
+            nameId
+          }
+          user {
+            login
+            organizationVerifiedDomainEmails(login: $org)
+          }
+        }
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
+      }
+    }
+  }
+}
