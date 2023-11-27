@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bookmarklet Emulator</title>
+<style>
+body {
+font-family: Arial, sans-serif;
+text-align: center;
+margin: 20px;
+}
+
+button {
+padding: 10px;
+font-size: 16px;
+cursor: pointer;
+}
+
+#codeDisplay {
+width: 80%;
+height: 100px;
+margin-top: 10px;
+white-space: pre-wrap;
+overflow: auto;
+border: 1px solid #ccc;
+padding: 10px;
+text-align: left;
+}
+</style>
+</head>
+<body>
+
+<button onclick="runBookmarklet()">Emulate Bookmarklet on about:blank</button>
+
+<script>
+function runBookmarklet() {
+var bookmarkletCode = prompt("Enter your bookmarklet code:");
+var newWindow = window.open('about:blank');
+var pre = newWindow.document.createElement('pre');
+pre.id = 'codeDisplay';
+pre.textContent = bookmarkletCode;
+newWindow.document.head.innerHTML = '<title>Bookmarklet Result</title>';
+newWindow.document.body.appendChild(pre);
+var script = newWindow.document.createElement('script');
+script.textContent = bookmarkletCode;
+newWindow.document.body.appendChild(script);
+}
+</script>
+
+</body>
+</html>
