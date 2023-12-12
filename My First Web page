@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>My IT School is Bano Qabil</h1>
+<h3>(ESCUELA)</h3>
+<h2>My First Web page</h2>
+<hr>
+
+<a href="https://www.google.com.pk/">HOME</a>
+
+<a href="https://www.youtube.com/">LINKS</a>
+
+<a href="file:///home/chronos/u-8501f3c1141934bec2a13a780fbeca6fcc89bf5e/MyFiles/AB/A.html">ABOUT US</a>
+
+<a href="file:///home/chronos/u-8501f3c1141934bec2a13a780fbeca6fcc89bf5e/MyFiles/Table.html">CONTAC US</a>
+<hr>
+<h3>I'm Sultan Ahmed</h3>
+<h5>I'm biginner in web development learning HTML and</h5>
+  
+<h5> CSS is a great start to becoming a web developer</h5>
+
+<h4>My teacher name is:</h4>
+<h2>Mohammad Khalid</h2>
+
+<img src="9.png" alt="ESCUELA School" width="600" height="333">
+
+<p>Learning HTML and CSS is a great start to becoming a web developer. To become an expert, <br>you will need to continue to build on your skills and knowledge. Here are a few tips to help you:<br>
+Practice, practice, practice: The more you practice coding, the better you will become. <br>Try building simple websites or recreating websites you like using HTML and CSS.
+</p>
+
+<p>Web development is the process of creating <q>websites</q> and web applications using programming languages and tools. Web developers are professionals who specialize in this field and can build various kinds of websites for different purposes.</p>
+
+<p>HTML is a language that consists of multiple short codes are typed into a text document. It has its own grammar and syntax just like any language.
+HTML stands for HyperText Markup Language.
+Hypertext is the method by which you move around the internet. You click on a link, which is hypertext that directs you from one page to another.
+When you write in HTML, you will use a series of tags. These tags tell the text what to do: be italicized, link to another page, be a bulleted point etc.
+When you write HTML in a text file, it is then saved as an html file. This file is then opened by a browser, like Google Chrome or Firefox.
+Your browser reads the file and translates your code into visual form. That's the website you see.
+To utilize HTML, you can use a simple text editor or a powerful HTML editing tool like HTML Kit.
+Other programming languages work similarly, but use different syntax and tags. Other languages are available for more complicated types of webpages.
+</p>
+
+<img src="1.png" alt="Trulli" width="200" height="150">
+<h3>Sultan Ahmed</h3>
+<hr><hr><hr>
+
+</body>
+</html>
+
+
