@@ -1,0 +1,11 @@
+.dashboard button{
+    width: 10vw;
+}
+
+@media screen and (max-width: 768px) {
+    .dashboard button {
+    width: 40vw;
+  }
+
+  
+  }

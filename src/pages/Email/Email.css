@@ -1,0 +1,14 @@
+.Email{
+    width: 50vw;
+}
+
+
+@media screen and (max-width: 768px) {
+    .Email{
+    width: 70vw;
+  }
+
+  .Email button{
+    width: 70vw;
+  }
+  }
