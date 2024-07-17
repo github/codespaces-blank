@@ -1,0 +1,47 @@
+{
+	"name": "string-length",
+	"version": "6.0.0",
+	"description": "Get the real length of a string - by correctly counting astral symbols and ignoring ansi escape codes",
+	"license": "MIT",
+	"repository": "sindresorhus/string-length",
+	"funding": "https://github.com/sponsors/sindresorhus",
+	"author": {
+		"name": "Sindre Sorhus",
+		"email": "sindresorhus@gmail.com",
+		"url": "https://sindresorhus.com"
+	},
+	"engines": {
+		"node": ">=16"
+	},
+	"type": "module",
+	"exports": "./index.js",
+	"scripts": {
+		"test": "xo && ava && tsd"
+	},
+	"files": [
+		"index.js",
+		"index.d.ts"
+	],
+	"keywords": [
+		"unicode",
+		"string",
+		"length",
+		"size",
+		"count",
+		"astral",
+		"symbol",
+		"surrogates",
+		"codepoints",
+		"ansi",
+		"escape",
+		"codes"
+	],
+	"dependencies": {
+		"strip-ansi": "^7.1.0"
+	},
+	"devDependencies": {
+		"ava": "^5.3.0",
+		"tsd": "^0.28.1",
+		"xo": "^0.54.2"
+	}
+}

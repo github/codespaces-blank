@@ -1,0 +1,2 @@
+export type LastArrayElement<Elements extends ReadonlyArray<unknown>, ElementBeforeTailingSpreadElement = undefined> = Elements extends readonly [] ? ElementBeforeTailingSpreadElement : Elements extends readonly [...infer _U, infer V] ? V : Elements extends readonly [infer U, ...infer V] ? LastArrayElement<V, U> : Elements extends ReadonlyArray<infer U> ? ElementBeforeTailingSpreadElement | U : never;
+//# sourceMappingURL=last-array-element.d.ts.map

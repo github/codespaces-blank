@@ -1,0 +1,1 @@
+{"version":3,"file":"on.d.ts","sourceRoot":"","sources":["../../../../src/layers/3_SelectionSet/runtime/on.ts"],"names":[],"mappings":"AAAA,eAAO,MAAM,SAAS,QAAiC,CAAA;AAEvD,MAAM,WAAW,EAAE;IACjB,IAAI,EAAE,IAAI,CAAA;IACV,kBAAkB,EAAE,MAAM,CAAA;CAC3B;AAGD,eAAO,MAAM,aAAa,UAAW,MAAM,KAAG,IAAI,GAAG,EASpD,CAAA;AAED,eAAO,MAAM,WAAW,OAAQ,EAAE,WAEjC,CAAA"}

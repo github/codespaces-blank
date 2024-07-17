@@ -1,0 +1,1 @@
+{"version":3,"file":"indicator.d.ts","sourceRoot":"","sources":["../../../../src/layers/3_SelectionSet/runtime/indicator.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,uBAAuB,EAAE,MAAM,aAAa,CAAA;AAE1D,MAAM,MAAM,SAAS,GAAG,CAAC,GAAG,CAAC,GAAG,OAAO,CAAA;AAEvC,eAAO,MAAM,WAAW,MAAO,GAAG,KAAG,CAAC,IAAI,SAEzC,CAAA;AAED,eAAO,MAAM,mBAAmB,MAAO,GAAG,KAAG,CAAC,IAAI,uBAEjD,CAAA"}

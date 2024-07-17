@@ -1,0 +1,69 @@
+{
+  "name": "@molt/command",
+  "version": "0.9.0",
+  "description": "Type-safe CLI command definition and execution.",
+  "type": "module",
+  "files": [
+    "src",
+    "build"
+  ],
+  "types": "./build/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "require": {
+        "types": "./build/cjs/index.d.cts",
+        "default": "./build/cjs/index.js"
+      },
+      "import": {
+        "types": "./build/esm/index.d.ts",
+        "default": "./build/esm/index.js"
+      }
+    },
+    "./types": {
+      "import": {
+        "types": "./build/esm/entrypoints/types.d.ts"
+      }
+    }
+  },
+  "keywords": [],
+  "author": "Jason Kuhrt",
+  "license": "MIT",
+  "dependencies": {
+    "alge": "0.8.1",
+    "chalk": "^5.3.0",
+    "lodash.camelcase": "^4.3.0",
+    "lodash.snakecase": "^4.1.1",
+    "readline-sync": "^1.4.10",
+    "string-length": "^6.0.0",
+    "strip-ansi": "^7.1.0",
+    "ts-toolbelt": "^9.6.0",
+    "type-fest": "^4.3.1",
+    "zod": "^3.22.2",
+    "@molt/types": "0.2.0"
+  },
+  "devDependencies": {
+    "@types/lodash.camelcase": "4.3.7",
+    "@types/lodash.snakecase": "^4.1.7",
+    "@types/readline-sync": "^1.4.4",
+    "conditional-type-checks": "1.0.6",
+    "execa": "8.0.1",
+    "fast-glob": "3.3.1",
+    "fs-jetpack": "5.1.0",
+    "tsd": "0.29.0",
+    "vitest": "0.34.4",
+    "vitest-mock-process": "^1.0.4"
+  },
+  "scripts": {
+    "vitest": "vitest",
+    "check:types": "tsc --noEmit",
+    "test": "vitest",
+    "clean": "tsc --build --clean",
+    "build": "pnpm clean && pnpm build:cjs && pnpm build:esm",
+    "build:cjs": "tsc --project tsconfig.cjs.json && echo '{\"type\":\"commonjs\"}' > build/cjs/package.json",
+    "build:esm": "tsc --project tsconfig.esm.json",
+    "build:toc": "markdown-toc README.md -i --maxdepth 4 && prettier --write README.md",
+    "examples:intro": "tsx examples/intro.ts",
+    "examples:kitchen-sink": "tsx examples/kitchen-sink.ts",
+    "examples:publish": "tsx examples/publish.ts"
+  }
+}

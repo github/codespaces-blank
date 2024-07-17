@@ -1,0 +1,1 @@
+{"version":3,"file":"ErrorInternal.js","sourceRoot":"","sources":["../../../src/lib/errors/ErrorInternal.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,eAAe,EAAE,MAAM,sBAAsB,CAAA;AAGtD,MAAM,OAAO,aAIX,SAAQ,eAAwC;IACvC,IAAI,GAAU,eAAwB,CAAA;IAC/C,YACE,UAAkB,uBAAuB,EACzC,UAAoB,EAAc,EAClC,QAAgB,SAAmB;QAEnC,KAAK,CAAC,OAAO,EAAE,OAAO,EAAE,KAAK,CAAC,CAAA;IAChC,CAAC;CACF"}

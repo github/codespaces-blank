@@ -1,0 +1,1 @@
+{"version":3,"file":"omit-index-signature.d.ts","sourceRoot":"","sources":["../../../src/type-fest/omit-index-signature.ts"],"names":[],"mappings":"AAAA,MAAM,MAAM,kBAAkB,CAAC,UAAU,IAAI;KAC1C,OAAO,IAAI,MAAM,UAAU,IAAI,EAAE,SAAS,MAAM,CAAC,OAAO,EAAE,OAAO,CAAC,GAC/D,KAAK,GACL,OAAO,GAAG,UAAU,CAAC,OAAO,CAAC;CAClC,CAAC"}

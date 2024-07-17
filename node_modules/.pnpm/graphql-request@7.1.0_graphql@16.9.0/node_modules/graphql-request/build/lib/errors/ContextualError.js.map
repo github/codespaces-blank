@@ -1,0 +1,1 @@
+{"version":3,"file":"ContextualError.js","sourceRoot":"","sources":["../../../src/lib/errors/ContextualError.ts"],"names":[],"mappings":"AAEA;;;;GAIG;AACH,MAAM,OAAO,eAIX,SAAQ,KAAK;IAIK;IACS;IAJlB,IAAI,GAAU,iBAA0B,CAAA;IACjD,YACE,OAAe,EACC,UAAoB,EAAc,EACzB,QAAgB,SAAmB;QAE5D,KAAK,CAAC,OAAO,EAAE,KAAK,CAAC,CAAA;QAHL,YAAO,GAAP,OAAO,CAA2B;QACzB,UAAK,GAAL,KAAK,CAA8B;IAG9D,CAAC;CACF"}

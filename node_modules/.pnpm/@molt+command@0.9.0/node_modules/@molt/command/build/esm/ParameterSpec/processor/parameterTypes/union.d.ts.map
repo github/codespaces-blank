@@ -1,0 +1,1 @@
+{"version":3,"file":"union.d.ts","sourceRoot":"","sources":["../../../../../src/ParameterSpec/processor/parameterTypes/union.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,QAAQ,EAAE,MAAM,mBAAmB,CAAA;AACjD,OAAO,KAAK,EAAE,KAAK,EAAE,MAAM,gBAAgB,CAAA;AAC3C,OAAO,KAAK,EAAE,MAAM,EAAE,MAAM,iBAAiB,CAAA;AAQ7C,eAAO,MAAM,YAAY,mBACP,MAAM,SACf,MAAM,KAAK,YACR,eAAe,KACxB,OAAO,KAaT,CAAA"}

@@ -1,0 +1,1 @@
+{"version":3,"file":"isPlainObject.d.ts","sourceRoot":"","sources":["../../src/isPlainObject.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,UAAU,EAAE,MAAM,UAAU,CAAC;AAE3C;;;;;;;;;;;;;;;;;;;;;;;;GAwBG;AACH,wBAAgB,aAAa,CAAC,CAAC,EAC7B,IAAI,EAAE,QAAQ,CAAC,MAAM,CAAC,WAAW,EAAE,OAAO,CAAC,CAAC,GAAG,CAAC,GAC/C,IAAI,IAAI,UAAU,CAAC,CAAC,EAAE,MAAM,CAAC,WAAW,EAAE,OAAO,CAAC,CAAC,CAQrD"}

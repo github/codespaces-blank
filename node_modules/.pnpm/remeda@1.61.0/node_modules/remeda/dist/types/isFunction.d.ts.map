@@ -1,0 +1,1 @@
+{"version":3,"file":"isFunction.d.ts","sourceRoot":"","sources":["../../src/isFunction.ts"],"names":[],"mappings":"AAIA,KAAK,kBAAkB,CAAC,CAAC,IACvB,OAAO,CAAC,CAAC,EAAE,QAAQ,CAAC,SAAS,KAAK,GAAG,QAAQ,GAAG,OAAO,CAAC,CAAC,EAAE,QAAQ,CAAC,CAAC;AACvE;;;;;;;;;;;GAWG;AACH,wBAAgB,UAAU,CAAC,CAAC,EAC1B,IAAI,EAAE,QAAQ,GAAG,CAAC,GACjB,IAAI,IAAI,kBAAkB,CAAC,CAAC,CAAC,CAE/B"}

@@ -1,0 +1,35 @@
+{
+  "name": "@molt/types",
+  "version": "0.2.0",
+  "description": "Advanced Types for parsing CLI flags and more.",
+  "type": "module",
+  "files": [
+    "src",
+    "build"
+  ],
+  "types": "./build/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./build/esm/index.d.ts",
+        "default": "./build/esm/index.js"
+      }
+    }
+  },
+  "keywords": [],
+  "author": "Jason Kuhrt",
+  "license": "MIT",
+  "dependencies": {
+    "ts-toolbelt": "^9.6.0"
+  },
+  "devDependencies": {
+    "conditional-type-checks": "1.0.6",
+    "tsd": "0.24.1"
+  },
+  "scripts": {
+    "clean": "tsc --build --clean",
+    "types:check": "tsc --noEmit",
+    "build": "pnpm clean && pnpm build:esm",
+    "build:esm": "pnpm tsc --project tsconfig.esm.json"
+  }
+}

@@ -1,0 +1,1 @@
+{"version":3,"file":"pick-index-signature.d.ts","sourceRoot":"","sources":["../../../src/type-fest/pick-index-signature.ts"],"names":[],"mappings":"AAAA,MAAM,MAAM,kBAAkB,CAAC,UAAU,IAAI;KAC1C,OAAO,IAAI,MAAM,UAAU,IAAI,EAAE,SAAS,MAAM,CAAC,OAAO,EAAE,OAAO,CAAC,GAC/D,OAAO,GACP,KAAK,GAAG,UAAU,CAAC,OAAO,CAAC;CAChC,CAAC"}

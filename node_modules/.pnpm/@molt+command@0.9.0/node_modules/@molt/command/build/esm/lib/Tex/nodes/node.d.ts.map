@@ -1,0 +1,1 @@
+{"version":3,"file":"node.d.ts","sourceRoot":"","sources":["../../../../../src/lib/Tex/nodes/node.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,aAAa,EAAE,KAAK,EAAE,MAAM,cAAc,CAAA;AAExD,8BAAsB,IAAI;IACxB,QAAQ,CAAC,MAAM,CAAC,OAAO,EAAE,aAAa,GAAG;QAAE,KAAK,EAAE,KAAK,CAAC;QAAC,KAAK,EAAE,MAAM,CAAA;KAAE;CACzE"}

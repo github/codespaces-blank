@@ -1,0 +1,1 @@
+{"version":3,"file":"analyzeFunction.d.ts","sourceRoot":"","sources":["../../src/lib/analyzeFunction.ts"],"names":[],"mappings":"AAEA,KAAK,SAAS,GAAG;IAAE,IAAI,EAAE,MAAM,CAAC;IAAC,KAAK,EAAE,MAAM,CAAA;CAAE,GAAG;IAAE,IAAI,EAAE,cAAc,CAAC;IAAC,KAAK,EAAE,MAAM,EAAE,CAAA;CAAE,CAAA;AAE5F,eAAO,MAAM,eAAe,OAAQ,CAAC,GAAG,IAAI,EAAE,CAAC,GAAG,GAAG,EAAE,CAAC,KAAK,OAAO;;;CA6CnE,CAAA"}

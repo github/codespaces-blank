@@ -1,0 +1,1 @@
+{"version":3,"file":"ClientError.d.ts","sourceRoot":"","sources":["../../../src/legacy/classes/ClientError.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,qBAAqB,EAAE,eAAe,EAAE,MAAM,qBAAqB,CAAA;AAEjF,qBAAa,WAAY,SAAQ,KAAK;IAC7B,QAAQ,EAAE,eAAe,CAAA;IACzB,OAAO,EAAE,qBAAqB,CAAA;gBAEzB,QAAQ,EAAE,eAAe,EAAE,OAAO,EAAE,qBAAqB;IAqBrE,OAAO,CAAC,MAAM,CAAC,cAAc;CAG9B"}
