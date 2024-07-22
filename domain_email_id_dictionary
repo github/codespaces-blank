@@ -1,0 +1,11 @@
+def email_list(domains):
+	eemails=[]
+	user = ""
+	for domain in domains:
+	  for user in domains[domain]:
+            user=user+"@"+domain
+            #print(user)
+            eemails.append(user)
+    return(eemails)
+
+print(email_list({"gmail.com": ["clark.kent", "diana.prince", "peter.parker"], "yahoo.com": ["barbara.gordon", "jean.grey"], "hotmail.com": ["bruce.wayne"]}))
