@@ -2,6 +2,10 @@
 name = "volga"
 version = "0.1.0"
 edition = "2021"
+authors = ["Roman Emreis"]
+license = "MIT"
+repository = "https://github.com/RomanEmreis/volga"
+description = "Easy & Fast Web Framework for Rust"
 
 [dependencies]
 tokio = { version = "1.40.0", features = ["full"] }
