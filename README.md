@@ -54,7 +54,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 use volga::app::{
     App,
     results::Results,
-    endpoints::mapping::asynchronous::AsyncEndpointsMapping
+    endpoints::mapping::asynchronous::AsyncEndpointsMapping,
+    middleware::mapping::asynchronous::AsyncMiddlewareMapping
 };
 
 #[tokio::main]
