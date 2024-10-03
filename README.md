@@ -1,6 +1,8 @@
 # Volga
 Easy &amp; Fast Web Framework for Rust
 
+[![latest](https://github.com/RomanEmreis/volga/actions/workflows/rust.yml/badge.svg)](https://github.com/RomanEmreis/volga/actions/workflows/rust.yml)
+
 ## Getting Started
 
 ### Asynchronous handler:
