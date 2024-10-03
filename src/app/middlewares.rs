@@ -9,7 +9,7 @@ use crate::app::{
     results::Results
 };
 
-pub(crate) mod mapping;
+pub mod mapping;
 
 pub(crate) type Next = Arc<dyn Fn(Arc<HttpContext>) -> Pin<Box<dyn Future<Output = http::Result<Response<Bytes>>> + Send>> + Send + Sync>;
 pub(crate) type Middleware = Arc<dyn Fn(Arc<HttpContext>, Next) -> Pin<Box<dyn Future<Output = http::Result<Response<Bytes>>> + Send>> + Send + Sync>;

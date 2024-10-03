@@ -9,7 +9,8 @@ use crate::app::endpoints::{
 
 pub(crate) mod handlers;
 pub(crate) mod route;
-pub(crate) mod mapping;
+
+pub mod mapping;
 
 pub(crate) struct Endpoints {
     routes: HashMap<Method, Route>
