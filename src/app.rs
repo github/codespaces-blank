@@ -17,8 +17,8 @@ use crate::app::{
     results::Results
 };
 
-pub(crate) mod middlewares;
-pub(crate) mod endpoints;
+pub mod middlewares;
+pub mod endpoints;
 pub mod request;
 pub mod results;
 pub mod mapping;
