@@ -11,7 +11,7 @@ env:
 
 jobs:
   build:
-
+    environment: CICD
     runs-on: ubuntu-latest
 
     steps:
