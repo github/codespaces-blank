@@ -2,10 +2,20 @@
 Fast & Easy Web Framework for Rust based on [Tokio](https://tokio.rs/) runtime for fun and painless microservices crafting.
 
 [![latest](https://github.com/RomanEmreis/volga/actions/workflows/rust.yml/badge.svg)](https://github.com/RomanEmreis/volga/actions/workflows/rust.yml)
-
+## Features
+* Supports HTTP/1.x
+* Robust routing
+* Custom middlewares
+* Full [Tokio](https://tokio.rs/) compatibility
+* Runs on stable Rust 1.80+
 ## Getting Started
-
-### Asynchronous handler:
+### Dependencies
+```
+[dependencies]
+volga = "0.1.3"
+tokio = "1.40.0"
+```
+### Asynchronous handler (Recommended):
 ```rust
 use volga::{App, Results, AsyncEndpointsMapping};
 
