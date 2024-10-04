@@ -21,7 +21,8 @@ jobs:
     - name: Run tests
       run: cargo test --verbose
     - uses: katyo/publish-crates@v2
+    - name: Publish
       with:
-          registry-token: ${{ secrets.cratesio.CARGO_REGISTRY_TOKEN }}
+          token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
           ignore-unpublished-changes: true
       
