@@ -108,7 +108,7 @@ impl Payload for Request<Bytes> {
 pub type RequestParams = Arc<HashMap<String, String>>;
 
 pub trait Params {
-    /// Returns a query params of HTTP request
+    /// Returns a query or route params of HTTP request
     /// 
     /// # Example
     /// ```no_run

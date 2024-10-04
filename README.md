@@ -92,6 +92,25 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     Ok(())
 }
 ```
+### Reading route parameters
+```rust
+use volga::{App, AsyncEndpointsMapping, Results, Params};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    let mut app = App::build("127.0.0.1:7878").await?;
+
+    // GET /test/11
+    app.map_get("/test/{id}", |req| async move {
+        let params = req.params().unwrap();
+        let id = params.get("id").unwrap(); // "11"
+
+        Results::text("Pass!")
+    }).await;
+
+    Ok(())
+}
+```
 ### Reading JSON payload
 ```rust
 use volga::{App, AsyncEndpointsMapping, Results, Payload};
