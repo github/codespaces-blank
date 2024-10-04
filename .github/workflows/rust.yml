@@ -24,5 +24,5 @@ jobs:
       with:
           token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
           registry-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-          ignore-unpublished-changes: true
+          ignore-unpublished-changes: false
       
