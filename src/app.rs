@@ -23,6 +23,21 @@ pub mod request;
 pub mod results;
 pub mod mapping;
 
+/// The web application used to configure the HTTP pipeline, and routes.
+///
+/// # Examples
+/// ```no_run
+/// use volga::App;
+///
+/// #[tokio::main]
+/// async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+///     let mut app = App::build("127.0.0.1:7878").await?;
+///     
+///     app.run().await?;
+/// 
+///     Ok(())
+/// }
+/// ```
 pub struct App {
     middlewares: Arc<Mutex<Middlewares>>,
     endpoints: Arc<Mutex<Endpoints>>,
@@ -112,7 +127,7 @@ impl App {
             Err(err) => {
                 eprintln!("Failed to send shutdown the server: {}", err);
             }
-        }
+        };
     }
 
     #[inline]

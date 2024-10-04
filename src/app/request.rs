@@ -9,7 +9,6 @@ use serde::Deserialize;
 
 pub(crate) struct RawRequest<'headers, 'buf> {
     raw_request: HttParseRequest<'headers, 'buf>,
-    headers_size: usize,
     body: Bytes
 }
 
@@ -23,7 +22,7 @@ impl RawRequest<'_, '_> {
                 // Body extraction from the buffer
                 // Note that this just takes the rest of the buffer; adjust according to the actual headers/content-length
                 let body = Bytes::copy_from_slice(&buffer[headers_size..]);
-                Ok(RawRequest { raw_request: req, headers_size, body })
+                Ok(RawRequest { raw_request: req, body })
             },
             Ok(httparse::Status::Partial) => Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Request is incomplete")),
             Err(e) => Err(io::Error::new(io::ErrorKind::InvalidData, format!("Failed to parse request: {}", e)))
@@ -34,7 +33,6 @@ impl RawRequest<'_, '_> {
     pub(crate) fn convert_to_http_request(raw_req: RawRequest) -> Result<Request<Bytes>, io::Error> {
         let RawRequest {
             raw_request: parse_req,
-            headers_size: _,
             body
         } = raw_req;
 
@@ -64,6 +62,34 @@ impl RawRequest<'_, '_> {
 }
 
 pub trait Payload {
+    /// Returns a request body deserialized to type of `T`
+    /// 
+    /// # Example
+    /// ```no_run
+    ///use volga::{App, AsyncEndpointsMapping, Results, Payload};
+    ///use serde::Deserialize;
+    /// 
+    ///#[derive(Deserialize)]
+    ///struct User {
+    ///    name: String,
+    ///    age: i32
+    ///}
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    ///     let mut app = App::build("127.0.0.1:7878").await?;
+    /// 
+    ///     // POST /test
+    ///     // { name: "John", age: 35 }
+    ///     app.map_post("/test", |req| async move {
+    ///         let params: User = req.payload().unwrap();
+    /// 
+    ///         Results::text("Pass!")
+    ///     }).await;
+    /// 
+    ///     Ok(())
+    /// }
+    /// ```
     fn payload<'a, T>(&'a self) -> Result<T, io::Error>
     where
         T: Deserialize<'a>;
@@ -82,6 +108,27 @@ impl Payload for Request<Bytes> {
 pub type RequestParams = Arc<HashMap<String, String>>;
 
 pub trait Params {
+    /// Returns a query params of HTTP request
+    /// 
+    /// # Example
+    /// ```no_run
+    ///use volga::{App, AsyncEndpointsMapping, Results, Params};
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    ///     let mut app = App::build("127.0.0.1:7878").await?;
+    /// 
+    ///     // GET /test?id=11
+    ///     app.map_get("/test", |req| async move {
+    ///         let params = req.params().unwrap();
+    ///         let id = params.get("id").unwrap(); // "11"
+    /// 
+    ///         Results::text("Pass!")
+    ///     }).await;
+    /// 
+    ///     Ok(())
+    /// }
+    /// ```
     fn params(&self) -> Option<&RequestParams>;
 }
 

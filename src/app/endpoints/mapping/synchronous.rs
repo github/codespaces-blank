@@ -9,23 +9,108 @@ pub trait SyncMapping {
 }
 
 pub trait SyncEndpointsMapping {
-    async fn map_get<F>(&mut self, pattern: &str, handler: F)
+    /// Adds a request handler that matches HTTP GET requests for the specified pattern.
+    /// 
+    /// # Examples
+    /// ```no_run
+    ///use volga::{App, SyncEndpointsMapping, Results};
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    ///     let mut app = App::build("127.0.0.1:7878").await?;
+    /// 
+    ///     app.map_get("/test", |_req| {
+    ///         Results::text("Pass!")
+    ///     }).await;
+    /// 
+    ///     Ok(())
+    /// }
+    /// ```
+    fn map_get<F>(&mut self, pattern: &str, handler: F) -> impl std::future::Future<Output = ()> + Send
     where
         F: Fn(Arc<Request<Bytes>>) -> http::Result<Response<Bytes>> + Send + Sync + 'static;
 
-    async fn map_post<F>(&mut self, pattern: &str, handler: F)
+    /// Adds a request handler that matches HTTP POST requests for the specified pattern.
+    /// 
+    /// # Examples
+    /// ```no_run
+    ///use volga::{App, SyncEndpointsMapping, Results};
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    ///     let mut app = App::build("127.0.0.1:7878").await?;
+    /// 
+    ///     app.map_post("/test", |_req| {
+    ///         Results::text("Pass!")
+    ///     }).await;
+    /// 
+    ///     Ok(())
+    /// }
+    /// ```
+    fn map_post<F>(&mut self, pattern: &str, handler: F) -> impl std::future::Future<Output = ()> + Send
     where
         F: Fn(Arc<Request<Bytes>>) -> http::Result<Response<Bytes>> + Send + Sync + 'static;
 
-    async fn map_put<F>(&mut self, pattern: &str, handler: F)
+    /// Adds a request handler that matches HTTP PUT requests for the specified pattern.
+    /// 
+    /// # Examples
+    /// ```no_run
+    ///use volga::{App, SyncEndpointsMapping, Results};
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    ///     let mut app = App::build("127.0.0.1:7878").await?;
+    /// 
+    ///     app.map_put("/test", |_req| {
+    ///         Results::text("Pass!")
+    ///     }).await;
+    /// 
+    ///     Ok(())
+    /// }
+    /// ```
+    fn map_put<F>(&mut self, pattern: &str, handler: F) -> impl std::future::Future<Output = ()> + Send
     where
         F: Fn(Arc<Request<Bytes>>) -> http::Result<Response<Bytes>> + Send + Sync + 'static;
 
-    async fn map_patch<F>(&mut self, pattern: &str, handler: F)
+    /// Adds a request handler that matches HTTP PATCH requests for the specified pattern.
+    /// 
+    /// # Examples
+    /// ```no_run
+    ///use volga::{App, SyncEndpointsMapping, Results};
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    ///     let mut app = App::build("127.0.0.1:7878").await?;
+    /// 
+    ///     app.map_patch("/test", |_req| {
+    ///         Results::text("Pass!")
+    ///     }).await;
+    /// 
+    ///     Ok(())
+    /// }
+    /// ```
+    fn map_patch<F>(&mut self, pattern: &str, handler: F) -> impl std::future::Future<Output = ()> + Send
     where
         F: Fn(Arc<Request<Bytes>>) -> http::Result<Response<Bytes>> + Send + Sync + 'static;
 
-    async fn map_delete<F>(&mut self, pattern: &str, handler: F)
+    /// Adds a request handler that matches HTTP DELETE requests for the specified pattern.
+    /// 
+    /// # Examples
+    /// ```no_run
+    ///use volga::{App, SyncEndpointsMapping, Results};
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    ///     let mut app = App::build("127.0.0.1:7878").await?;
+    /// 
+    ///     app.map_delete("/test", |_req| {
+    ///         Results::text("Pass!")
+    ///     }).await;
+    /// 
+    ///     Ok(())
+    /// }
+    /// ```
+    fn map_delete<F>(&mut self, pattern: &str, handler: F) -> impl std::future::Future<Output = ()> + Send
     where
         F: Fn(Arc<Request<Bytes>>) -> http::Result<Response<Bytes>> + Send + Sync + 'static;
 }

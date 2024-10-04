@@ -11,7 +11,7 @@ pub trait AsyncMapping {
 }
 
 pub trait AsyncMiddlewareMapping {
-    async fn use_middleware<F, Fut>(&mut self, handler: F)
+    fn use_middleware<F, Fut>(&mut self, handler: F) -> impl Future<Output = ()> + Send
     where
         F: 'static + Send + Sync + Fn(Arc<HttpContext>, Next) -> Fut,
         Fut: Future<Output = http::Result<Response<Bytes>>> + Send + 'static;

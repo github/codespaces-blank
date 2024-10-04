@@ -1,4 +1,4 @@
-﻿use volga::app::App;
+﻿use volga::App;
 
 #[tokio::test]
 async fn correct_socket_str_provided_it_builds() {

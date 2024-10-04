@@ -6,6 +6,31 @@ use http::response::Builder;
 use mime::Mime;
 use serde::Serialize;
 
+/// A customized response context with custom response `headers` and `content_type`
+/// 
+/// # Example
+/// ```no_run
+///use volga::{App, AsyncEndpointsMapping, Results, ResponseContext};
+///use std::collections::HashMap;
+///
+///#[tokio::main]
+///async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+///    let mut app = App::build("127.0.0.1:7878").await?;
+///
+///    app.map_get("/test", |req| async move {
+///        let mut headers = HashMap::new();
+///        headers.insert(String::from("x-api-key"), String::from("some api key"));
+///        
+///        Results::from(ResponseContext {
+///            content: Box::new(String::from("Hello World!")),
+///            headers: Some(headers),
+///            content_type: Some(mime::TEXT_PLAIN)
+///        })
+///    }).await;
+///
+///    Ok(())
+///}
+/// ```
 pub struct ResponseContext<T: ?Sized> {
     pub content: Box<T>,
     pub headers: Option<HashMap<String, String>>,
@@ -15,6 +40,7 @@ pub struct ResponseContext<T: ?Sized> {
 pub struct Results;
 
 impl Results {
+    /// Produces a customized `OK 200` response
     pub fn from<T>(context: ResponseContext<T>) -> http::Result<Response<Bytes>>
     where T:
         ?Sized + Serialize
@@ -46,6 +72,7 @@ impl Results {
             .body(Bytes::from(content))
     }
 
+    /// Produces an `OK 200` response with the `JSON` body.
     #[inline]
     pub fn json<T>(content: &T) -> http::Result<Response<Bytes>>
     where T:
@@ -64,6 +91,7 @@ impl Results {
         }
     }
 
+    /// Produces an `OK 200` response with the plain text body.
     #[inline]
     pub fn text(content: &str) -> http::Result<Response<Bytes>> {
         let builder = Self::create_default_builder();
@@ -75,6 +103,7 @@ impl Results {
             .body(Bytes::from(String::from(content)))
     }
 
+    /// Produces an `NOT FOUND 400` response.
     #[inline]
     pub fn not_found() -> http::Result<Response<Bytes>> {
         let builder = Self::create_default_builder();
@@ -86,6 +115,7 @@ impl Results {
             .body(Bytes::new())
     }
 
+    /// Produces an `INTERNAL SERVER ERROR 500` response.
     #[inline]
     pub fn internal_server_error() -> http::Result<Response<Bytes>> {
         let builder = Self::create_default_builder();
