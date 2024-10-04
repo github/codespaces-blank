@@ -1,7 +1,10 @@
 # Volga
 Fast & Easy Web Framework for Rust based on [Tokio](https://tokio.rs/) runtime for fun and painless microservices crafting.
 
-[![latest](https://github.com/RomanEmreis/volga/actions/workflows/rust.yml/badge.svg)](https://github.com/RomanEmreis/volga/actions/workflows/rust.yml)
+[![crates.io](https://img.shields.io/badge/volga-0.1.5-blue)](https://crates.io/crates/volga)
+[![License: MIT](https://img.shields.io/badge/License-MIT-violet.svg)](https://github.com/RomanEmreis/volga/blob/main/LICENSE)
+[![Build](https://github.com/RomanEmreis/volga/actions/workflows/rust.yml/badge.svg)](https://github.com/RomanEmreis/volga/actions/workflows/rust.yml)
+
 ## Features
 * Supports HTTP/1.x
 * Robust routing
