@@ -14,7 +14,7 @@ use serde::Serialize;
 ///use std::collections::HashMap;
 ///
 ///#[tokio::main]
-///async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+///async fn main() -> tokio::io::Result<()> {
 ///    let mut app = App::build("127.0.0.1:7878").await?;
 ///
 ///    app.map_get("/test", |req| async move {
@@ -28,7 +28,7 @@ use serde::Serialize;
 ///        })
 ///    }).await;
 ///
-///    Ok(())
+///    app.run().await
 ///}
 /// ```
 pub struct ResponseContext<T: ?Sized> {

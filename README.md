@@ -20,7 +20,7 @@ tokio = "1.40.0"
 use volga::{App, Results, AsyncEndpointsMapping};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+async fn main() -> tokio::io::Result<()> {
     // Start the server
     let mut server = App::build("127.0.0.1:7878").await?;
 
@@ -29,9 +29,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         Results::text("Hello World!")
     }).await;
     
-    server.run().await?;
-    
-    Ok(())
+    server.run().await
 }
 ```
 ### Synchronous handler:
@@ -39,7 +37,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 use volga::{App, Results, SyncEndpointsMapping};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+async fn main() -> tokio::io::Result<()> {
     // Start the server
     let mut server = App::build("127.0.0.1:7878").await?;
     
@@ -48,9 +46,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         Results::text("Hello World!")
     }).await;
     
-    server.run().await?;
-    
-    Ok(())
+    server.run().await
 }
 ```
 ### Custom middleware:
@@ -58,7 +54,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 use volga::{App, Results, AsyncEndpointsMapping, AsyncMiddlewareMapping};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+async fn main() -> tokio::io::Result<()> {
     // Start the server
     let mut server = App::build("127.0.0.1:7878").await?;
 
@@ -78,9 +74,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         Results::text("Hello World!")
     }).await;
     
-    server.run().await?;
-    
-    Ok(())
+    server.run().await
 }
 ```
 ### Reading query parameters
@@ -88,7 +82,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 use volga::{App, AsyncEndpointsMapping, Results, Params};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+async fn main() -> tokio::io::Result<()> {
     let mut app = App::build("127.0.0.1:7878").await?;
 
     // GET /test?id=11
@@ -99,7 +93,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         Results::text("Pass!")
     }).await;
 
-    Ok(())
+    app.run().await
 }
 ```
 ### Reading route parameters
@@ -107,7 +101,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 use volga::{App, AsyncEndpointsMapping, Results, Params};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+async fn main() -> tokio::io::Result<()> {
     let mut app = App::build("127.0.0.1:7878").await?;
 
     // GET /test/11
@@ -118,7 +112,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         Results::text("Pass!")
     }).await;
 
-    Ok(())
+    app.run().await
 }
 ```
 ### Reading JSON payload
@@ -133,7 +127,7 @@ struct User {
 }
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+async fn main() -> tokio::io::Result<()> {
     let mut app = App::build("127.0.0.1:7878").await?;
 
     // POST /test
@@ -144,7 +138,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         Results::text("Pass!")
     }).await;
 
-    Ok(())
+    app.run().await
 }
 ```
 ### Returning a JSON
@@ -159,7 +153,7 @@ struct User {
 }
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+async fn main() -> tokio::io::Result<()> {
     let mut app = App::build("127.0.0.1:7878").await?;
 
     app.map_get("/test", |req| async move {
@@ -171,7 +165,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         Results::json(&user) // { name: "John", age: 35 }
     }).await;
 
-    Ok(())
+    app.run().await
 }
 ```
 

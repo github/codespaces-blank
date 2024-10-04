@@ -1,11 +1,11 @@
 ﻿use bytes::Bytes;
 use httparse::EMPTY_HEADER;
 use http::{Request, Response};
-use std::{io, sync::Arc};
+use std::sync::Arc;
 
 use tokio::{
     net::{TcpListener, TcpStream},
-    io::{AsyncReadExt, AsyncWriteExt},
+    io::{self,AsyncReadExt, AsyncWriteExt},
     sync::{broadcast, Mutex},
     signal
 };
@@ -27,16 +27,14 @@ pub mod mapping;
 ///
 /// # Examples
 /// ```no_run
-/// use volga::App;
+///use volga::App;
 ///
-/// #[tokio::main]
-/// async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-///     let mut app = App::build("127.0.0.1:7878").await?;
-///     
-///     app.run().await?;
-/// 
-///     Ok(())
-/// }
+///#[tokio::main]
+///async fn main() -> tokio::io::Result<()> {
+///    let mut app = App::build("127.0.0.1:7878").await?;
+///    
+///    app.run().await
+///}
 /// ```
 pub struct App {
     middlewares: Arc<Mutex<Middlewares>>,
@@ -59,9 +57,9 @@ impl HttpContext {
 }
 
 impl App {
-    pub async fn build(socket: &str) -> Result<App, Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn build(socket: &str) -> io::Result<App> {
         if socket.is_empty() {
-            return Err("An empty socket has been provided.".into());
+            return Err(io::Error::new(io::ErrorKind::InvalidData, "An empty socket has been provided."));
         }
 
         let tcp_listener = TcpListener::bind(socket).await?;
@@ -93,6 +91,7 @@ impl App {
         };
 
         println!("Start listening: {socket}");
+        
         Ok(server)
     }
 

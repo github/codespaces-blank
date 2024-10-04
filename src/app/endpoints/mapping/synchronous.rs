@@ -15,16 +15,16 @@ pub trait SyncEndpointsMapping {
     /// ```no_run
     ///use volga::{App, SyncEndpointsMapping, Results};
     ///
-    /// #[tokio::main]
-    /// async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    ///     let mut app = App::build("127.0.0.1:7878").await?;
-    /// 
-    ///     app.map_get("/test", |_req| {
-    ///         Results::text("Pass!")
-    ///     }).await;
-    /// 
-    ///     Ok(())
-    /// }
+    ///#[tokio::main]
+    ///async fn main() -> tokio::io::Result<()> {
+    ///    let mut app = App::build("127.0.0.1:7878").await?;
+    ///
+    ///    app.map_get("/test", |_req| {
+    ///        Results::text("Pass!")
+    ///    }).await;
+    ///
+    ///    app.run().await
+    ///}
     /// ```
     fn map_get<F>(&mut self, pattern: &str, handler: F) -> impl std::future::Future<Output = ()> + Send
     where
@@ -36,16 +36,16 @@ pub trait SyncEndpointsMapping {
     /// ```no_run
     ///use volga::{App, SyncEndpointsMapping, Results};
     ///
-    /// #[tokio::main]
-    /// async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    ///     let mut app = App::build("127.0.0.1:7878").await?;
-    /// 
-    ///     app.map_post("/test", |_req| {
-    ///         Results::text("Pass!")
-    ///     }).await;
-    /// 
-    ///     Ok(())
-    /// }
+    ///#[tokio::main]
+    ///async fn main() -> tokio::io::Result<()> {
+    ///    let mut app = App::build("127.0.0.1:7878").await?;
+    ///
+    ///    app.map_post("/test", |_req| {
+    ///        Results::text("Pass!")
+    ///    }).await;
+    ///
+    ///    app.run().await
+    ///}
     /// ```
     fn map_post<F>(&mut self, pattern: &str, handler: F) -> impl std::future::Future<Output = ()> + Send
     where
@@ -57,16 +57,16 @@ pub trait SyncEndpointsMapping {
     /// ```no_run
     ///use volga::{App, SyncEndpointsMapping, Results};
     ///
-    /// #[tokio::main]
-    /// async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    ///     let mut app = App::build("127.0.0.1:7878").await?;
-    /// 
-    ///     app.map_put("/test", |_req| {
-    ///         Results::text("Pass!")
-    ///     }).await;
-    /// 
-    ///     Ok(())
-    /// }
+    ///#[tokio::main]
+    ///async fn main() -> tokio::io::Result<()> {
+    ///    let mut app = App::build("127.0.0.1:7878").await?;
+    ///
+    ///    app.map_put("/test", |_req| {
+    ///        Results::text("Pass!")
+    ///    }).await;
+    ///
+    ///    app.run().await
+    ///}
     /// ```
     fn map_put<F>(&mut self, pattern: &str, handler: F) -> impl std::future::Future<Output = ()> + Send
     where
@@ -78,16 +78,16 @@ pub trait SyncEndpointsMapping {
     /// ```no_run
     ///use volga::{App, SyncEndpointsMapping, Results};
     ///
-    /// #[tokio::main]
-    /// async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    ///     let mut app = App::build("127.0.0.1:7878").await?;
-    /// 
-    ///     app.map_patch("/test", |_req| {
-    ///         Results::text("Pass!")
-    ///     }).await;
-    /// 
-    ///     Ok(())
-    /// }
+    ///#[tokio::main]
+    ///async fn main() -> tokio::io::Result<()> {
+    ///    let mut app = App::build("127.0.0.1:7878").await?;
+    ///
+    ///    app.map_patch("/test", |_req| {
+    ///        Results::text("Pass!")
+    ///    }).await;
+    ///
+    ///    app.run().await
+    ///}
     /// ```
     fn map_patch<F>(&mut self, pattern: &str, handler: F) -> impl std::future::Future<Output = ()> + Send
     where
@@ -99,16 +99,16 @@ pub trait SyncEndpointsMapping {
     /// ```no_run
     ///use volga::{App, SyncEndpointsMapping, Results};
     ///
-    /// #[tokio::main]
-    /// async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    ///     let mut app = App::build("127.0.0.1:7878").await?;
-    /// 
-    ///     app.map_delete("/test", |_req| {
-    ///         Results::text("Pass!")
-    ///     }).await;
-    /// 
-    ///     Ok(())
-    /// }
+    ///#[tokio::main]
+    ///async fn main() -> tokio::io::Result<()> {
+    ///    let mut app = App::build("127.0.0.1:7878").await?;
+    ///
+    ///    app.map_delete("/test", |_req| {
+    ///        Results::text("Pass!")
+    ///    }).await;
+    ///
+    ///    app.run().await
+    ///}
     /// ```
     fn map_delete<F>(&mut self, pattern: &str, handler: F) -> impl std::future::Future<Output = ()> + Send
     where
