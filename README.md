@@ -88,12 +88,12 @@ use volga::{App, AsyncEndpointsMapping, Results, Params};
 async fn main() -> tokio::io::Result<()> {
     let mut app = App::build("127.0.0.1:7878").await?;
 
-    // GET /test?id=11
-    app.map_get("/test", |req| async move {
+    // GET /hello?id=11
+    app.map_get("/hello", |req| async move {
         let params = req.params().unwrap();
         let id = params.get("id").unwrap(); // "11"
 
-        Results::text("Pass!")
+        Results::text("Hello World!")
     }).await;
 
     app.run().await
@@ -107,12 +107,12 @@ use volga::{App, AsyncEndpointsMapping, Results, Params};
 async fn main() -> tokio::io::Result<()> {
     let mut app = App::build("127.0.0.1:7878").await?;
 
-    // GET /test/11
-    app.map_get("/test/{id}", |req| async move {
+    // GET /hello/11
+    app.map_get("/hello/{id}", |req| async move {
         let params = req.params().unwrap();
         let id = params.get("id").unwrap(); // "11"
 
-        Results::text("Pass!")
+        Results::text("Hello World!")
     }).await;
 
     app.run().await
@@ -133,12 +133,12 @@ struct User {
 async fn main() -> tokio::io::Result<()> {
     let mut app = App::build("127.0.0.1:7878").await?;
 
-    // POST /test
+    // POST /hello
     // { name: "John", age: 35 }
-    app.map_post("/test", |req| async move {
+    app.map_post("/hello", |req| async move {
         let params: User = req.payload().unwrap();
 
-        Results::text("Pass!")
+        Results::text("Hello World!")
     }).await;
 
     app.run().await
@@ -159,7 +159,7 @@ struct User {
 async fn main() -> tokio::io::Result<()> {
     let mut app = App::build("127.0.0.1:7878").await?;
 
-    app.map_get("/test", |req| async move {
+    app.map_get("/hello", |req| async move {
         let user: User = User {
             name: "John",
             age: 35
