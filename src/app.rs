@@ -57,6 +57,7 @@ impl HttpContext {
 }
 
 impl App {
+    /// Initializes a new instance of the `App` on specified `socket`.
     pub async fn build(socket: &str) -> io::Result<App> {
         if socket.is_empty() {
             return Err(io::Error::new(io::ErrorKind::InvalidData, "An empty socket has been provided."));
@@ -95,6 +96,7 @@ impl App {
         Ok(server)
     }
 
+    /// Runs the Web Server
     pub async fn run(&mut self) -> io::Result<()> {
         self.use_middleware(|ctx, _| async move {
             ctx.execute().await
@@ -120,6 +122,7 @@ impl App {
         Ok(())
     }
 
+    /// Gracefully shutdown the server
     pub fn shutdown(&self) {
         match self.shutdown_sender.send(()) {
             Ok(_) => (),
