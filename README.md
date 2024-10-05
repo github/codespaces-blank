@@ -13,7 +13,7 @@ Fast & Easy Web Framework for Rust based on [Tokio](https://tokio.rs/) runtime f
 * Runs on stable Rust 1.80+
 ## Getting Started
 ### Dependencies
-```
+```toml
 [dependencies]
 volga = "0.1.5"
 tokio = "1.40.0"
@@ -169,6 +169,31 @@ async fn main() -> tokio::io::Result<()> {
     }).await;
 
     app.run().await
+}
+```
+### Custom headers and Content-Type
+```rust
+use volga::{App, AsyncEndpointsMapping, Results, ResponseContext};
+use std::collections::HashMap;
+
+#[tokio::main]
+async fn main() -> tokio::io::Result<()> {
+   let mut app = App::build("127.0.0.1:7878").await?;
+
+   app.map_get("/hello", |req| async move {
+       let mut headers = HashMap::new();
+
+       // Insert a custom header
+       headers.insert(String::from("x-api-key"), String::from("some api key"));
+       
+       Results::from(ResponseContext {
+           content: Box::new(String::from("Hello World!")),
+           headers: Some(headers),
+           content_type: Some(mime::TEXT_PLAIN)
+       })
+   }).await;
+
+   app.run().await
 }
 ```
 ## Performance
