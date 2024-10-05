@@ -27,14 +27,14 @@ use volga::{App, Results, AsyncEndpointsMapping};
 #[tokio::main]
 async fn main() -> tokio::io::Result<()> {
     // Start the server
-    let mut server = App::build("127.0.0.1:7878").await?;
+    let mut app = App::build("127.0.0.1:7878").await?;
 
     // Example of asynchronous request handler
-    server.map_get("/hello", |request| async {
+    app.map_get("/hello", |request| async {
         Results::text("Hello World!")
     }).await;
     
-    server.run().await
+    app.run().await
 }
 ```
 ### Synchronous handler:
@@ -44,14 +44,14 @@ use volga::{App, Results, SyncEndpointsMapping};
 #[tokio::main]
 async fn main() -> tokio::io::Result<()> {
     // Start the server
-    let mut server = App::build("127.0.0.1:7878").await?;
+    let mut app = App::build("127.0.0.1:7878").await?;
     
     // Example of synchronous request handler
-    server.map_get("/hello", |request| {
+    app.map_get("/hello", |request| {
         Results::text("Hello World!")
     }).await;
     
-    server.run().await
+    app.run().await
 }
 ```
 ### Custom middleware:
@@ -61,10 +61,10 @@ use volga::{App, Results, AsyncEndpointsMapping, AsyncMiddlewareMapping};
 #[tokio::main]
 async fn main() -> tokio::io::Result<()> {
     // Start the server
-    let mut server = App::build("127.0.0.1:7878").await?;
+    let mut app = App::build("127.0.0.1:7878").await?;
 
     // Example of middleware
-    server.use_middleware(|context, next| async move {
+    app.use_middleware(|context, next| async move {
         // Something can be done before the next middleware
 
         let response = next(context).await;
@@ -75,11 +75,11 @@ async fn main() -> tokio::io::Result<()> {
     }).await;
     
     // Example of asynchronous request handler
-    server.map_get("/hello", |request| async {
+    app.map_get("/hello", |request| async {
         Results::text("Hello World!")
     }).await;
     
-    server.run().await
+    app.run().await
 }
 ```
 ### Reading query parameters
