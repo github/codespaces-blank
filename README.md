@@ -171,4 +171,22 @@ async fn main() -> tokio::io::Result<()> {
     app.run().await
 }
 ```
+## Performance
+Tested a single instance on a laptop using 1 thread and 200 connections and under configuration:
+```
+OS: Arch Linux
+CPU: Intel i7-8665U (8) @ 4.800GHz
+RAM: 31686MiB
+```
+### Results
+```
+Running 10s test @ http://127.0.0.1:7878/hello
+  1 threads and 200 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     1.52ms  277.07us   8.17ms   84.19%
+    Req/Sec   131.94k     9.66k  153.34k    73.00%
+  1313351 requests in 10.07s, 162.83MB read
+Requests/sec: 130454.31
+Transfer/sec:     16.17MB
+```
 
