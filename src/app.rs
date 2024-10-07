@@ -50,6 +50,7 @@ pub struct HttpContext {
 }
 
 impl HttpContext {
+    #[inline]
     async fn execute(&self) -> http::Result<Response<Bytes>> {
         let request = &self.request;
         self.endpoint_context.handler.call(request.clone()).await
@@ -58,6 +59,18 @@ impl HttpContext {
 
 impl App {
     /// Initializes a new instance of the `App` on specified `socket`.
+    /// 
+    ///# Examples
+    /// ```no_run
+    ///use volga::App;
+    ///
+    ///#[tokio::main]
+    ///async fn main() -> tokio::io::Result<()> {
+    ///    let mut app = App::build("127.0.0.1:7878").await?;
+    ///    
+    ///    app.run().await
+    ///}
+    /// ```
     pub async fn build(socket: &str) -> io::Result<App> {
         if socket.is_empty() {
             return Err(io::Error::new(io::ErrorKind::InvalidData, "An empty socket has been provided."));
@@ -149,8 +162,6 @@ impl App {
                 }
             }
         }
-
-        println!("Connection handling has ended.");
     }
 
     #[inline]
