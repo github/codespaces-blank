@@ -210,10 +210,10 @@ RAM: 31686MiB
 Running 10s test @ http://127.0.0.1:7878/hello
   1 threads and 200 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency     1.52ms  277.07us   8.17ms   84.19%
-    Req/Sec   131.94k     9.66k  153.34k    73.00%
-  1313351 requests in 10.07s, 162.83MB read
-Requests/sec: 130454.31
-Transfer/sec:     16.17MB
+    Latency     1.47ms  206.78us   3.82ms   63.96%
+    Req/Sec   136.88k     9.41k  160.43k    66.00%
+  1362576 requests in 10.07s, 168.93MB read
+Requests/sec: 135335.46
+Transfer/sec:     16.78MB
 ```
 
