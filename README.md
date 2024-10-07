@@ -5,7 +5,7 @@ Fast & Easy Web Framework for Rust based on [Tokio](https://tokio.rs/) runtime f
 [![License: MIT](https://img.shields.io/badge/License-MIT-violet.svg)](https://github.com/RomanEmreis/volga/blob/main/LICENSE)
 [![Build](https://github.com/RomanEmreis/volga/actions/workflows/rust.yml/badge.svg)](https://github.com/RomanEmreis/volga/actions/workflows/rust.yml)
 
-[Tutorial](https://romanemreis.github.io/volga-docs/) | [API Docs](https://docs.rs/volga/0.1.5/volga/)
+[Tutorial](https://romanemreis.github.io/volga-docs/) | [API Docs](https://docs.rs/volga/0.1.6/volga/)
 
 ## Features
 * Supports HTTP/1.x
