@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use tokio::{
     net::{TcpListener, TcpStream},
-    io::{self,AsyncReadExt, AsyncWriteExt},
+    io::{self, AsyncReadExt, AsyncWriteExt},
     sync::{broadcast, Mutex},
     signal
 };
@@ -12,7 +12,7 @@ use crate::app::{
     endpoints::{Endpoints, EndpointContext},
     middlewares::{Middlewares, mapping::asynchronous::AsyncMiddlewareMapping},
     request::{RawRequest, HttpRequest},
-    results::{Results, HttpResponse}
+    results::{Results, HttpResponse, HttpResult}
 };
 
 pub mod middlewares;
@@ -57,7 +57,7 @@ pub struct HttpContext {
 
 impl HttpContext {
     #[inline]
-    async fn execute(&self) -> http::Result<HttpResponse> {
+    async fn execute(&self) -> HttpResult {
         let request = &self.request;
         self.endpoint_context.handler.call(request.clone()).await
     }
@@ -179,7 +179,7 @@ impl App {
     }
 
     #[inline]
-    async fn handle_request(pipeline: &Arc<Pipeline>, socket: &mut TcpStream, buffer: &mut [u8]) -> Result<HttpResponse, io::Error> {
+    async fn handle_request(pipeline: &Arc<Pipeline>, socket: &mut TcpStream, buffer: &mut [u8]) -> io::Result<HttpResponse> {
         let bytes_read = socket.read(buffer).await?;
         if bytes_read == 0 {
             return Err(io::Error::new(io::ErrorKind::BrokenPipe, "Client closed the connection"));

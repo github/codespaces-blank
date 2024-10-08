@@ -6,8 +6,13 @@ use http::{Request, Version};
 use http::header::{HeaderName, HeaderValue};
 use httparse::{Header, Request as HttParseRequest};
 use serde::Deserialize;
+use crate::{Params, Payload};
+
+pub mod params;
+pub mod payload;
 
 pub type HttpRequest = Request<Bytes>;
+pub type RequestParams = Arc<HashMap<String, String>>;
 
 pub(crate) struct RawRequest<'headers, 'buf> {
     raw_request: HttParseRequest<'headers, 'buf>,
@@ -63,40 +68,6 @@ impl RawRequest<'_, '_> {
     }
 }
 
-pub trait Payload {
-    /// Returns a request body deserialized to type of `T`
-    /// 
-    /// # Example
-    /// ```no_run
-    ///use volga::{App, AsyncEndpointsMapping, Results, Payload};
-    ///use serde::Deserialize;
-    /// 
-    ///#[derive(Deserialize)]
-    ///struct User {
-    ///    name: String,
-    ///    age: i32
-    ///}
-    ///
-    ///#[tokio::main]
-    ///async fn main() -> tokio::io::Result<()> {
-    ///    let mut app = App::build("127.0.0.1:7878").await?;
-    ///
-    ///    // POST /test
-    ///    // { name: "John", age: 35 }
-    ///    app.map_post("/test", |req| async move {
-    ///        let params: User = req.payload().unwrap();
-    ///
-    ///        Results::text("Pass!")
-    ///    }).await;
-    ///
-    ///    app.run().await
-    ///}
-    /// ```
-    fn payload<'a, T>(&'a self) -> Result<T, io::Error>
-    where
-        T: Deserialize<'a>;
-}
-
 impl Payload for HttpRequest {
     fn payload<'a, T>(&'a self) -> Result<T, io::Error>
     where
@@ -107,39 +78,13 @@ impl Payload for HttpRequest {
     }
 }
 
-pub type RequestParams = Arc<HashMap<String, String>>;
-
-pub trait Params {
-    /// Returns a query or route params of HTTP request
-    /// 
-    /// # Example
-    /// ```no_run
-    ///use volga::{App, AsyncEndpointsMapping, Results, Params};
-    ///
-    ///#[tokio::main]
-    ///async fn main() -> tokio::io::Result<()> {
-    ///    let mut app = App::build("127.0.0.1:7878").await?;
-    ///
-    ///    // GET /test?id=11
-    ///    app.map_get("/test", |req| async move {
-    ///        let params = req.params().unwrap();
-    ///        let id = params.get("id").unwrap(); // "11"
-    ///
-    ///        Results::text("Pass!")
-    ///    }).await;
-    ///
-    ///    app.run().await
-    ///}
-    /// ```
-    fn params(&self) -> Option<&RequestParams>;
-}
-
 impl Params for HttpRequest {
     fn params(&self) -> Option<&RequestParams> {
-        if let Some(params) = self.extensions().get::<RequestParams>() {
-            Some(params)
-        } else {
-            None
-        }
+        self.extensions().get::<RequestParams>()
+    }
+
+    fn param(&self, name: &str) -> Option<&String> {
+        self.extensions().get::<RequestParams>()
+            .and_then(|params| params.get(name))
     }
 }

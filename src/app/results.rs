@@ -38,12 +38,13 @@ pub struct ResponseContext<T: ?Sized> {
 }
 
 pub type HttpResponse = Response<Bytes>; 
+pub type HttpResult = http::Result<HttpResponse>;
 
 pub struct Results;
 
 impl Results {
     /// Produces a customized `OK 200` response
-    pub fn from<T>(context: ResponseContext<T>) -> http::Result<HttpResponse>
+    pub fn from<T>(context: ResponseContext<T>) -> HttpResult
     where T:
         ?Sized + Serialize
     {
@@ -76,7 +77,7 @@ impl Results {
 
     /// Produces an `OK 200` response with the `JSON` body.
     #[inline]
-    pub fn json<T>(content: &T) -> http::Result<HttpResponse>
+    pub fn json<T>(content: &T) -> HttpResult
     where T:
         ?Sized + Serialize
     {
@@ -95,7 +96,7 @@ impl Results {
 
     /// Produces an `OK 200` response with the plain text body.
     #[inline]
-    pub fn text(content: &str) -> http::Result<HttpResponse> {
+    pub fn text(content: &str) -> HttpResult {
         let builder = Self::create_default_builder();
 
         builder
@@ -107,7 +108,7 @@ impl Results {
 
     /// Produces an `NOT FOUND 400` response.
     #[inline]
-    pub fn not_found() -> http::Result<HttpResponse> {
+    pub fn not_found() -> HttpResult {
         let builder = Self::create_default_builder();
 
         builder
@@ -119,7 +120,7 @@ impl Results {
 
     /// Produces an `INTERNAL SERVER ERROR 500` response.
     #[inline]
-    pub fn internal_server_error() -> http::Result<HttpResponse> {
+    pub fn internal_server_error() -> HttpResult {
         let builder = Self::create_default_builder();
 
         builder
