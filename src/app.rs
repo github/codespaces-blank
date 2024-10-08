@@ -35,8 +35,16 @@ pub mod mapping;
 ///}
 /// ```
 pub struct App {
-    middlewares: Arc<Mutex<Middlewares>>,
-    endpoints: Arc<Mutex<Endpoints>>,
+    pipeline: Arc<Pipeline>,
+    connection: Connection
+}
+
+struct Pipeline {
+    middlewares: Mutex<Middlewares>,
+    endpoints: Mutex<Endpoints>
+}
+
+struct Connection {
     tcp_listener: TcpListener,
     shutdown_signal: broadcast::Receiver<()>,
     shutdown_sender: broadcast::Sender<()>
@@ -94,12 +102,14 @@ impl App {
             }
         });
 
+        let pipeline = Pipeline {
+            middlewares: Mutex::new(Middlewares::new()),
+            endpoints: Mutex::new(Endpoints::new())
+        };
+        
         let server = Self {
-            tcp_listener,
-            shutdown_sender,
-            shutdown_signal: shutdown_receiver,
-            middlewares: Arc::new(Mutex::new(Middlewares::new())),
-            endpoints: Arc::new(Mutex::new(Endpoints::new()))
+            connection: Connection { tcp_listener, shutdown_sender, shutdown_signal: shutdown_receiver },
+            pipeline: Arc::new(pipeline)
         };
 
         println!("Start listening: {socket}");
@@ -113,17 +123,19 @@ impl App {
             ctx.execute().await
         }).await;
 
+        let connection = &mut self.connection;
+        let pipeline = &self.pipeline;
+        
         loop {
             tokio::select! {
-                Ok((socket, _)) = self.tcp_listener.accept() => {
-                    let middlewares = Arc::clone(&self.middlewares);
-                    let endpoints = Arc::clone(&self.endpoints);
+                Ok((socket, _)) = connection.tcp_listener.accept() => {
+                    let pipeline = pipeline.clone();
                     
                     tokio::spawn(async move {
-                        Self::handle_connection(&middlewares, &endpoints, socket).await;
+                        Self::handle_connection(&pipeline, socket).await;
                     });
                 }
-                _ = self.shutdown_signal.recv() => {
+                _ = connection.shutdown_signal.recv() => {
                     println!("Shutting down server...");
                     break;
                 }
@@ -135,7 +147,7 @@ impl App {
 
     /// Gracefully shutdown the server
     pub fn shutdown(&self) {
-        match self.shutdown_sender.send(()) {
+        match self.connection.shutdown_sender.send(()) {
             Ok(_) => (),
             Err(err) => {
                 eprintln!("Failed to send shutdown the server: {}", err);
@@ -144,18 +156,22 @@ impl App {
     }
 
     #[inline]
-    async fn handle_connection(middlewares: &Arc<Mutex<Middlewares>>, endpoints: &Arc<Mutex<Endpoints>>, mut socket: TcpStream) {
+    async fn handle_connection(pipeline: &Arc<Pipeline>, mut socket: TcpStream) {
         let mut buffer = [0; 1024];
         loop {
-            match Self::handle_request(middlewares, endpoints, &mut socket, &mut buffer).await {
+            match Self::handle_request(pipeline, &mut socket, &mut buffer).await {
                 Ok(response) => {
                     if let Err(err) = Self::write_response(&mut socket, &response).await {
-                        eprintln!("Failed to write to socket: {:?}", err);
+                        if cfg!(debug_assertions) {
+                            eprintln!("Failed to write to socket: {:?}", err);
+                        }
                         break; // Break the loop if fail to write to the socket
                     }
                 }
                 Err(err) => {
-                    eprintln!("Error occurred handling request: {}", err);
+                    if cfg!(debug_assertions) {
+                        eprintln!("Error occurred handling request: {}", err);  
+                    }
                     break;  // Break the loop if handle_request returns an error
                 }
             }
@@ -163,7 +179,7 @@ impl App {
     }
 
     #[inline]
-    async fn handle_request(middlewares: &Arc<Mutex<Middlewares>>, endpoints: &Arc<Mutex<Endpoints>>, socket: &mut TcpStream, buffer: &mut [u8]) -> Result<HttpResponse, io::Error> {
+    async fn handle_request(pipeline: &Arc<Pipeline>, socket: &mut TcpStream, buffer: &mut [u8]) -> Result<HttpResponse, io::Error> {
         let bytes_read = socket.read(buffer).await?;
         if bytes_read == 0 {
             return Err(io::Error::new(io::ErrorKind::BrokenPipe, "Client closed the connection"));
@@ -173,7 +189,7 @@ impl App {
         let parse_req = RawRequest::parse_request(&buffer[..bytes_read], &mut headers)?;
         let mut http_request = RawRequest::convert_to_http_request(parse_req)?;
 
-        let endpoints_guard = endpoints.lock().await;
+        let endpoints_guard = pipeline.endpoints.lock().await;
         if let Some(endpoint_context) = endpoints_guard.get_endpoint(&http_request).await {
             let extensions = http_request.extensions_mut();
             extensions.insert(endpoint_context.params.clone());
@@ -183,7 +199,7 @@ impl App {
                 endpoint_context
             };
 
-            let middlewares_guard = middlewares.lock().await;
+            let middlewares_guard = pipeline.middlewares.lock().await;
             let response = middlewares_guard.execute(Arc::new(context)).await;
 
             Ok(response.unwrap())

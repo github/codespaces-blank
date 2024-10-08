@@ -8,7 +8,7 @@ impl SyncEndpointsMapping for App {
     where
         F: Fn(Arc<HttpRequest>) -> http::Result<HttpResponse> + Send + Sync + 'static,
     {
-        let mut endpoints_guard = self.endpoints.lock().await;
+        let mut endpoints_guard = self.pipeline.endpoints.lock().await;
         SyncMapping::map(&mut *endpoints_guard, Method::GET, pattern, handler);
     }
 
@@ -16,7 +16,7 @@ impl SyncEndpointsMapping for App {
     where
         F: Fn(Arc<HttpRequest>) -> http::Result<HttpResponse> + Send + Sync + 'static,
     {
-        let mut endpoints_guard = self.endpoints.lock().await;
+        let mut endpoints_guard = self.pipeline.endpoints.lock().await;
         SyncMapping::map(&mut *endpoints_guard, Method::GET, pattern, handler);
     }
 
@@ -24,7 +24,7 @@ impl SyncEndpointsMapping for App {
     where
         F: Fn(Arc<HttpRequest>) -> http::Result<HttpResponse> + Send + Sync + 'static,
     {
-        let mut endpoints_guard = self.endpoints.lock().await;
+        let mut endpoints_guard = self.pipeline.endpoints.lock().await;
         SyncMapping::map(&mut *endpoints_guard, Method::GET, pattern, handler);
     }
 
@@ -32,7 +32,7 @@ impl SyncEndpointsMapping for App {
     where
         F: Fn(Arc<HttpRequest>) -> http::Result<HttpResponse> + Send + Sync + 'static,
     {
-        let mut endpoints_guard = self.endpoints.lock().await;
+        let mut endpoints_guard = self.pipeline.endpoints.lock().await;
         SyncMapping::map(&mut *endpoints_guard, Method::GET, pattern, handler);
     }
 
@@ -40,7 +40,7 @@ impl SyncEndpointsMapping for App {
     where
         F: Fn(Arc<HttpRequest>) -> http::Result<HttpResponse> + Send + Sync + 'static,
     {
-        let mut endpoints_guard = self.endpoints.lock().await;
+        let mut endpoints_guard = self.pipeline.endpoints.lock().await;
         SyncMapping::map(&mut *endpoints_guard, Method::GET, pattern, handler);
     }
 }
