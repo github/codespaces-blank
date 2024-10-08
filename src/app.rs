@@ -1,6 +1,4 @@
-﻿use bytes::Bytes;
-use httparse::EMPTY_HEADER;
-use http::{Request, Response};
+﻿use httparse::EMPTY_HEADER;
 use std::sync::Arc;
 
 use tokio::{
@@ -13,8 +11,8 @@ use tokio::{
 use crate::app::{
     endpoints::{Endpoints, EndpointContext},
     middlewares::{Middlewares, mapping::asynchronous::AsyncMiddlewareMapping},
-    request::RawRequest,
-    results::Results
+    request::{RawRequest, HttpRequest},
+    results::{Results, HttpResponse}
 };
 
 pub mod middlewares;
@@ -45,13 +43,13 @@ pub struct App {
 }
 
 pub struct HttpContext {
-    pub request: Arc<Request<Bytes>>,
+    pub request: Arc<HttpRequest>,
     endpoint_context: EndpointContext
 }
 
 impl HttpContext {
     #[inline]
-    async fn execute(&self) -> http::Result<Response<Bytes>> {
+    async fn execute(&self) -> http::Result<HttpResponse> {
         let request = &self.request;
         self.endpoint_context.handler.call(request.clone()).await
     }
@@ -165,7 +163,7 @@ impl App {
     }
 
     #[inline]
-    async fn handle_request(middlewares: &Arc<Mutex<Middlewares>>, endpoints: &Arc<Mutex<Endpoints>>, socket: &mut TcpStream, buffer: &mut [u8]) -> Result<Response<Bytes>, io::Error> {
+    async fn handle_request(middlewares: &Arc<Mutex<Middlewares>>, endpoints: &Arc<Mutex<Endpoints>>, socket: &mut TcpStream, buffer: &mut [u8]) -> Result<HttpResponse, io::Error> {
         let bytes_read = socket.read(buffer).await?;
         if bytes_read == 0 {
             return Err(io::Error::new(io::ErrorKind::BrokenPipe, "Client closed the connection"));
@@ -195,7 +193,7 @@ impl App {
     }
 
     #[inline]
-    async fn write_response(stream: &mut TcpStream, response: &Response<Bytes>) -> io::Result<()> {
+    async fn write_response(stream: &mut TcpStream, response: &HttpResponse) -> io::Result<()> {
         let mut response_bytes = vec![];
 
         // Start with the HTTP status line

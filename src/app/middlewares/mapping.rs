@@ -1,9 +1,8 @@
-﻿use bytes::Bytes;
-use http::Response;
-use std::{pin::Pin, sync::Arc, future::Future};
-use crate::app::{
+﻿use std::{pin::Pin, sync::Arc, future::Future};
+use crate::{
+    HttpResponse, 
     HttpContext,
-    middlewares::{Middlewares, mapping::asynchronous::AsyncMapping}
+    app::middlewares::{Middlewares, mapping::asynchronous::AsyncMapping}
 };
 
 pub mod asynchronous;
@@ -11,17 +10,17 @@ pub mod asynchronous;
 impl AsyncMapping for Middlewares {
     fn use_middleware<F, Fut>(&mut self, middleware: F)
     where
-        F: 'static + Send + Sync + Fn(Arc<HttpContext>, Arc<dyn Fn(Arc<HttpContext>) -> Pin<Box<dyn Future<Output = http::Result<Response<Bytes>>> + Send>> + Send + Sync>) -> Fut,
-        Fut: Future<Output = http::Result<Response<Bytes>>> + Send + 'static,
+        F: 'static + Send + Sync + Fn(Arc<HttpContext>, Arc<dyn Fn(Arc<HttpContext>) -> Pin<Box<dyn Future<Output = http::Result<HttpResponse>> + Send>> + Send + Sync>) -> Fut,
+        Fut: Future<Output = http::Result<HttpResponse>> + Send + 'static,
     {
         let middleware = Arc::new(middleware); // wrapping the middleware into an Arc
-        let mw = Arc::new(move |ctx: Arc<HttpContext>, next: Arc<dyn Fn(Arc<HttpContext>) -> Pin<Box<dyn Future<Output = http::Result<Response<Bytes>>> + Send>> + Send + Sync>| {
+        let mw = Arc::new(move |ctx: Arc<HttpContext>, next: Arc<dyn Fn(Arc<HttpContext>) -> Pin<Box<dyn Future<Output = http::Result<HttpResponse>> + Send>> + Send + Sync>| {
             let middleware = middleware.clone(); // cloning for each invocation
 
             Box::pin(async move {
                 // Here, middleware() can be invoked repeatedly because it’s wrapped in an Arc and cloned.
                 middleware(ctx, next).await
-            }) as Pin<Box<dyn Future<Output = http::Result<Response<Bytes>>> + Send>>
+            }) as Pin<Box<dyn Future<Output = http::Result<HttpResponse>> + Send>>
         });
         self.pipeline.push(mw);
     }

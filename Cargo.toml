@@ -1,11 +1,14 @@
 [package]
 name = "volga"
-version = "0.1.6"
+version = "0.1.7"
 edition = "2021"
-authors = ["Roman Emreis"]
+authors = ["Roman Emreis <roman.emreis@outlook.com>"]
 license = "MIT"
 repository = "https://github.com/RomanEmreis/volga"
 description = "Easy & Fast Web Framework for Rust"
+documentation = "https://docs.rs/volga"
+readme = "README.md"
+homepage = "https://romanemreis.github.io/volga-docs"
 
 [dependencies]
 tokio = { version = "1.40.0", features = ["full"] }

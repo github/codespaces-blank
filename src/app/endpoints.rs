@@ -1,7 +1,7 @@
 ﻿use std::collections::HashMap;
 use std::sync::Arc;
-use bytes::Bytes;
-use http::{Method, Request};
+use http::Method;
+use crate::HttpRequest;
 use crate::app::endpoints::{
     route::Route,
     handlers::RouteHandler
@@ -29,7 +29,7 @@ impl Endpoints {
     }
 
     #[inline]
-    pub(crate) async fn get_endpoint(&self, request: &Request<Bytes>) -> Option<EndpointContext> {
+    pub(crate) async fn get_endpoint(&self, request: &HttpRequest) -> Option<EndpointContext> {
         let uri = request.uri();
 
         let mut query_map = HashMap::new();

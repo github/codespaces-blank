@@ -1,10 +1,10 @@
 ﻿use std::collections::HashMap;
 use bytes::Bytes;
 use chrono::Utc;
-use http::{HeaderName, HeaderValue, Response, StatusCode};
-use http::response::Builder;
 use mime::Mime;
 use serde::Serialize;
+use http::{HeaderName, HeaderValue, Response, StatusCode};
+use http::response::Builder;
 
 /// A customized response context with custom response `headers` and `content_type`
 /// 
@@ -37,11 +37,13 @@ pub struct ResponseContext<T: ?Sized> {
     pub content_type: Option<Mime>
 }
 
+pub type HttpResponse = Response<Bytes>; 
+
 pub struct Results;
 
 impl Results {
     /// Produces a customized `OK 200` response
-    pub fn from<T>(context: ResponseContext<T>) -> http::Result<Response<Bytes>>
+    pub fn from<T>(context: ResponseContext<T>) -> http::Result<HttpResponse>
     where T:
         ?Sized + Serialize
     {
@@ -74,7 +76,7 @@ impl Results {
 
     /// Produces an `OK 200` response with the `JSON` body.
     #[inline]
-    pub fn json<T>(content: &T) -> http::Result<Response<Bytes>>
+    pub fn json<T>(content: &T) -> http::Result<HttpResponse>
     where T:
         ?Sized + Serialize
     {
@@ -93,7 +95,7 @@ impl Results {
 
     /// Produces an `OK 200` response with the plain text body.
     #[inline]
-    pub fn text(content: &str) -> http::Result<Response<Bytes>> {
+    pub fn text(content: &str) -> http::Result<HttpResponse> {
         let builder = Self::create_default_builder();
 
         builder
@@ -105,7 +107,7 @@ impl Results {
 
     /// Produces an `NOT FOUND 400` response.
     #[inline]
-    pub fn not_found() -> http::Result<Response<Bytes>> {
+    pub fn not_found() -> http::Result<HttpResponse> {
         let builder = Self::create_default_builder();
 
         builder
@@ -117,7 +119,7 @@ impl Results {
 
     /// Produces an `INTERNAL SERVER ERROR 500` response.
     #[inline]
-    pub fn internal_server_error() -> http::Result<Response<Bytes>> {
+    pub fn internal_server_error() -> http::Result<HttpResponse> {
         let builder = Self::create_default_builder();
 
         builder

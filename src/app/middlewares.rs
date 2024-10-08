@@ -1,18 +1,12 @@
 ﻿use std::future::Future;
 use std::sync::Arc;
 use std::pin::Pin;
-use bytes::Bytes;
-use http::Response;
-
-use crate::app::{
-    HttpContext,
-    results::Results
-};
+use crate::{HttpResponse, HttpContext, Results};
 
 pub mod mapping;
 
-pub type Next = Arc<dyn Fn(Arc<HttpContext>) -> Pin<Box<dyn Future<Output = http::Result<Response<Bytes>>> + Send>> + Send + Sync>;
-pub(crate) type Middleware = Arc<dyn Fn(Arc<HttpContext>, Next) -> Pin<Box<dyn Future<Output = http::Result<Response<Bytes>>> + Send>> + Send + Sync>;
+pub type Next = Arc<dyn Fn(Arc<HttpContext>) -> Pin<Box<dyn Future<Output = http::Result<HttpResponse>> + Send>> + Send + Sync>;
+pub(crate) type Middleware = Arc<dyn Fn(Arc<HttpContext>, Next) -> Pin<Box<dyn Future<Output = http::Result<HttpResponse>> + Send>> + Send + Sync>;
 
 pub(crate) struct Middlewares {
     pipeline: Vec<Middleware>
@@ -23,7 +17,7 @@ impl Middlewares {
         Self { pipeline: Vec::new() }
     }
 
-    pub(crate) async fn execute(&self, ctx: Arc<HttpContext>) -> http::Result<Response<Bytes>> {
+    pub(crate) async fn execute(&self, ctx: Arc<HttpContext>) -> http::Result<HttpResponse> {
         let next = self.compose();
         next(Arc::clone(&ctx)).await
     }

@@ -7,6 +7,8 @@ use http::header::{HeaderName, HeaderValue};
 use httparse::{Header, Request as HttParseRequest};
 use serde::Deserialize;
 
+pub type HttpRequest = Request<Bytes>;
+
 pub(crate) struct RawRequest<'headers, 'buf> {
     raw_request: HttParseRequest<'headers, 'buf>,
     body: Bytes
@@ -30,7 +32,7 @@ impl RawRequest<'_, '_> {
     }
 
     #[inline]
-    pub(crate) fn convert_to_http_request(raw_req: RawRequest) -> Result<Request<Bytes>, io::Error> {
+    pub(crate) fn convert_to_http_request(raw_req: RawRequest) -> Result<HttpRequest, io::Error> {
         let RawRequest {
             raw_request: parse_req,
             body
@@ -95,7 +97,7 @@ pub trait Payload {
         T: Deserialize<'a>;
 }
 
-impl Payload for Request<Bytes> {
+impl Payload for HttpRequest {
     fn payload<'a, T>(&'a self) -> Result<T, io::Error>
     where
         T: Deserialize<'a>
@@ -132,7 +134,7 @@ pub trait Params {
     fn params(&self) -> Option<&RequestParams>;
 }
 
-impl Params for Request<Bytes> {
+impl Params for HttpRequest {
     fn params(&self) -> Option<&RequestParams> {
         if let Some(params) = self.extensions().get::<RequestParams>() {
             Some(params)
