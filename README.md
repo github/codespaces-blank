@@ -18,7 +18,7 @@ Fast & Easy Web Framework for Rust based on [Tokio](https://tokio.rs/) runtime f
 ### Dependencies
 ```toml
 [dependencies]
-volga = "0.1.7"
+volga = "0.1.8"
 tokio = "1.40.0"
 ```
 ### Asynchronous handler (Recommended):
