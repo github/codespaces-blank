@@ -1,10 +1,10 @@
-﻿use std::{pin::Pin, sync::Arc, future::Future};
+﻿use std::{sync::Arc, future::Future};
 use crate::{HttpContext, HttpResult, Next};
 
 pub trait AsyncMapping {
     fn use_middleware<F, Fut>(&mut self, middleware: F)
     where
-        F: 'static + Send + Sync + Fn(Arc<HttpContext>, Arc<dyn Fn(Arc<HttpContext>) -> Pin<Box<dyn Future<Output = HttpResult> + Send>> + Send + Sync>) -> Fut,
+        F: 'static + Send + Sync + Fn(Arc<HttpContext>, Next) -> Fut,
         Fut: Future<Output = HttpResult> + Send + 'static;
 }
 

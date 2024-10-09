@@ -88,7 +88,7 @@ impl Results {
                 .status(StatusCode::OK)
                 .header(http::header::CONTENT_LENGTH, content.len())
                 .header(http::header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref())
-                .body(Bytes::from(String::from(content)))
+                .body(Bytes::from(content))
         } else {
             Self::internal_server_error()
         }
@@ -98,7 +98,7 @@ impl Results {
     #[inline]
     pub fn text(content: &str) -> HttpResult {
         let builder = Self::create_default_builder();
-
+        
         builder
             .status(StatusCode::OK)
             .header(http::header::CONTENT_LENGTH, content.len())

@@ -1,4 +1,5 @@
-﻿use httparse::EMPTY_HEADER;
+﻿use std::future::Future;
+use httparse::EMPTY_HEADER;
 use std::sync::Arc;
 
 use tokio::{
@@ -55,6 +56,8 @@ pub struct HttpContext {
     endpoint_context: EndpointContext
 }
 
+pub(crate) type BoxedHttpResultFuture = Box<dyn Future<Output = HttpResult> + Send>;
+
 impl HttpContext {
     #[inline]
     async fn execute(&self) -> HttpResult {
@@ -64,6 +67,16 @@ impl HttpContext {
 }
 
 impl App {
+    #[inline]
+    pub(crate) fn middlewares(&self) -> &Mutex<Middlewares> {
+        &self.pipeline.middlewares
+    }
+
+    #[inline]
+    pub(crate) fn endpoints(&self) -> &Mutex<Endpoints> {
+        &self.pipeline.endpoints
+    }
+    
     /// Initializes a new instance of the `App` on specified `socket`.
     /// 
     ///# Examples
@@ -119,9 +132,7 @@ impl App {
 
     /// Runs the Web Server
     pub async fn run(&mut self) -> io::Result<()> {
-        self.use_middleware(|ctx, _| async move {
-            ctx.execute().await
-        }).await;
+        self.use_endpoints().await;
 
         let connection = &mut self.connection;
         let pipeline = &self.pipeline;
@@ -153,6 +164,13 @@ impl App {
                 eprintln!("Failed to send shutdown the server: {}", err);
             }
         };
+    }
+    
+    #[inline]
+    async fn use_endpoints(&mut self) {
+        self.use_middleware(|ctx, _| async move {
+            ctx.execute().await
+        }).await;
     }
 
     #[inline]
@@ -191,8 +209,10 @@ impl App {
 
         let endpoints_guard = pipeline.endpoints.lock().await;
         if let Some(endpoint_context) = endpoints_guard.get_endpoint(&http_request).await {
-            let extensions = http_request.extensions_mut();
-            extensions.insert(endpoint_context.params.clone());
+            if !endpoint_context.params.is_empty() {
+                let extensions = http_request.extensions_mut();
+                extensions.insert(endpoint_context.params.clone());   
+            }
 
             let context = HttpContext {
                 request: Arc::new(http_request),
@@ -202,7 +222,11 @@ impl App {
             let middlewares_guard = pipeline.middlewares.lock().await;
             let response = middlewares_guard.execute(Arc::new(context)).await;
 
-            Ok(response.unwrap())
+            if let Ok(response) = response { 
+                Ok(response)
+            } else { 
+                Ok(Results::internal_server_error().unwrap())
+            } 
         } else {
             Ok(Results::not_found().unwrap())
         }

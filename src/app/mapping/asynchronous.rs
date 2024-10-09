@@ -17,8 +17,8 @@ impl AsyncEndpointsMapping for App {
         Fut: Future<Output = HttpResult> + Send + 'static,
     {
         use crate::app::endpoints::mapping::asynchronous::AsyncMapping;
-        
-        let mut endpoints_guard = self.pipeline.endpoints.lock().await;
+
+        let mut endpoints_guard = self.endpoints().lock().await;
         AsyncMapping::map(&mut *endpoints_guard, Method::GET, pattern, handler);
     }
 
@@ -28,8 +28,8 @@ impl AsyncEndpointsMapping for App {
         Fut: Future<Output = HttpResult> + Send + 'static,
     {
         use crate::app::endpoints::mapping::asynchronous::AsyncMapping;
-        
-        let mut endpoints_guard = self.pipeline.endpoints.lock().await;
+
+        let mut endpoints_guard = self.endpoints().lock().await;
         AsyncMapping::map(&mut *endpoints_guard, Method::POST, pattern, handler);
     }
 
@@ -40,7 +40,7 @@ impl AsyncEndpointsMapping for App {
     {
         use crate::app::endpoints::mapping::asynchronous::AsyncMapping;
 
-        let mut endpoints_guard = self.pipeline.endpoints.lock().await;
+        let mut endpoints_guard = self.endpoints().lock().await;
         AsyncMapping::map(&mut *endpoints_guard, Method::PUT, pattern, handler);
     }
 
@@ -51,7 +51,7 @@ impl AsyncEndpointsMapping for App {
     {
         use crate::app::endpoints::mapping::asynchronous::AsyncMapping;
 
-        let mut endpoints_guard = self.pipeline.endpoints.lock().await;
+        let mut endpoints_guard = self.endpoints().lock().await;
         AsyncMapping::map(&mut *endpoints_guard, Method::DELETE, pattern, handler);
     }
 
@@ -62,7 +62,7 @@ impl AsyncEndpointsMapping for App {
     {
         use crate::app::endpoints::mapping::asynchronous::AsyncMapping;
 
-        let mut endpoints_guard = self.pipeline.endpoints.lock().await;
+        let mut endpoints_guard = self.endpoints().lock().await;
         AsyncMapping::map(&mut *endpoints_guard, Method::PATCH, pattern, handler);
     }
 }
@@ -75,7 +75,7 @@ impl AsyncMiddlewareMapping for App {
     {
         use crate::app::middlewares::mapping::asynchronous::AsyncMapping;
 
-        let mut middlewares_guard = self.pipeline.middlewares.lock().await;
+        let mut middlewares_guard = self.middlewares().lock().await;
         middlewares_guard.use_middleware(handler);
     }
 }

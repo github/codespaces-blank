@@ -69,6 +69,7 @@ impl RawRequest<'_, '_> {
 }
 
 impl Payload for HttpRequest {
+    #[inline]
     fn payload<'a, T>(&'a self) -> Result<T, io::Error>
     where
         T: Deserialize<'a>
@@ -79,12 +80,14 @@ impl Payload for HttpRequest {
 }
 
 impl Params for HttpRequest {
+    #[inline]
     fn params(&self) -> Option<&RequestParams> {
         self.extensions().get::<RequestParams>()
     }
 
+    #[inline]
     fn param(&self, name: &str) -> Option<&String> {
-        self.extensions().get::<RequestParams>()
+        self.params()
             .and_then(|params| params.get(name))
     }
 }
