@@ -86,8 +86,9 @@ impl Params for HttpRequest {
     }
 
     #[inline]
-    fn param(&self, name: &str) -> Option<&String> {
+    fn param(&self, name: &str) -> Result<&String, io::Error> {
         self.params()
             .and_then(|params| params.get(name))
+            .ok_or(io::Error::new(io::ErrorKind::InvalidInput, format!("Missing parameter: {name}")))
     }
 }

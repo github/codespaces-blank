@@ -1,5 +1,4 @@
-﻿use std::io;
-use serde::Deserialize;
+﻿use serde::Deserialize;
 
 pub trait Payload {
     /// Returns a request body deserialized to type of `T`
@@ -16,13 +15,13 @@ pub trait Payload {
     ///}
     ///
     ///#[tokio::main]
-    ///async fn main() -> tokio::io::Result<()> {
+    ///async fn main() -> std::io::Result<()> {
     ///    let mut app = App::build("127.0.0.1:7878").await?;
     ///
     ///    // POST /test
     ///    // { name: "John", age: 35 }
     ///    app.map_post("/test", |req| async move {
-    ///        let params: User = req.payload().unwrap();
+    ///        let params: User = req.payload()?;
     ///
     ///        Results::text("Pass!")
     ///    }).await;
@@ -30,7 +29,7 @@ pub trait Payload {
     ///    app.run().await
     ///}
     /// ```
-    fn payload<'a, T>(&'a self) -> Result<T, io::Error>
+    fn payload<'a, T>(&'a self) -> Result<T, std::io::Error>
     where
         T: Deserialize<'a>;
 }

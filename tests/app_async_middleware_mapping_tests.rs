@@ -6,8 +6,6 @@ async fn it_adds_middleware_request() {
         app.use_middleware(|context, next| async move {
             next(context).await
         }).await;
-
-        assert!(true);
     } else {
         panic!("Unable to build the server!");
     }

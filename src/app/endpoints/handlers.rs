@@ -16,6 +16,7 @@ where
     F: Fn(Arc<HttpRequest>) -> Fut + Send + Sync + 'static,
     Fut: Future<Output = HttpResult> + Send + 'static,
 {
+    #[inline]
     fn call(&self, req: Arc<HttpRequest>) -> Pin<BoxedHttpResultFuture> {
         Box::pin(self.0(req))
     }
@@ -27,6 +28,7 @@ impl<F> Handler for SyncHandler<F>
 where
     F: Fn(Arc<HttpRequest>) -> HttpResult + Send + Sync + 'static,
 {
+    #[inline]
     fn call(&self, req: Arc<HttpRequest>) -> Pin<BoxedHttpResultFuture> {
         let response = self.0(req);
         Box::pin(async move { response })

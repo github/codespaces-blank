@@ -1,8 +1,8 @@
 # Volga
 Fast & Easy Web Framework for Rust based on [Tokio](https://tokio.rs/) runtime for fun and painless microservices crafting.
 
-[![latest](https://img.shields.io/badge/latest-0.1.8-blue)](https://crates.io/crates/volga)
-[![latest](https://img.shields.io/badge/rustc-1.80+-964B00)](https://www.rust-lang.org/)
+[![latest](https://img.shields.io/badge/latest-0.1.9-blue)](https://crates.io/crates/volga)
+[![latest](https://img.shields.io/badge/rustc-1.80+-964B00)](https://crates.io/crates/volga)
 [![License: MIT](https://img.shields.io/badge/License-MIT-violet.svg)](https://github.com/RomanEmreis/volga/blob/main/LICENSE)
 [![Build](https://github.com/RomanEmreis/volga/actions/workflows/rust.yml/badge.svg)](https://github.com/RomanEmreis/volga/actions/workflows/rust.yml)
 
@@ -18,7 +18,7 @@ Fast & Easy Web Framework for Rust based on [Tokio](https://tokio.rs/) runtime f
 ### Dependencies
 ```toml
 [dependencies]
-volga = "0.1.8"
+volga = "0.1.9"
 tokio = "1.40.0"
 ```
 ### Asynchronous handler (Recommended):
@@ -26,7 +26,7 @@ tokio = "1.40.0"
 use volga::{App, Results, AsyncEndpointsMapping};
 
 #[tokio::main]
-async fn main() -> tokio::io::Result<()> {
+async fn main() -> std::io::Result<()> {
     // Start the server
     let mut app = App::build("127.0.0.1:7878").await?;
 
@@ -43,7 +43,7 @@ async fn main() -> tokio::io::Result<()> {
 use volga::{App, Results, SyncEndpointsMapping};
 
 #[tokio::main]
-async fn main() -> tokio::io::Result<()> {
+async fn main() -> std::io::Result<()> {
     // Start the server
     let mut app = App::build("127.0.0.1:7878").await?;
     
@@ -60,7 +60,7 @@ async fn main() -> tokio::io::Result<()> {
 use volga::{App, Results, AsyncEndpointsMapping, AsyncMiddlewareMapping};
 
 #[tokio::main]
-async fn main() -> tokio::io::Result<()> {
+async fn main() -> std::io::Result<()> {
     // Start the server
     let mut app = App::build("127.0.0.1:7878").await?;
 
@@ -88,7 +88,7 @@ async fn main() -> tokio::io::Result<()> {
 use volga::{App, AsyncEndpointsMapping, Results, Params};
 
 #[tokio::main]
-async fn main() -> tokio::io::Result<()> {
+async fn main() -> std::io::Result<()> {
     let mut app = App::build("127.0.0.1:7878").await?;
 
     // GET /hello?id=11
@@ -107,7 +107,7 @@ async fn main() -> tokio::io::Result<()> {
 use volga::{App, AsyncEndpointsMapping, Results, Params};
 
 #[tokio::main]
-async fn main() -> tokio::io::Result<()> {
+async fn main() -> std::io::Result<()> {
     let mut app = App::build("127.0.0.1:7878").await?;
 
     // GET /hello/11
@@ -133,7 +133,7 @@ struct User {
 }
 
 #[tokio::main]
-async fn main() -> tokio::io::Result<()> {
+async fn main() -> std::io::Result<()> {
     let mut app = App::build("127.0.0.1:7878").await?;
 
     // POST /hello
@@ -159,7 +159,7 @@ struct User {
 }
 
 #[tokio::main]
-async fn main() -> tokio::io::Result<()> {
+async fn main() -> std::io::Result<()> {
     let mut app = App::build("127.0.0.1:7878").await?;
 
     app.map_get("/hello", |req| async move {
@@ -180,7 +180,7 @@ use volga::{App, AsyncEndpointsMapping, Results, ResponseContext};
 use std::collections::HashMap;
 
 #[tokio::main]
-async fn main() -> tokio::io::Result<()> {
+async fn main() -> std::io::Result<()> {
    let mut app = App::build("127.0.0.1:7878").await?;
 
    app.map_get("/hello", |req| async move {

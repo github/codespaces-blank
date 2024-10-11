@@ -5,6 +5,7 @@ use mime::Mime;
 use serde::Serialize;
 use http::{HeaderName, HeaderValue, Response, StatusCode};
 use http::response::Builder;
+use tokio::io;
 
 /// A customized response context with custom response `headers` and `content_type`
 /// 
@@ -14,7 +15,7 @@ use http::response::Builder;
 ///use std::collections::HashMap;
 ///
 ///#[tokio::main]
-///async fn main() -> tokio::io::Result<()> {
+///async fn main() -> std::io::Result<()> {
 ///    let mut app = App::build("127.0.0.1:7878").await?;
 ///
 ///    app.map_get("/test", |req| async move {
@@ -38,7 +39,7 @@ pub struct ResponseContext<T: ?Sized> {
 }
 
 pub type HttpResponse = Response<Bytes>; 
-pub type HttpResult = http::Result<HttpResponse>;
+pub type HttpResult = io::Result<HttpResponse>;
 
 pub struct Results;
 
@@ -54,25 +55,32 @@ impl Results {
         if let Some(headers_ref) = builder.headers_mut() {
             if let Some(headers_map) = headers {
                 for (name, value) in headers_map {
-                    headers_ref.insert(HeaderName::from_bytes(name.as_bytes())?, HeaderValue::from_bytes(value.as_bytes())?);
+                    let header_name = HeaderName::from_bytes(name.as_bytes());
+                    let header_value = HeaderValue::from_bytes(value.as_bytes());
+                    
+                    match (header_name, header_value) {
+                        (Ok(header_name), Ok(header_value)) => headers_ref.insert(header_name, header_value),
+                        _ => None
+                    };
                 }
             }
 
             if let Some(content_type) = content_type {
-                headers_ref.insert(http::header::CONTENT_TYPE, HeaderValue::from_bytes(content_type.as_ref().as_bytes())?);
+                headers_ref.insert(http::header::CONTENT_TYPE, HeaderValue::from_bytes(content_type.as_ref().as_bytes()).unwrap());
             } else {
-                headers_ref.insert(http::header::CONTENT_TYPE, HeaderValue::from_bytes(mime::TEXT_PLAIN.as_ref().as_bytes())?);
+                headers_ref.insert(http::header::CONTENT_TYPE, HeaderValue::from_bytes(mime::TEXT_PLAIN.as_ref().as_bytes()).unwrap());
             }
         } else {
             // log this issue
         }
 
-        let content = serde_json::to_string(&content).unwrap();
+        let content = serde_json::to_vec(&content)?;
 
         builder
             .status(StatusCode::OK)
             .header(http::header::CONTENT_LENGTH, content.len())
             .body(Bytes::from(content))
+            .map_err(|_| Self::response_error())
     }
 
     /// Produces an `OK 200` response with the `JSON` body.
@@ -81,53 +89,57 @@ impl Results {
     where T:
         ?Sized + Serialize
     {
-        if let Ok(content) = serde_json::to_string(content) {
-            let builder = Self::create_default_builder();
-
-            builder
-                .status(StatusCode::OK)
-                .header(http::header::CONTENT_LENGTH, content.len())
-                .header(http::header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref())
-                .body(Bytes::from(content))
-        } else {
-            Self::internal_server_error()
-        }
+        let content = serde_json::to_vec(content)?;
+        Self::create_default_builder()
+            .status(StatusCode::OK)
+            .header(http::header::CONTENT_LENGTH, content.len())
+            .header(http::header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref())
+            .body(Bytes::from(content))
+            .map_err(|_| Self::response_error())
     }
 
     /// Produces an `OK 200` response with the plain text body.
     #[inline]
     pub fn text(content: &str) -> HttpResult {
-        let builder = Self::create_default_builder();
-        
-        builder
+        Self::create_default_builder()
             .status(StatusCode::OK)
             .header(http::header::CONTENT_LENGTH, content.len())
             .header(http::header::CONTENT_TYPE, mime::TEXT_PLAIN.as_ref())
             .body(Bytes::from(String::from(content)))
+            .map_err(|_| Self::response_error())
     }
 
     /// Produces an `NOT FOUND 400` response.
     #[inline]
     pub fn not_found() -> HttpResult {
-        let builder = Self::create_default_builder();
-
-        builder
+        Self::create_default_builder()
             .status(StatusCode::NOT_FOUND)
             .header(http::header::CONTENT_LENGTH, 0)
             .header(http::header::CONTENT_TYPE, mime::TEXT_PLAIN.as_ref())
             .body(Bytes::new())
+            .map_err(|_| Self::response_error())
     }
 
     /// Produces an `INTERNAL SERVER ERROR 500` response.
     #[inline]
     pub fn internal_server_error() -> HttpResult {
-        let builder = Self::create_default_builder();
-
-        builder
+        Self::create_default_builder()
             .status(StatusCode::INTERNAL_SERVER_ERROR)
             .header(http::header::CONTENT_LENGTH, 0)
             .header(http::header::CONTENT_TYPE, mime::TEXT_PLAIN.as_ref())
             .body(Bytes::new())
+            .map_err(|_| Self::response_error())
+    }
+
+    /// Produces an `BAD REQUEST 400` response.
+    #[inline]
+    pub fn bad_request(error: String) -> HttpResult {
+        Self::create_default_builder()
+            .status(StatusCode::BAD_REQUEST)
+            .header(http::header::CONTENT_LENGTH, error.len())
+            .header(http::header::CONTENT_TYPE, mime::TEXT_PLAIN.as_ref())
+            .body(Bytes::from(error))
+            .map_err(|_| Self::response_error())
     }
 
     #[inline]
@@ -135,5 +147,10 @@ impl Results {
         Response::builder()
             .header(http::header::DATE,Utc::now().to_rfc2822())
             .header(http::header::SERVER, "Volga")
+    }
+    
+    #[inline]
+    fn response_error() -> io::Error {
+        io::Error::new(io::ErrorKind::Other, "Unable to create a response")
     }
 }

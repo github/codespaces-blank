@@ -16,7 +16,7 @@ pub trait SyncEndpointsMapping {
     ///use volga::{App, SyncEndpointsMapping, Results};
     ///
     ///#[tokio::main]
-    ///async fn main() -> tokio::io::Result<()> {
+    ///async fn main() -> std::io::Result<()> {
     ///    let mut app = App::build("127.0.0.1:7878").await?;
     ///
     ///    app.map_get("/test", |_req| {
@@ -37,7 +37,7 @@ pub trait SyncEndpointsMapping {
     ///use volga::{App, SyncEndpointsMapping, Results};
     ///
     ///#[tokio::main]
-    ///async fn main() -> tokio::io::Result<()> {
+    ///async fn main() -> std::io::Result<()> {
     ///    let mut app = App::build("127.0.0.1:7878").await?;
     ///
     ///    app.map_post("/test", |_req| {
@@ -58,7 +58,7 @@ pub trait SyncEndpointsMapping {
     ///use volga::{App, SyncEndpointsMapping, Results};
     ///
     ///#[tokio::main]
-    ///async fn main() -> tokio::io::Result<()> {
+    ///async fn main() -> std::io::Result<()> {
     ///    let mut app = App::build("127.0.0.1:7878").await?;
     ///
     ///    app.map_put("/test", |_req| {
@@ -79,7 +79,7 @@ pub trait SyncEndpointsMapping {
     ///use volga::{App, SyncEndpointsMapping, Results};
     ///
     ///#[tokio::main]
-    ///async fn main() -> tokio::io::Result<()> {
+    ///async fn main() -> std::io::Result<()> {
     ///    let mut app = App::build("127.0.0.1:7878").await?;
     ///
     ///    app.map_patch("/test", |_req| {
@@ -100,7 +100,7 @@ pub trait SyncEndpointsMapping {
     ///use volga::{App, SyncEndpointsMapping, Results};
     ///
     ///#[tokio::main]
-    ///async fn main() -> tokio::io::Result<()> {
+    ///async fn main() -> std::io::Result<()> {
     ///    let mut app = App::build("127.0.0.1:7878").await?;
     ///
     ///    app.map_delete("/test", |_req| {

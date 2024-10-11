@@ -1,4 +1,5 @@
-﻿use crate::RequestParams;
+﻿use std::io;
+use crate::RequestParams;
 
 pub trait Params {
     /// Returns a query or route params of HTTP request
@@ -8,7 +9,7 @@ pub trait Params {
     ///use volga::{App, AsyncEndpointsMapping, Results, Params};
     ///
     ///#[tokio::main]
-    ///async fn main() -> tokio::io::Result<()> {
+    ///async fn main() -> std::io::Result<()> {
     ///    let mut app = App::build("127.0.0.1:7878").await?;
     ///
     ///    // GET /test?id=11
@@ -31,12 +32,12 @@ pub trait Params {
     ///use volga::{App, AsyncEndpointsMapping, Results, Params};
     ///
     ///#[tokio::main]
-    ///async fn main() -> tokio::io::Result<()> {
+    ///async fn main() -> std::io::Result<()> {
     ///    let mut app = App::build("127.0.0.1:7878").await?;
     ///
     ///    // GET /test?id=11
     ///    app.map_get("/test", |req| async move {
-    ///        let id = req.param("id").unwrap(); // "11"
+    ///        let id = req.param("id")?; // "11"
     ///
     ///        Results::text("Pass!")
     ///    }).await;
@@ -44,5 +45,5 @@ pub trait Params {
     ///    app.run().await
     ///}
     /// ```
-    fn param(&self, name: &str) -> Option<&String>;
+    fn param(&self, name: &str) -> Result<&String, io::Error>;
 }
