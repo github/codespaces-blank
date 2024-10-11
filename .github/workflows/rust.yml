@@ -43,6 +43,9 @@ jobs:
     needs: [clippy_check,build]
     
     steps:
+    - uses: actions/checkout@v4
+    - name: Release
+      run: cargo build --release
     - uses: katyo/publish-crates@v2
       with:
         token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
