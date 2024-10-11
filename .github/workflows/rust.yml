@@ -26,6 +26,7 @@ jobs:
   build:
     environment: CICD
     runs-on: ubuntu-latest
+    needs: clippy_check
 
     steps:
     - uses: actions/checkout@v4
@@ -37,6 +38,7 @@ jobs:
   publish:
     environment: CICD
     runs-on: ubuntu-latest
+    needs: [clippy_check,build]
     
     steps:
     - uses: katyo/publish-crates@v2
