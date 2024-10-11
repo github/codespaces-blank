@@ -190,7 +190,7 @@ impl App {
                     if cfg!(debug_assertions) {
                         eprintln!("Error occurred handling request: {}", err);  
                     }
-                    break;  // Break the loop if handle_request returns an error
+                    break; // Break the loop if handle_request returns an error
                 }
             }
         }
@@ -217,15 +217,13 @@ impl App {
             };
 
             let middlewares_guard = pipeline.middlewares.lock().await;
-            let response = middlewares_guard.execute(Arc::new(context)).await;
-
-            if let Ok(response) = response { 
-                Ok(response)
-            } else { 
-                Ok(Results::internal_server_error().unwrap())
-            } 
+            match middlewares_guard.execute(Arc::new(context)).await {
+                Ok(response) => Ok(response),
+                Err(error) if error.kind() == io::ErrorKind::InvalidInput => Results::bad_request(error.to_string()),
+                _ => Results::internal_server_error()
+            }
         } else {
-            Ok(Results::not_found().unwrap())
+            Results::not_found()
         }
     }
     

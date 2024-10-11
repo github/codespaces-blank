@@ -1,4 +1,5 @@
-﻿use crate::RequestParams;
+﻿use std::io;
+use crate::RequestParams;
 
 pub trait Params {
     /// Returns a query or route params of HTTP request
@@ -36,7 +37,7 @@ pub trait Params {
     ///
     ///    // GET /test?id=11
     ///    app.map_get("/test", |req| async move {
-    ///        let id = req.param("id").unwrap(); // "11"
+    ///        let id = req.param("id")?; // "11"
     ///
     ///        Results::text("Pass!")
     ///    }).await;
@@ -44,5 +45,5 @@ pub trait Params {
     ///    app.run().await
     ///}
     /// ```
-    fn param(&self, name: &str) -> Option<&String>;
+    fn param(&self, name: &str) -> Result<&String, io::Error>;
 }
