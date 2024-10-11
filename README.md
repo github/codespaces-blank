@@ -99,6 +99,13 @@ async fn main() -> std::io::Result<()> {
         Results::text("Hello World!")
     }).await;
 
+    // GET /hello-again?id=11
+    app.map_get("/hello-again", |req| async move {
+        let id = req.param("id")?; // "11"
+
+        Results::text("Hello World!")
+    }).await;
+
     app.run().await
 }
 ```
@@ -114,6 +121,13 @@ async fn main() -> std::io::Result<()> {
     app.map_get("/hello/{id}", |req| async move {
         let params = req.params().unwrap();
         let id = params.get("id").unwrap(); // "11"
+
+        Results::text("Hello World!")
+    }).await;
+
+    // GET /hello-again/11
+    app.map_get("/hello-again/{id}", |req| async move {
+        let id = req.param("id")?; // "11"
 
         Results::text("Hello World!")
     }).await;
@@ -139,7 +153,7 @@ async fn main() -> std::io::Result<()> {
     // POST /hello
     // { name: "John", age: 35 }
     app.map_post("/hello", |req| async move {
-        let params: User = req.payload().unwrap();
+        let params: User = req.payload()?;
 
         Results::text("Hello World!")
     }).await;
