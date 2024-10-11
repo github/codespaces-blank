@@ -6,11 +6,13 @@ on:
     paths:
       - 'src/**'
       - 'tests/**'
+      - '.github/workflows/**'
   pull_request:
     branches: [ "main" ]
     paths:
       - 'src/**'
       - 'tests/**'
+      - '.github/workflows/**'
 
 env:
   CARGO_TERM_COLOR: always
