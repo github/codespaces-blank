@@ -44,7 +44,7 @@ jobs:
     
     steps:
     - uses: katyo/publish-crates@v2
-      name: Publish to crates.io
+    - name: Publish to crates.io
       with:
         token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         registry-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
