@@ -14,7 +14,7 @@ use http::response::Builder;
 ///use std::collections::HashMap;
 ///
 ///#[tokio::main]
-///async fn main() -> tokio::io::Result<()> {
+///async fn main() -> std::io::Result<()> {
 ///    let mut app = App::build("127.0.0.1:7878").await?;
 ///
 ///    app.map_get("/test", |req| async move {

@@ -4,14 +4,14 @@
 //!
 //! ```toml
 //! [dependencies]
-//! volga = "0.1.8"
+//! volga = "0.1.9"
 //! tokio = "1.40.0"
 //! ```
 //! ```no_run
 //! use volga::{App, Results, AsyncEndpointsMapping};
 //!
 //! #[tokio::main]
-//! async fn main() -> tokio::io::Result<()> {
+//! async fn main() -> std::io::Result<()> {
 //!     // Start the server
 //!     let mut server = App::build("localhost:7878").await?;
 //!

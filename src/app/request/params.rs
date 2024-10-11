@@ -8,7 +8,7 @@ pub trait Params {
     ///use volga::{App, AsyncEndpointsMapping, Results, Params};
     ///
     ///#[tokio::main]
-    ///async fn main() -> tokio::io::Result<()> {
+    ///async fn main() -> std::io::Result<()> {
     ///    let mut app = App::build("127.0.0.1:7878").await?;
     ///
     ///    // GET /test?id=11
@@ -31,7 +31,7 @@ pub trait Params {
     ///use volga::{App, AsyncEndpointsMapping, Results, Params};
     ///
     ///#[tokio::main]
-    ///async fn main() -> tokio::io::Result<()> {
+    ///async fn main() -> std::io::Result<()> {
     ///    let mut app = App::build("127.0.0.1:7878").await?;
     ///
     ///    // GET /test?id=11

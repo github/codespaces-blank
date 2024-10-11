@@ -16,11 +16,13 @@ impl Middlewares {
         Self { pipeline: Vec::new() }
     }
 
+    #[inline]
     pub(crate) async fn execute(&self, ctx: Arc<HttpContext>) -> HttpResult {
         let next = self.compose();
         next(Arc::clone(&ctx)).await
     }
 
+    #[inline]
     fn compose(&self) -> Next {
         // Check if the pipeline is empty or not as a safeguard.
         if self.pipeline.is_empty() {

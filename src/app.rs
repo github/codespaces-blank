@@ -29,7 +29,7 @@ pub mod mapping;
 ///use volga::App;
 ///
 ///#[tokio::main]
-///async fn main() -> tokio::io::Result<()> {
+///async fn main() -> std::io::Result<()> {
 ///    let mut app = App::build("127.0.0.1:7878").await?;
 ///    
 ///    app.run().await
@@ -84,7 +84,7 @@ impl App {
     ///use volga::App;
     ///
     ///#[tokio::main]
-    ///async fn main() -> tokio::io::Result<()> {
+    ///async fn main() -> std::io::Result<()> {
     ///    let mut app = App::build("127.0.0.1:7878").await?;
     ///    
     ///    app.run().await
@@ -196,16 +196,13 @@ impl App {
         }
     }
 
-    #[inline]
     async fn handle_request(pipeline: &Arc<Pipeline>, socket: &mut TcpStream, buffer: &mut [u8]) -> io::Result<HttpResponse> {
         let bytes_read = socket.read(buffer).await?;
         if bytes_read == 0 {
             return Err(io::Error::new(io::ErrorKind::BrokenPipe, "Client closed the connection"));
         }
 
-        let mut headers = [EMPTY_HEADER; 16]; // Adjust header size as necessary
-        let parse_req = RawRequest::parse_request(&buffer[..bytes_read], &mut headers)?;
-        let mut http_request = RawRequest::convert_to_http_request(parse_req)?;
+        let mut http_request = Self::parse_http_request(&mut buffer[..bytes_read])?;
 
         let endpoints_guard = pipeline.endpoints.lock().await;
         if let Some(endpoint_context) = endpoints_guard.get_endpoint(&http_request).await {
@@ -231,8 +228,15 @@ impl App {
             Ok(Results::not_found().unwrap())
         }
     }
-
+    
     #[inline]
+    fn parse_http_request(buffer: &mut [u8]) -> io::Result<HttpRequest> {
+        let mut headers = [EMPTY_HEADER; 16]; // Adjust header size as necessary
+        let parse_req = RawRequest::parse_request(buffer, &mut headers)?;
+        
+        RawRequest::convert_to_http_request(parse_req)
+    }
+
     async fn write_response(stream: &mut TcpStream, response: &HttpResponse) -> io::Result<()> {
         let mut response_bytes = vec![];
 

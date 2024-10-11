@@ -6,8 +6,6 @@ async fn it_maps_to_get_request() {
         app.map_get("/test", |_req| async {
             Results::text("Pass!")
         }).await;
-
-        assert!(true);
     } else {
         panic!("Unable to build the server!");
     }
@@ -19,8 +17,6 @@ async fn it_maps_to_post_request() {
         app.map_post("/test", |_req| async {
             Results::text("Pass!")
         }).await;
-
-        assert!(true);
     } else {
         panic!("Unable to build the server!");
     }
@@ -32,8 +28,6 @@ async fn it_maps_to_put_request() {
         app.map_put("/test", |_req| async {
             Results::text("Pass!")
         }).await;
-
-        assert!(true);
     } else {
         panic!("Unable to build the server!");
     }
@@ -45,8 +39,6 @@ async fn it_maps_to_patch_request() {
         app.map_patch("/test", |_req| async {
             Results::text("Pass!")
         }).await;
-
-        assert!(true);
     } else {
         panic!("Unable to build the server!");
     }
@@ -58,8 +50,6 @@ async fn it_maps_to_delete_request() {
         app.map_delete("/test", |_req| async {
             Results::text("Pass!")
         }).await;
-
-        assert!(true);
     } else {
         panic!("Unable to build the server!");
     }

@@ -16,7 +16,7 @@ pub trait AsyncMiddlewareMapping {
     ///use volga::{App, AsyncMiddlewareMapping, Results};
     ///
     ///#[tokio::main]
-    ///async fn main() -> tokio::io::Result<()> {
+    ///async fn main() -> std::io::Result<()> {
     ///    let mut app = App::build("127.0.0.1:7878").await?;
     ///
     ///    app.use_middleware(|ctx, next| async move {

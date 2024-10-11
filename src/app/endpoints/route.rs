@@ -95,7 +95,7 @@ impl Route {
             };
         }
 
-        current.and_then(|route| Some(RouteParams { route, params }))
+        current.map(|route| RouteParams { route, params })
     }
 
     #[inline]
