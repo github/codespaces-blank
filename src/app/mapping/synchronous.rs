@@ -17,7 +17,7 @@ impl SyncEndpointsMapping for App {
         F: Fn(Arc<HttpRequest>) -> HttpResult + Send + Sync + 'static,
     {
         let mut endpoints_guard = self.endpoints().lock().await;
-        SyncMapping::map(&mut *endpoints_guard, Method::GET, pattern, handler);
+        SyncMapping::map(&mut *endpoints_guard, Method::POST, pattern, handler);
     }
 
     async fn map_put<F>(&mut self, pattern: &str, handler: F)
@@ -25,7 +25,7 @@ impl SyncEndpointsMapping for App {
         F: Fn(Arc<HttpRequest>) -> HttpResult + Send + Sync + 'static,
     {
         let mut endpoints_guard = self.endpoints().lock().await;
-        SyncMapping::map(&mut *endpoints_guard, Method::GET, pattern, handler);
+        SyncMapping::map(&mut *endpoints_guard, Method::PUT, pattern, handler);
     }
 
     async fn map_patch<F>(&mut self, pattern: &str, handler: F)
@@ -33,7 +33,7 @@ impl SyncEndpointsMapping for App {
         F: Fn(Arc<HttpRequest>) -> HttpResult + Send + Sync + 'static,
     {
         let mut endpoints_guard = self.endpoints().lock().await;
-        SyncMapping::map(&mut *endpoints_guard, Method::GET, pattern, handler);
+        SyncMapping::map(&mut *endpoints_guard, Method::PATCH, pattern, handler);
     }
 
     async fn map_delete<F>(&mut self, pattern: &str, handler: F)
@@ -41,6 +41,6 @@ impl SyncEndpointsMapping for App {
         F: Fn(Arc<HttpRequest>) -> HttpResult + Send + Sync + 'static,
     {
         let mut endpoints_guard = self.endpoints().lock().await;
-        SyncMapping::map(&mut *endpoints_guard, Method::GET, pattern, handler);
+        SyncMapping::map(&mut *endpoints_guard, Method::DELETE, pattern, handler);
     }
 }

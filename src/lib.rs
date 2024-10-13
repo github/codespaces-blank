@@ -4,7 +4,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! volga = "0.1.9"
+//! volga = "0.1.10"
 //! tokio = "1.40.0"
 //! ```
 //! ```no_run
@@ -13,14 +13,14 @@
 //! #[tokio::main]
 //! async fn main() -> std::io::Result<()> {
 //!     // Start the server
-//!     let mut server = App::build("localhost:7878").await?;
+//!     let mut app = App::build("localhost:7878").await?;
 //!
 //!     // Example of asynchronous GET request handler
-//!     server.map_get("/hello", |request| async {
+//!     app.map_get("/hello", |request| async {
 //!         Results::text("Hello World!")
 //!     }).await;
 //!     
-//!     server.run().await
+//!     app.run().await
 //! }
 //! ```
 

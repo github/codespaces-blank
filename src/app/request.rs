@@ -92,3 +92,59 @@ impl Params for HttpRequest {
             .ok_or(io::Error::new(io::ErrorKind::InvalidInput, format!("Missing parameter: {name}")))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::{collections::HashMap, sync::Arc};
+    use bytes::Bytes;
+    use serde::Deserialize;
+    use crate::{Params, Payload};
+
+    use super::HttpRequest;
+
+    #[derive(Deserialize)]
+    struct TestPayload {
+        name: String
+    }
+
+    #[test]
+    fn it_parses_payload() {
+        let request_body = "{\"name\":\"test\"}";
+        let request = HttpRequest::new(Bytes::from(request_body));
+
+        let payload: TestPayload = request.payload().unwrap();
+
+        assert_eq!(payload.name, "test");
+    }
+
+    #[test]
+    fn it_reads_params() {
+        let mut params = HashMap::new();
+        params.insert(String::from("name"), String::from("test"));
+
+        let mut request = HttpRequest::new(Bytes::new());
+        request.extensions_mut().insert(Arc::new(params));
+
+        let request_params = request.params().unwrap();
+
+        assert_eq!(request_params.len(), 1);
+
+        let name = request_params.get("name").unwrap();
+
+        assert_eq!(name, "test");
+    }
+
+    #[test]
+    fn it_reads_param() {
+        let mut params = HashMap::new();
+        params.insert(String::from("name"), String::from("test"));
+
+        let mut request = HttpRequest::new(Bytes::new());
+        request.extensions_mut().insert(Arc::new(params));
+
+        let name = request.param("name").unwrap();
+
+        assert_eq!(name, "test");
+    }
+
+}
