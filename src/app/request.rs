@@ -2,14 +2,17 @@
 use std::io;
 use std::sync::Arc;
 use bytes::Bytes;
+use cancel::Cancel;
 use http::{Request, Version};
 use http::header::{HeaderName, HeaderValue};
 use httparse::{Header, Request as HttParseRequest};
 use serde::Deserialize;
+use tokio_util::sync::CancellationToken;
 use crate::{Params, Payload};
 
 pub mod params;
 pub mod payload;
+pub mod cancel;
 
 pub type HttpRequest = Request<Bytes>;
 pub type RequestParams = Arc<HashMap<String, String>>;
@@ -93,12 +96,21 @@ impl Params for HttpRequest {
     }
 }
 
+impl Cancel for HttpRequest {
+    fn cancel(&self) {
+        if let Some(token) = self.extensions().get::<CancellationToken>() {
+            token.cancel();
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::{collections::HashMap, sync::Arc};
     use bytes::Bytes;
     use serde::Deserialize;
-    use crate::{Params, Payload};
+    use tokio_util::sync::CancellationToken;
+    use crate::{Cancel, Params, Payload};
 
     use super::HttpRequest;
 
@@ -145,6 +157,18 @@ mod tests {
         let name = request.param("name").unwrap();
 
         assert_eq!(name, "test");
+    }
+
+    #[test]
+    fn it_cancels() {
+        let token = CancellationToken::new();
+
+        let mut request = HttpRequest::new(Bytes::new());
+        request.extensions_mut().insert(token.clone());
+
+        request.cancel();
+
+        assert!(token.is_cancelled());
     }
 
 }

@@ -8,6 +8,7 @@ use tokio::{
     sync::{broadcast, Mutex},
     signal
 };
+use tokio_util::sync::CancellationToken;
 
 use crate::app::{
     endpoints::{Endpoints, EndpointContext},
@@ -98,22 +99,7 @@ impl App {
         let tcp_listener = TcpListener::bind(socket).await?;
         let (shutdown_sender, shutdown_receiver) = broadcast::channel::<()>(1);
 
-        let ctrl_c_shutdown_sender = shutdown_sender.clone();
-        tokio::spawn(async move {
-            match signal::ctrl_c().await {
-                Ok(_) => (),
-                Err(err) => {
-                    eprintln!("Unable to listen for shutdown signal: {}", err);
-                }
-            };
-
-            match ctrl_c_shutdown_sender.send(()) {
-                Ok(_) => (),
-                Err(err) => {
-                    eprintln!("Failed to send shutdown signal: {}", err);
-                }
-            }
-        });
+        Self::subscribe_for_ctrl_c_signal(&shutdown_sender);
 
         let pipeline = Pipeline {
             middlewares: Mutex::new(Middlewares::new()),
@@ -165,6 +151,26 @@ impl App {
             }
         };
     }
+
+    #[inline]
+    fn subscribe_for_ctrl_c_signal(shutdown_sender: &broadcast::Sender<()>) {
+        let ctrl_c_shutdown_sender = shutdown_sender.clone();
+        tokio::spawn(async move {
+            match signal::ctrl_c().await {
+                Ok(_) => (),
+                Err(err) => {
+                    eprintln!("Unable to listen for shutdown signal: {}", err);
+                }
+            };
+
+            match ctrl_c_shutdown_sender.send(()) {
+                Ok(_) => (),
+                Err(err) => {
+                    eprintln!("Failed to send shutdown signal: {}", err);
+                }
+            }
+        });
+    }
     
     #[inline]
     async fn use_endpoints(&mut self) {
@@ -175,28 +181,43 @@ impl App {
 
     #[inline]
     async fn handle_connection(pipeline: &Arc<Pipeline>, mut socket: TcpStream) {
+        let cancellation_token = CancellationToken::new();
         let mut buffer = [0; 1024];
+        
         loop {
-            match Self::handle_request(pipeline, &mut socket, &mut buffer).await {
-                Ok(response) => {
-                    if let Err(err) = Self::write_response(&mut socket, &response).await {
-                        if cfg!(debug_assertions) {
-                            eprintln!("Failed to write to socket: {:?}", err);
+            tokio::select! {
+                response = Self::handle_request(pipeline, &mut socket, &mut buffer, cancellation_token.clone()) => {
+                    match response {
+                        Ok(response) => {
+                            if let Err(err) = Self::write_response(&mut socket, &response).await {
+                                if cfg!(debug_assertions) {
+                                    eprintln!("Failed to write to socket: {:?}", err);
+                                }
+                                cancellation_token.cancel();
+                                break; // Break the loop if fail to write to the socket
+                            }
                         }
-                        break; // Break the loop if fail to write to the socket
+                        Err(err) => {
+                            if cfg!(debug_assertions) {
+                                eprintln!("Error occurred handling request: {}", err);  
+                            }
+                            cancellation_token.cancel();
+                            break; // Break the loop if handle_request returns an error
+                        }
                     }
                 }
-                Err(err) => {
+
+                _ = cancellation_token.cancelled() => {
                     if cfg!(debug_assertions) {
-                        eprintln!("Error occurred handling request: {}", err);  
+                        println!("Task was cancelled.");
                     }
-                    break; // Break the loop if handle_request returns an error
+                    break;
                 }
             }
         }
     }
 
-    async fn handle_request(pipeline: &Arc<Pipeline>, socket: &mut TcpStream, buffer: &mut [u8]) -> io::Result<HttpResponse> {
+    async fn handle_request(pipeline: &Arc<Pipeline>, socket: &mut TcpStream, buffer: &mut [u8], cancellation_token: CancellationToken) -> io::Result<HttpResponse> {
         let bytes_read = socket.read(buffer).await?;
         if bytes_read == 0 {
             return Err(io::Error::new(io::ErrorKind::BrokenPipe, "Client closed the connection"));
@@ -206,8 +227,10 @@ impl App {
 
         let endpoints_guard = pipeline.endpoints.lock().await;
         if let Some(endpoint_context) = endpoints_guard.get_endpoint(&http_request).await {
+            let extensions = http_request.extensions_mut();
+            extensions.insert(cancellation_token.clone());
+
             if !endpoint_context.params.is_empty() {
-                let extensions = http_request.extensions_mut();
                 extensions.insert(endpoint_context.params.clone());   
             }
 
