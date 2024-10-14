@@ -41,6 +41,8 @@ jobs:
     environment: CICD
     runs-on: ubuntu-latest
     needs: [clippy_check,build]
+
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     
     steps:
     - uses: actions/checkout@v4
