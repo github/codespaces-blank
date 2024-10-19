@@ -1,5 +1,7 @@
+use tokio_util::sync::CancellationToken;
+
 pub trait Cancel {
-    /// Cancels current HTTP request
+    /// Creates a clone of the `CancellationToken` attached to the HTTP request which will get cancelled whenever the current token gets cancelled, and vice versa.
     /// 
     ///# Example
     /// ```no_run
@@ -9,15 +11,18 @@ pub trait Cancel {
     ///async fn main() -> std::io::Result<()> {
     ///    let mut app = App::build("127.0.0.1:7878").await?;
     ///
-    ///    // GET /test?id=11
     ///    app.map_get("/test", |req| async move {
-    ///        req.cancel();
+    ///        let token = req.cancellation_token();
     ///
-    ///        Results::text("Pass!")
+    ///         if token.is_cancelled() { 
+    ///             Results::text("Cancelled!")
+    ///         } else {
+    ///             Results::text("Pass!")
+    ///         } 
     ///    }).await;
     ///
     ///    app.run().await
     ///}
     /// ```
-    fn cancel(&self);
+    fn cancellation_token(&self) -> CancellationToken;
 }

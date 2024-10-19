@@ -142,6 +142,17 @@ impl Results {
             .map_err(|_| Self::response_error())
     }
 
+    /// Produces an `CLIENT CLOSED REQUEST 499` response.
+    #[inline]
+    pub fn request_cancelled() -> HttpResult {
+        Self::create_default_builder()
+            .status(499)
+            .header(http::header::CONTENT_LENGTH, 0)
+            .header(http::header::CONTENT_TYPE, mime::TEXT_PLAIN.as_ref())
+            .body(Bytes::new())
+            .map_err(|_| Self::response_error())
+    }
+
     #[inline]
     fn create_default_builder() -> Builder {
         Response::builder()

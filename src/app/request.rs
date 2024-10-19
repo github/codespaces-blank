@@ -97,9 +97,11 @@ impl Params for HttpRequest {
 }
 
 impl Cancel for HttpRequest {
-    fn cancel(&self) {
+    fn cancellation_token(&self) -> CancellationToken {
         if let Some(token) = self.extensions().get::<CancellationToken>() {
-            token.cancel();
+            token.clone()
+        } else { 
+            CancellationToken::new()
         }
     }
 }
@@ -166,7 +168,8 @@ mod tests {
         let mut request = HttpRequest::new(Bytes::new());
         request.extensions_mut().insert(token.clone());
 
-        request.cancel();
+        let req_token = request.cancellation_token();
+        req_token.cancel();
 
         assert!(token.is_cancelled());
     }

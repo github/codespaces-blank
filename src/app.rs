@@ -1,15 +1,14 @@
 ﻿use std::future::Future;
 use httparse::EMPTY_HEADER;
 use std::sync::Arc;
-
+use std::time::Duration;
+use tokio_util::sync::CancellationToken;
 use tokio::{
     net::{TcpListener, TcpStream},
     io::{self, AsyncReadExt, AsyncWriteExt},
     sync::{broadcast, Mutex},
     signal
 };
-use tokio_util::sync::CancellationToken;
-
 use crate::app::{
     endpoints::{Endpoints, EndpointContext},
     middlewares::{Middlewares, mapping::asynchronous::AsyncMiddlewareMapping},
@@ -180,51 +179,77 @@ impl App {
     }
 
     #[inline]
-    async fn handle_connection(pipeline: &Arc<Pipeline>, mut socket: TcpStream) {
-        let cancellation_token = CancellationToken::new();
+    async fn handle_connection(pipeline: &Arc<Pipeline>, socket: TcpStream) {
         let mut buffer = [0; 1024];
+        let socket = Arc::new(Mutex::new(socket));
         
         loop {
-            tokio::select! {
-                response = Self::handle_request(pipeline, &mut socket, &mut buffer, cancellation_token.clone()) => {
-                    match response {
-                        Ok(response) => {
-                            if let Err(err) = Self::write_response(&mut socket, &response).await {
-                                if cfg!(debug_assertions) {
-                                    eprintln!("Failed to write to socket: {:?}", err);
-                                }
-                                cancellation_token.cancel();
-                                break; // Break the loop if fail to write to the socket
-                            }
+            match Self::handle_request(pipeline, socket.clone(), &mut buffer).await {
+                Ok(response) => {
+                    if let Err(err) = Self::write_response(socket.clone(), &response).await {
+                        if cfg!(debug_assertions) {
+                            eprintln!("Failed to write to socket: {:?}", err);
                         }
-                        Err(err) => {
-                            if cfg!(debug_assertions) {
-                                eprintln!("Error occurred handling request: {}", err);  
-                            }
-                            cancellation_token.cancel();
-                            break; // Break the loop if handle_request returns an error
-                        }
+                        break; // Break the loop if fail to write to the socket
                     }
                 }
-
-                _ = cancellation_token.cancelled() => {
+                Err(err) => {
                     if cfg!(debug_assertions) {
-                        println!("Task was cancelled.");
+                        eprintln!("Error occurred handling request: {}", err);
                     }
-                    break;
+                    break; // Break the loop if handle_request returns an error
                 }
             }
         }
     }
+    
+    fn create_cancellation_monitoring_task(socket: Arc<Mutex<TcpStream>>, cancellation_token: CancellationToken, stop_token: CancellationToken) {
+        tokio::spawn(async move {
+            // Monitor the connection
+            let mut peek_buf = [0u8; 1];
+            let mut interval = tokio::time::interval(Duration::from_millis(1000));
+            loop {
+                tokio::select! {
+                    _ = stop_token.cancelled() => break,
+                    _ = cancellation_token.cancelled() => break,
+                    _ = interval.tick() => {
+                        if cancellation_token.is_cancelled() || stop_token.is_cancelled() {
+                            break;
+                        }
 
-    async fn handle_request(pipeline: &Arc<Pipeline>, socket: &mut TcpStream, buffer: &mut [u8], cancellation_token: CancellationToken) -> io::Result<HttpResponse> {
-        let bytes_read = socket.read(buffer).await?;
+                        let socket_guard = socket.lock().await;
+                        match socket_guard.peek(&mut peek_buf).await {
+                            Ok(0) => {
+                                cancellation_token.cancel();
+                                break;
+                            },
+                            Ok(_) => continue, // Stream is still open, no action needed
+                            Err(_) => {
+                                cancellation_token.cancel();
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    async fn handle_request(pipeline: &Arc<Pipeline>, socket: Arc<Mutex<TcpStream>>, buffer: &mut [u8]) -> io::Result<HttpResponse> {
+        //let bytes_read = socket.read(buffer).await?;
+        let bytes_read = {
+            let mut socket_guard = socket.lock().await;
+            socket_guard.read(buffer).await?
+        };
+
         if bytes_read == 0 {
             return Err(io::Error::new(io::ErrorKind::BrokenPipe, "Client closed the connection"));
         }
-
+        
         let mut http_request = Self::parse_http_request(&mut buffer[..bytes_read])?;
 
+        let cancellation_token = CancellationToken::new();
+        
         let endpoints_guard = pipeline.endpoints.lock().await;
         if let Some(endpoint_context) = endpoints_guard.get_endpoint(&http_request).await {
             let extensions = http_request.extensions_mut();
@@ -238,13 +263,33 @@ impl App {
                 request: Arc::new(http_request),
                 endpoint_context
             };
-
+            
+            let stop_token = CancellationToken::new();
+            Self::create_cancellation_monitoring_task(socket.clone(), cancellation_token.clone(), stop_token.clone());
+                
             let middlewares_guard = pipeline.middlewares.lock().await;
-            match middlewares_guard.execute(Arc::new(context)).await {
-                Ok(response) => Ok(response),
-                Err(error) if error.kind() == io::ErrorKind::InvalidInput => Results::bad_request(error.to_string()),
-                _ => Results::internal_server_error()
+            tokio::select! {
+                response = middlewares_guard.execute(Arc::new(context)) => {
+                    stop_token.cancel();
+                    match response {
+                        Ok(response) => Ok(response),
+                        Err(error) if error.kind() == io::ErrorKind::InvalidInput => Results::bad_request(error.to_string()),
+                        _ => Results::internal_server_error()
+                    }
+                }
+                _ = cancellation_token.cancelled() => {
+                    if cfg!(debug_assertions) {
+                        println!("Task was cancelled.");
+                    }
+                    Results::request_cancelled()
+                }
             }
+
+            //match middlewares_guard.execute(Arc::new(context)).await {
+            //    Ok(response) => Ok(response),
+            //    Err(error) if error.kind() == io::ErrorKind::InvalidInput => Results::bad_request(error.to_string()),
+            //    _ => Results::internal_server_error()
+            //}
         } else {
             Results::not_found()
         }
@@ -258,7 +303,7 @@ impl App {
         RawRequest::convert_to_http_request(parse_req)
     }
 
-    async fn write_response(stream: &mut TcpStream, response: &HttpResponse) -> io::Result<()> {
+    async fn write_response(socket: Arc<Mutex<TcpStream>>, response: &HttpResponse) -> io::Result<()> {
         let mut response_bytes = vec![];
 
         // Start with the HTTP status line
@@ -286,9 +331,11 @@ impl App {
         if !response.body().is_empty() {
             response_bytes.extend_from_slice(response.body());
         }
+        
+        let mut socket_guard = socket.lock().await;
 
-        stream.write_all(&response_bytes).await?;
-        stream.flush().await
+        socket_guard.write_all(&response_bytes).await?;
+        socket_guard.flush().await
     }
 }
 
