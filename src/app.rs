@@ -9,6 +9,7 @@ use tokio::{
     sync::{broadcast, Mutex},
     signal
 };
+use tokio::io::Interest;
 use crate::app::{
     endpoints::{Endpoints, EndpointContext},
     middlewares::{Middlewares, mapping::asynchronous::AsyncMiddlewareMapping},
@@ -179,14 +180,14 @@ impl App {
     }
 
     #[inline]
-    async fn handle_connection(pipeline: &Arc<Pipeline>, socket: TcpStream) {
+    async fn handle_connection(pipeline: &Arc<Pipeline>, mut socket: TcpStream) {
         let mut buffer = [0; 1024];
-        let socket = Arc::new(Mutex::new(socket));
+        let cancellation_token = CancellationToken::new();
         
         loop {
-            match Self::handle_request(pipeline, socket.clone(), &mut buffer).await {
+            match Self::handle_request(pipeline, &mut socket, &mut buffer, cancellation_token.clone()).await {
                 Ok(response) => {
-                    if let Err(err) = Self::write_response(socket.clone(), &response).await {
+                    if let Err(err) = Self::write_response(&mut socket, &response).await {
                         if cfg!(debug_assertions) {
                             eprintln!("Failed to write to socket: {:?}", err);
                         }
@@ -203,53 +204,36 @@ impl App {
         }
     }
     
-    fn create_cancellation_monitoring_task(socket: Arc<Mutex<TcpStream>>, cancellation_token: CancellationToken, stop_token: CancellationToken) {
-        tokio::spawn(async move {
-            // Monitor the connection
-            let mut peek_buf = [0u8; 1];
-            let mut interval = tokio::time::interval(Duration::from_millis(1000));
-            loop {
-                tokio::select! {
-                    _ = stop_token.cancelled() => break,
-                    _ = cancellation_token.cancelled() => break,
-                    _ = interval.tick() => {
-                        if cancellation_token.is_cancelled() || stop_token.is_cancelled() {
-                            break;
-                        }
-
-                        let socket_guard = socket.lock().await;
-                        match socket_guard.peek(&mut peek_buf).await {
-                            Ok(0) => {
-                                cancellation_token.cancel();
-                                break;
-                            },
-                            Ok(_) => continue, // Stream is still open, no action needed
-                            Err(_) => {
-                                cancellation_token.cancel();
-                                break;
-                            }
-                        }
-                    }
+    async fn create_cancellation_monitoring_task(socket: &mut TcpStream) -> bool {
+        let mut interval = tokio::time::interval(Duration::from_millis(500));
+        let cancelled;
+        
+        loop {
+            interval.tick().await;
+            match socket.ready(Interest::READABLE | Interest::WRITABLE).await {
+                Ok(ready) if ready.is_read_closed() || ready.is_write_closed() => {
+                    cancelled = true;
+                    break;
+                },
+                Ok(_) => continue,
+                Err(_) => {
+                    cancelled = true;
+                    break;
                 }
             }
-        });
+        }
+        
+        cancelled
     }
 
-    async fn handle_request(pipeline: &Arc<Pipeline>, socket: Arc<Mutex<TcpStream>>, buffer: &mut [u8]) -> io::Result<HttpResponse> {
-        //let bytes_read = socket.read(buffer).await?;
-        let bytes_read = {
-            let mut socket_guard = socket.lock().await;
-            socket_guard.read(buffer).await?
-        };
-
+    async fn handle_request(pipeline: &Arc<Pipeline>, socket: &mut TcpStream, buffer: &mut [u8], cancellation_token: CancellationToken) -> io::Result<HttpResponse> {
+        let bytes_read = socket.read(buffer).await?;
         if bytes_read == 0 {
             return Err(io::Error::new(io::ErrorKind::BrokenPipe, "Client closed the connection"));
         }
         
         let mut http_request = Self::parse_http_request(&mut buffer[..bytes_read])?;
 
-        let cancellation_token = CancellationToken::new();
-        
         let endpoints_guard = pipeline.endpoints.lock().await;
         if let Some(endpoint_context) = endpoints_guard.get_endpoint(&http_request).await {
             let extensions = http_request.extensions_mut();
@@ -263,33 +247,27 @@ impl App {
                 request: Arc::new(http_request),
                 endpoint_context
             };
-            
-            let stop_token = CancellationToken::new();
-            Self::create_cancellation_monitoring_task(socket.clone(), cancellation_token.clone(), stop_token.clone());
                 
             let middlewares_guard = pipeline.middlewares.lock().await;
-            tokio::select! {
-                response = middlewares_guard.execute(Arc::new(context)) => {
-                    stop_token.cancel();
-                    match response {
-                        Ok(response) => Ok(response),
-                        Err(error) if error.kind() == io::ErrorKind::InvalidInput => Results::bad_request(error.to_string()),
-                        _ => Results::internal_server_error()
+            let response = tokio::select! {
+                _ = cancellation_token.cancelled() => Results::client_closed_request(),
+                response = middlewares_guard.execute(Arc::new(context)) => response,
+                cancelled = Self::create_cancellation_monitoring_task(socket) => {
+                    if cancelled {
+                        cancellation_token.cancel();
+                        Results::client_closed_request()
+                    } else {
+                        // Unreachable
+                        Results::internal_server_error(None)  
                     }
                 }
-                _ = cancellation_token.cancelled() => {
-                    if cfg!(debug_assertions) {
-                        println!("Task was cancelled.");
-                    }
-                    Results::request_cancelled()
-                }
+            };
+            
+            match response {
+                Ok(response) => Ok(response),
+                Err(error) if error.kind() == io::ErrorKind::InvalidInput => Results::bad_request(Some(error.to_string())),
+                Err(error) => Results::internal_server_error(Some(error.to_string()))
             }
-
-            //match middlewares_guard.execute(Arc::new(context)).await {
-            //    Ok(response) => Ok(response),
-            //    Err(error) if error.kind() == io::ErrorKind::InvalidInput => Results::bad_request(error.to_string()),
-            //    _ => Results::internal_server_error()
-            //}
         } else {
             Results::not_found()
         }
@@ -303,7 +281,7 @@ impl App {
         RawRequest::convert_to_http_request(parse_req)
     }
 
-    async fn write_response(socket: Arc<Mutex<TcpStream>>, response: &HttpResponse) -> io::Result<()> {
+    async fn write_response(socket: &mut TcpStream, response: &HttpResponse) -> io::Result<()> {
         let mut response_bytes = vec![];
 
         // Start with the HTTP status line
@@ -332,10 +310,8 @@ impl App {
             response_bytes.extend_from_slice(response.body());
         }
         
-        let mut socket_guard = socket.lock().await;
-
-        socket_guard.write_all(&response_bytes).await?;
-        socket_guard.flush().await
+        socket.write_all(&response_bytes).await?;
+        socket.flush().await
     }
 }
 

@@ -122,29 +122,31 @@ impl Results {
 
     /// Produces an `INTERNAL SERVER ERROR 500` response.
     #[inline]
-    pub fn internal_server_error() -> HttpResult {
+    pub fn internal_server_error(error: Option<String>) -> HttpResult {
+        let (len, body) = Self::get_error_info(error);
         Self::create_default_builder()
             .status(StatusCode::INTERNAL_SERVER_ERROR)
-            .header(http::header::CONTENT_LENGTH, 0)
+            .header(http::header::CONTENT_LENGTH, len)
             .header(http::header::CONTENT_TYPE, mime::TEXT_PLAIN.as_ref())
-            .body(Bytes::new())
+            .body(body)
             .map_err(|_| Self::response_error())
     }
 
     /// Produces an `BAD REQUEST 400` response.
     #[inline]
-    pub fn bad_request(error: String) -> HttpResult {
+    pub fn bad_request(error: Option<String>) -> HttpResult {
+        let (len, body) = Self::get_error_info(error);
         Self::create_default_builder()
             .status(StatusCode::BAD_REQUEST)
-            .header(http::header::CONTENT_LENGTH, error.len())
+            .header(http::header::CONTENT_LENGTH, len)
             .header(http::header::CONTENT_TYPE, mime::TEXT_PLAIN.as_ref())
-            .body(Bytes::from(error))
+            .body(body)
             .map_err(|_| Self::response_error())
     }
 
     /// Produces an `CLIENT CLOSED REQUEST 499` response.
     #[inline]
-    pub fn request_cancelled() -> HttpResult {
+    pub fn client_closed_request() -> HttpResult {
         Self::create_default_builder()
             .status(499)
             .header(http::header::CONTENT_LENGTH, 0)
@@ -163,5 +165,14 @@ impl Results {
     #[inline]
     fn response_error() -> io::Error {
         io::Error::new(io::ErrorKind::Other, "Unable to create a response")
+    }
+
+    #[inline]
+    fn get_error_info(error: Option<String>) -> (usize, Bytes) {
+        if let Some(error) = error {
+            (error.len(), Bytes::from(error))
+        } else {
+            (0, Bytes::new())
+        }
     }
 }
