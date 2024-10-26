@@ -1,14 +1,15 @@
 ﻿use std::future::Future;
 use httparse::EMPTY_HEADER;
 use std::sync::Arc;
-
+use std::time::Duration;
+use tokio_util::sync::CancellationToken;
 use tokio::{
     net::{TcpListener, TcpStream},
     io::{self, AsyncReadExt, AsyncWriteExt},
     sync::{broadcast, Mutex},
     signal
 };
-
+use tokio::io::Interest;
 use crate::app::{
     endpoints::{Endpoints, EndpointContext},
     middlewares::{Middlewares, mapping::asynchronous::AsyncMiddlewareMapping},
@@ -98,22 +99,7 @@ impl App {
         let tcp_listener = TcpListener::bind(socket).await?;
         let (shutdown_sender, shutdown_receiver) = broadcast::channel::<()>(1);
 
-        let ctrl_c_shutdown_sender = shutdown_sender.clone();
-        tokio::spawn(async move {
-            match signal::ctrl_c().await {
-                Ok(_) => (),
-                Err(err) => {
-                    eprintln!("Unable to listen for shutdown signal: {}", err);
-                }
-            };
-
-            match ctrl_c_shutdown_sender.send(()) {
-                Ok(_) => (),
-                Err(err) => {
-                    eprintln!("Failed to send shutdown signal: {}", err);
-                }
-            }
-        });
+        Self::subscribe_for_ctrl_c_signal(&shutdown_sender);
 
         let pipeline = Pipeline {
             middlewares: Mutex::new(Middlewares::new()),
@@ -165,6 +151,26 @@ impl App {
             }
         };
     }
+
+    #[inline]
+    fn subscribe_for_ctrl_c_signal(shutdown_sender: &broadcast::Sender<()>) {
+        let ctrl_c_shutdown_sender = shutdown_sender.clone();
+        tokio::spawn(async move {
+            match signal::ctrl_c().await {
+                Ok(_) => (),
+                Err(err) => {
+                    eprintln!("Unable to listen for shutdown signal: {}", err);
+                }
+            };
+
+            match ctrl_c_shutdown_sender.send(()) {
+                Ok(_) => (),
+                Err(err) => {
+                    eprintln!("Failed to send shutdown signal: {}", err);
+                }
+            }
+        });
+    }
     
     #[inline]
     async fn use_endpoints(&mut self) {
@@ -176,6 +182,7 @@ impl App {
     #[inline]
     async fn handle_connection(pipeline: &Arc<Pipeline>, mut socket: TcpStream) {
         let mut buffer = [0; 1024];
+        
         loop {
             match Self::handle_request(pipeline, &mut socket, &mut buffer).await {
                 Ok(response) => {
@@ -188,10 +195,22 @@ impl App {
                 }
                 Err(err) => {
                     if cfg!(debug_assertions) {
-                        eprintln!("Error occurred handling request: {}", err);  
+                        eprintln!("Error occurred handling request: {}", err);
                     }
                     break; // Break the loop if handle_request returns an error
                 }
+            }
+        }
+    }
+    
+    async fn create_cancellation_monitoring_task(socket: &mut TcpStream) {
+        let mut interval = tokio::time::interval(Duration::from_millis(500));
+        loop {
+            interval.tick().await;
+            match socket.ready(Interest::READABLE | Interest::WRITABLE).await {
+                Ok(ready) if ready.is_read_closed() || ready.is_write_closed() => break,
+                Ok(_) => continue,
+                Err(_) => break
             }
         }
     }
@@ -201,13 +220,16 @@ impl App {
         if bytes_read == 0 {
             return Err(io::Error::new(io::ErrorKind::BrokenPipe, "Client closed the connection"));
         }
-
+        
         let mut http_request = Self::parse_http_request(&mut buffer[..bytes_read])?;
-
+        let cancellation_token = CancellationToken::new();
+        
         let endpoints_guard = pipeline.endpoints.lock().await;
         if let Some(endpoint_context) = endpoints_guard.get_endpoint(&http_request).await {
+            let extensions = http_request.extensions_mut();
+            extensions.insert(cancellation_token.clone());
+
             if !endpoint_context.params.is_empty() {
-                let extensions = http_request.extensions_mut();
                 extensions.insert(endpoint_context.params.clone());   
             }
 
@@ -215,12 +237,20 @@ impl App {
                 request: Arc::new(http_request),
                 endpoint_context
             };
-
+                
             let middlewares_guard = pipeline.middlewares.lock().await;
-            match middlewares_guard.execute(Arc::new(context)).await {
+            let response = tokio::select! {
+                response = middlewares_guard.execute(Arc::new(context)) => response,
+                _ = Self::create_cancellation_monitoring_task(socket) => {
+                    cancellation_token.cancel();
+                    Results::client_closed_request()
+                }
+            };
+            
+            match response {
                 Ok(response) => Ok(response),
-                Err(error) if error.kind() == io::ErrorKind::InvalidInput => Results::bad_request(error.to_string()),
-                _ => Results::internal_server_error()
+                Err(error) if error.kind() == io::ErrorKind::InvalidInput => Results::bad_request(Some(error.to_string())),
+                Err(error) => Results::internal_server_error(Some(error.to_string()))
             }
         } else {
             Results::not_found()
@@ -235,7 +265,7 @@ impl App {
         RawRequest::convert_to_http_request(parse_req)
     }
 
-    async fn write_response(stream: &mut TcpStream, response: &HttpResponse) -> io::Result<()> {
+    async fn write_response(socket: &mut TcpStream, response: &HttpResponse) -> io::Result<()> {
         let mut response_bytes = vec![];
 
         // Start with the HTTP status line
@@ -263,9 +293,9 @@ impl App {
         if !response.body().is_empty() {
             response_bytes.extend_from_slice(response.body());
         }
-
-        stream.write_all(&response_bytes).await?;
-        stream.flush().await
+        
+        socket.write_all(&response_bytes).await?;
+        socket.flush().await
     }
 }
 
