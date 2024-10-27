@@ -21,12 +21,12 @@ pub trait SyncEndpointsMapping {
     ///
     ///    app.map_get("/test", |_req| {
     ///        Results::text("Pass!")
-    ///    }).await;
+    ///    });
     ///
     ///    app.run().await
     ///}
     /// ```
-    fn map_get<F>(&mut self, pattern: &str, handler: F) -> impl std::future::Future<Output = ()> + Send
+    fn map_get<F>(&mut self, pattern: &str, handler: F)
     where
         F: Fn(Arc<HttpRequest>) -> HttpResult + Send + Sync + 'static;
 
@@ -42,12 +42,12 @@ pub trait SyncEndpointsMapping {
     ///
     ///    app.map_post("/test", |_req| {
     ///        Results::text("Pass!")
-    ///    }).await;
+    ///    });
     ///
     ///    app.run().await
     ///}
     /// ```
-    fn map_post<F>(&mut self, pattern: &str, handler: F) -> impl std::future::Future<Output = ()> + Send
+    fn map_post<F>(&mut self, pattern: &str, handler: F)
     where
         F: Fn(Arc<HttpRequest>) -> HttpResult + Send + Sync + 'static;
 
@@ -63,12 +63,12 @@ pub trait SyncEndpointsMapping {
     ///
     ///    app.map_put("/test", |_req| {
     ///        Results::text("Pass!")
-    ///    }).await;
+    ///    });
     ///
     ///    app.run().await
     ///}
     /// ```
-    fn map_put<F>(&mut self, pattern: &str, handler: F) -> impl std::future::Future<Output = ()> + Send
+    fn map_put<F>(&mut self, pattern: &str, handler: F)
     where
         F: Fn(Arc<HttpRequest>) -> HttpResult + Send + Sync + 'static;
 
@@ -84,12 +84,12 @@ pub trait SyncEndpointsMapping {
     ///
     ///    app.map_patch("/test", |_req| {
     ///        Results::text("Pass!")
-    ///    }).await;
+    ///    });
     ///
     ///    app.run().await
     ///}
     /// ```
-    fn map_patch<F>(&mut self, pattern: &str, handler: F) -> impl std::future::Future<Output = ()> + Send
+    fn map_patch<F>(&mut self, pattern: &str, handler: F)
     where
         F: Fn(Arc<HttpRequest>) -> HttpResult + Send + Sync + 'static;
 
@@ -105,12 +105,12 @@ pub trait SyncEndpointsMapping {
     ///
     ///    app.map_delete("/test", |_req| {
     ///        Results::text("Pass!")
-    ///    }).await;
+    ///    });
     ///
     ///    app.run().await
     ///}
     /// ```
-    fn map_delete<F>(&mut self, pattern: &str, handler: F) -> impl std::future::Future<Output = ()> + Send
+    fn map_delete<F>(&mut self, pattern: &str, handler: F)
     where
         F: Fn(Arc<HttpRequest>) -> HttpResult + Send + Sync + 'static;
 }

@@ -21,12 +21,12 @@ pub trait AsyncMiddlewareMapping {
     ///
     ///    app.use_middleware(|ctx, next| async move {
     ///        next(ctx).await
-    ///    }).await;
+    ///    });
     ///
     ///    app.run().await
     ///}
     /// ```
-    fn use_middleware<F, Fut>(&mut self, handler: F) -> impl Future<Output = ()> + Send
+    fn use_middleware<F, Fut>(&mut self, handler: F)
     where
         F: 'static + Send + Sync + Fn(Arc<HttpContext>, Next) -> Fut,
         Fut: Future<Output = HttpResult> + Send + 'static;

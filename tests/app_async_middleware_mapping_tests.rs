@@ -7,14 +7,14 @@ async fn it_adds_middleware_request() {
 
         app.use_middleware(|context, next| async move {
             next(context).await
-        }).await;
+        });
         app.use_middleware(|_, _| async move {
             Results::text("Pass!")
-        }).await;
+        });
 
         app.map_get("/test", |_req| {
             Results::text("Unreachable!")
-        }).await;
+        });
 
        app.run().await
     });

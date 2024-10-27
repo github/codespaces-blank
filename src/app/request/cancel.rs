@@ -19,7 +19,7 @@ pub trait Cancel {
     ///         } else {
     ///             Results::text("Pass!")
     ///         } 
-    ///    }).await;
+    ///    });
     ///
     ///    app.run().await
     ///}

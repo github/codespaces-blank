@@ -4,7 +4,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! volga = "0.1.11"
+//! volga = "0.2.0"
 //! tokio = "1.40.0"
 //! ```
 //! ```no_run
@@ -18,7 +18,7 @@
 //!     // Example of asynchronous GET request handler
 //!     app.map_get("/hello", |request| async {
 //!         Results::text("Hello World!")
-//!     }).await;
+//!     });
 //!     
 //!     app.run().await
 //! }

@@ -6,7 +6,7 @@ use tokio_util::sync::CancellationToken;
 use tokio::{
     net::{TcpListener, TcpStream},
     io::{self, AsyncReadExt, AsyncWriteExt},
-    sync::{broadcast, Mutex},
+    sync::broadcast,
     signal
 };
 use tokio::io::Interest;
@@ -37,13 +37,13 @@ pub mod mapping;
 ///}
 /// ```
 pub struct App {
-    pipeline: Arc<Pipeline>,
+    pipeline: Pipeline,
     connection: Connection
 }
 
 struct Pipeline {
-    middlewares: Mutex<Middlewares>,
-    endpoints: Mutex<Endpoints>
+    middlewares: Middlewares,
+    endpoints: Endpoints
 }
 
 struct Connection {
@@ -69,13 +69,13 @@ impl HttpContext {
 
 impl App {
     #[inline]
-    pub(crate) fn middlewares(&self) -> &Mutex<Middlewares> {
-        &self.pipeline.middlewares
+    pub(crate) fn middlewares(&mut self) -> &mut Middlewares {
+        &mut self.pipeline.middlewares
     }
 
     #[inline]
-    pub(crate) fn endpoints(&self) -> &Mutex<Endpoints> {
-        &self.pipeline.endpoints
+    pub(crate) fn endpoints(&mut self) -> &mut Endpoints {
+        &mut self.pipeline.endpoints
     }
     
     /// Initializes a new instance of the `App` on specified `socket`.
@@ -100,15 +100,10 @@ impl App {
         let (shutdown_sender, shutdown_receiver) = broadcast::channel::<()>(1);
 
         Self::subscribe_for_ctrl_c_signal(&shutdown_sender);
-
-        let pipeline = Pipeline {
-            middlewares: Mutex::new(Middlewares::new()),
-            endpoints: Mutex::new(Endpoints::new())
-        };
         
         let server = Self {
             connection: Connection { tcp_listener, shutdown_sender, shutdown_signal: shutdown_receiver },
-            pipeline: Arc::new(pipeline)
+            pipeline: Pipeline { middlewares: Middlewares::new(), endpoints: Endpoints::new() }
         };
 
         println!("Start listening: {socket}");
@@ -117,11 +112,11 @@ impl App {
     }
 
     /// Runs the Web Server
-    pub async fn run(&mut self) -> io::Result<()> {
-        self.use_endpoints().await;
+    pub async fn run(mut self) -> io::Result<()> {
+        self.use_endpoints();
 
         let connection = &mut self.connection;
-        let pipeline = &self.pipeline;
+        let pipeline = Arc::new(self.pipeline);
         
         loop {
             tokio::select! {
@@ -173,10 +168,10 @@ impl App {
     }
     
     #[inline]
-    async fn use_endpoints(&mut self) {
+    fn use_endpoints(&mut self) {
         self.use_middleware(|ctx, _| async move {
             ctx.execute().await
-        }).await;
+        });
     }
 
     #[inline]
@@ -224,8 +219,7 @@ impl App {
         let mut http_request = Self::parse_http_request(&mut buffer[..bytes_read])?;
         let cancellation_token = CancellationToken::new();
         
-        let endpoints_guard = pipeline.endpoints.lock().await;
-        if let Some(endpoint_context) = endpoints_guard.get_endpoint(&http_request).await {
+        if let Some(endpoint_context) = pipeline.endpoints.get_endpoint(&http_request).await {
             let extensions = http_request.extensions_mut();
             extensions.insert(cancellation_token.clone());
 
@@ -238,9 +232,8 @@ impl App {
                 endpoint_context
             };
                 
-            let middlewares_guard = pipeline.middlewares.lock().await;
             let response = tokio::select! {
-                response = middlewares_guard.execute(Arc::new(context)) => response,
+                response = pipeline.middlewares.execute(Arc::new(context)) => response,
                 _ = Self::create_cancellation_monitoring_task(socket) => {
                     cancellation_token.cancel();
                     Results::client_closed_request()
@@ -299,8 +292,8 @@ impl App {
     }
 }
 
-impl Drop for App {
-    fn drop(&mut self) {
-        self.shutdown();
-    }
-}
+//impl Drop for App {
+//    fn drop(mut self) {
+//        self.shutdown();
+//    }
+//}

@@ -11,71 +11,71 @@ use crate::{
 };
 
 impl AsyncEndpointsMapping for App {
-    async fn map_get<F, Fut>(&mut self, pattern: &str, handler: F)
+    fn map_get<F, Fut>(&mut self, pattern: &str, handler: F)
     where
         F: Fn(Arc<HttpRequest>) -> Fut + Send + Sync + 'static,
         Fut: Future<Output = HttpResult> + Send + 'static,
     {
         use crate::app::endpoints::mapping::asynchronous::AsyncMapping;
 
-        let mut endpoints_guard = self.endpoints().lock().await;
-        AsyncMapping::map(&mut *endpoints_guard, Method::GET, pattern, handler);
+        let endpoints = self.endpoints();
+        endpoints.map(Method::GET, pattern, handler);
     }
 
-    async fn map_post<F, Fut>(&mut self, pattern: &str, handler: F)
+    fn map_post<F, Fut>(&mut self, pattern: &str, handler: F)
     where
         F: Fn(Arc<HttpRequest>) -> Fut + Send + Sync + 'static,
         Fut: Future<Output = HttpResult> + Send + 'static,
     {
         use crate::app::endpoints::mapping::asynchronous::AsyncMapping;
 
-        let mut endpoints_guard = self.endpoints().lock().await;
-        AsyncMapping::map(&mut *endpoints_guard, Method::POST, pattern, handler);
+        let endpoints = self.endpoints();
+        endpoints.map(Method::POST, pattern, handler);
     }
 
-    async fn map_put<F, Fut>(&mut self, pattern: &str, handler: F)
+    fn map_put<F, Fut>(&mut self, pattern: &str, handler: F)
     where
         F: Fn(Arc<HttpRequest>) -> Fut + Send + Sync + 'static,
         Fut: Future<Output = HttpResult> + Send + 'static,
     {
         use crate::app::endpoints::mapping::asynchronous::AsyncMapping;
 
-        let mut endpoints_guard = self.endpoints().lock().await;
-        AsyncMapping::map(&mut *endpoints_guard, Method::PUT, pattern, handler);
+        let endpoints = self.endpoints();
+        endpoints.map(Method::PUT, pattern, handler);
     }
 
-    async fn map_delete<F, Fut>(&mut self, pattern: &str, handler: F)
+    fn map_delete<F, Fut>(&mut self, pattern: &str, handler: F)
     where
         F: Fn(Arc<HttpRequest>) -> Fut + Send + Sync + 'static,
         Fut: Future<Output = HttpResult> + Send + 'static,
     {
         use crate::app::endpoints::mapping::asynchronous::AsyncMapping;
 
-        let mut endpoints_guard = self.endpoints().lock().await;
-        AsyncMapping::map(&mut *endpoints_guard, Method::DELETE, pattern, handler);
+        let endpoints = self.endpoints();
+        endpoints.map(Method::DELETE, pattern, handler);
     }
 
-    async fn map_patch<F, Fut>(&mut self, pattern: &str, handler: F)
+    fn map_patch<F, Fut>(&mut self, pattern: &str, handler: F)
     where
         F: Fn(Arc<HttpRequest>) -> Fut + Send + Sync + 'static,
         Fut: Future<Output = HttpResult> + Send + 'static,
     {
         use crate::app::endpoints::mapping::asynchronous::AsyncMapping;
 
-        let mut endpoints_guard = self.endpoints().lock().await;
-        AsyncMapping::map(&mut *endpoints_guard, Method::PATCH, pattern, handler);
+        let endpoints = self.endpoints();
+        endpoints.map(Method::PATCH, pattern, handler);
     }
 }
 
 impl AsyncMiddlewareMapping for App {
-    async fn use_middleware<F, Fut>(&mut self, handler: F)
+    fn use_middleware<F, Fut>(&mut self, handler: F)
     where
         F: 'static + Send + Sync + Fn(Arc<HttpContext>, Next) -> Fut,
         Fut: Future<Output = HttpResult> + Send + 'static,
     {
         use crate::app::middlewares::mapping::asynchronous::AsyncMapping;
 
-        let mut middlewares_guard = self.middlewares().lock().await;
-        middlewares_guard.use_middleware(handler);
+        let middlewares = self.middlewares();
+        middlewares.use_middleware(handler);
     }
 }
