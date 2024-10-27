@@ -18,7 +18,7 @@ pub trait Params {
     ///        let id = params.get("id").unwrap(); // "11"
     ///
     ///        Results::text("Pass!")
-    ///    }).await;
+    ///    });
     ///
     ///    app.run().await
     ///}
@@ -40,7 +40,7 @@ pub trait Params {
     ///        let id = req.param("id")?; // "11"
     ///
     ///        Results::text("Pass!")
-    ///    }).await;
+    ///    });
     ///
     ///    app.run().await
     ///}

@@ -27,7 +27,7 @@ use tokio::io;
 ///            headers: Some(headers),
 ///            content_type: Some(mime::TEXT_PLAIN)
 ///        })
-///    }).await;
+///    });
 ///
 ///    app.run().await
 ///}

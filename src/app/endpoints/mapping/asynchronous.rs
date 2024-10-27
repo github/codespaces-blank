@@ -22,12 +22,12 @@ pub trait AsyncEndpointsMapping {
     ///
     ///    app.map_get("/test", |_req| async {
     ///        Results::text("Pass!")
-    ///    }).await;
+    ///    });
     ///
     ///    app.run().await
     ///}
     /// ```
-    fn map_get<F, Fut>(&mut self, pattern: &str, handler: F) -> impl Future<Output = ()> + Send
+    fn map_get<F, Fut>(&mut self, pattern: &str, handler: F)
     where
         F: Fn(Arc<HttpRequest>) -> Fut + Send + Sync + 'static,
         Fut: Future<Output = HttpResult> + Send + 'static;
@@ -44,12 +44,12 @@ pub trait AsyncEndpointsMapping {
     ///
     ///    app.map_post("/test", |_req| async {
     ///        Results::text("Pass!")
-    ///    }).await;
+    ///    });
     ///
     ///    app.run().await
     ///}
     /// ```
-    fn map_post<F, Fut>(&mut self, pattern: &str, handler: F) -> impl Future<Output = ()> + Send
+    fn map_post<F, Fut>(&mut self, pattern: &str, handler: F)
     where
         F: Fn(Arc<HttpRequest>) -> Fut + Send + Sync + 'static,
         Fut: Future<Output = HttpResult> + Send + 'static;
@@ -66,12 +66,12 @@ pub trait AsyncEndpointsMapping {
     ///
     ///    app.map_put("/test", |_req| async {
     ///        Results::text("Pass!")
-    ///    }).await;
+    ///    });
     ///
     ///    app.run().await
     ///}
     /// ```
-    fn map_put<F, Fut>(&mut self, pattern: &str, handler: F) -> impl Future<Output = ()> + Send
+    fn map_put<F, Fut>(&mut self, pattern: &str, handler: F)
     where
         F: Fn(Arc<HttpRequest>) -> Fut + Send + Sync + 'static,
         Fut: Future<Output = HttpResult> + Send + 'static;
@@ -88,12 +88,12 @@ pub trait AsyncEndpointsMapping {
     ///
     ///    app.map_delete("/test", |_req| async {
     ///        Results::text("Pass!")
-    ///    }).await;
+    ///    });
     ///
     ///    app.run().await
     ///}
     /// ```
-    fn map_delete<F, Fut>(&mut self, pattern: &str, handler: F) -> impl Future<Output = ()> + Send
+    fn map_delete<F, Fut>(&mut self, pattern: &str, handler: F)
     where
         F: Fn(Arc<HttpRequest>) -> Fut + Send + Sync + 'static,
         Fut: Future<Output = HttpResult> + Send + 'static;
@@ -110,12 +110,12 @@ pub trait AsyncEndpointsMapping {
     ///
     ///    app.map_patch("/test", |_req| async {
     ///        Results::text("Pass!")
-    ///    }).await;
+    ///    });
     ///
     ///    app.run().await
     ///}
     /// ```
-    fn map_patch<F, Fut>(&mut self, pattern: &str, handler: F) -> impl Future<Output = ()> + Send
+    fn map_patch<F, Fut>(&mut self, pattern: &str, handler: F)
     where
         F: Fn(Arc<HttpRequest>) -> Fut + Send + Sync + 'static,
         Fut: Future<Output = HttpResult> + Send + 'static;

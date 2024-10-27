@@ -24,7 +24,7 @@ pub trait Payload {
     ///        let params: User = req.payload()?;
     ///
     ///        Results::text("Pass!")
-    ///    }).await;
+    ///    });
     ///
     ///    app.run().await
     ///}
