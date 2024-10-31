@@ -23,7 +23,7 @@ tokio = "1.40.0"
 ```
 ### Asynchronous handler (Recommended):
 ```rust
-use volga::{App, Results, AsyncEndpointsMapping};
+use volga::{App, ok, AsyncEndpointsMapping};
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -32,7 +32,7 @@ async fn main() -> std::io::Result<()> {
 
     // Example of asynchronous request handler
     app.map_get("/hello", |request| async {
-        Results::text("Hello World!")
+        ok!("Hello World!")
     });
     
     app.run().await
@@ -40,7 +40,7 @@ async fn main() -> std::io::Result<()> {
 ```
 ### Synchronous handler:
 ```rust
-use volga::{App, Results, SyncEndpointsMapping};
+use volga::{App, ok, SyncEndpointsMapping};
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -49,7 +49,7 @@ async fn main() -> std::io::Result<()> {
     
     // Example of synchronous request handler
     app.map_get("/hello", |request| {
-        Results::text("Hello World!")
+        ok!("Hello World!")
     });
     
     app.run().await
@@ -57,7 +57,7 @@ async fn main() -> std::io::Result<()> {
 ```
 ### Custom middleware:
 ```rust
-use volga::{App, Results, AsyncEndpointsMapping, AsyncMiddlewareMapping};
+use volga::{App, ok, AsyncEndpointsMapping, AsyncMiddlewareMapping};
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -77,7 +77,7 @@ async fn main() -> std::io::Result<()> {
     
     // Example of asynchronous request handler
     app.map_get("/hello", |request| async {
-        Results::text("Hello World!")
+        ok!("Hello World!")
     });
     
     app.run().await
@@ -85,7 +85,7 @@ async fn main() -> std::io::Result<()> {
 ```
 ### Reading query parameters
 ```rust
-use volga::{App, AsyncEndpointsMapping, Results, Params};
+use volga::{App, AsyncEndpointsMapping, ok, Params};
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -96,14 +96,14 @@ async fn main() -> std::io::Result<()> {
         let params = req.params().unwrap();
         let id = params.get("id").unwrap(); // "11"
 
-        Results::text("Hello World!")
+        ok!("Hello World!")
     });
 
     // GET /hello-again?id=11
     app.map_get("/hello-again", |req| async move {
         let id = req.param("id")?; // "11"
 
-        Results::text("Hello World!")
+        ok!("Hello World!")
     });
 
     app.run().await
@@ -111,7 +111,7 @@ async fn main() -> std::io::Result<()> {
 ```
 ### Reading route parameters
 ```rust
-use volga::{App, AsyncEndpointsMapping, Results, Params};
+use volga::{App, AsyncEndpointsMapping, ok, Params};
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -122,14 +122,14 @@ async fn main() -> std::io::Result<()> {
         let params = req.params().unwrap();
         let id = params.get("id").unwrap(); // "11"
 
-        Results::text("Hello World!")
+        ok!("Hello World!")
     });
 
     // GET /hello-again/11
     app.map_get("/hello-again/{id}", |req| async move {
         let id = req.param("id")?; // "11"
 
-        Results::text("Hello World!")
+        ok!("Hello World!")
     });
 
     app.run().await
@@ -137,7 +137,7 @@ async fn main() -> std::io::Result<()> {
 ```
 ### Reading JSON payload
 ```rust
-use volga::{App, AsyncEndpointsMapping, Results, Payload};
+use volga::{App, AsyncEndpointsMapping, ok, Payload};
 use serde::Deserialize;
  
 #[derive(Deserialize)]
@@ -155,7 +155,7 @@ async fn main() -> std::io::Result<()> {
     app.map_post("/hello", |req| async move {
         let params: User = req.payload()?;
 
-        Results::text("Hello World!")
+        ok!("Hello World!")
     });
 
     app.run().await
@@ -163,7 +163,7 @@ async fn main() -> std::io::Result<()> {
 ```
 ### Returning a JSON
 ```rust
-use volga::{App, AsyncEndpointsMapping, Results, Payload};
+use volga::{App, AsyncEndpointsMapping, ok, Payload};
 use serde::Serialize;
  
 #[derive(Serialize)]
@@ -178,11 +178,11 @@ async fn main() -> std::io::Result<()> {
 
     app.map_get("/hello", |req| async move {
         let user: User = User {
-            name: "John",
+            name: String::from("John"),
             age: 35
         };
 
-        Results::json(&user) // { name: "John", age: 35 }
+        ok!(&user, json) // { name: "John", age: 35 }
     });
 
     app.run().await

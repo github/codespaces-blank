@@ -7,6 +7,8 @@ use http::{HeaderName, HeaderValue, Response, StatusCode};
 use http::response::Builder;
 use tokio::io;
 
+pub mod macros;
+
 /// A customized response context with custom response `headers` and `content_type`
 /// 
 /// # Example
@@ -90,75 +92,112 @@ impl Results {
         ?Sized + Serialize
     {
         let content = serde_json::to_vec(content)?;
-        Self::create_default_builder()
-            .status(StatusCode::OK)
-            .header(http::header::CONTENT_LENGTH, content.len())
-            .header(http::header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref())
-            .body(Bytes::from(content))
-            .map_err(|_| Self::response_error())
+        let body = Bytes::from(content);
+        Self::status(
+            StatusCode::OK,
+            mime::APPLICATION_JSON.as_ref(),
+            body)
+    }
+
+    /// Produces a response with `StatusCode` the `JSON` body.
+    #[inline]
+    pub fn json_with_status<T>(status: StatusCode, content: &T) -> HttpResult
+    where T:
+        ?Sized + Serialize
+    {
+        let content = serde_json::to_vec(content)?;
+        let body = Bytes::from(content);
+        Self::status(
+            status,
+            mime::APPLICATION_JSON.as_ref(),
+            body)
     }
 
     /// Produces an `OK 200` response with the plain text body.
     #[inline]
     pub fn text(content: &str) -> HttpResult {
+        let body = Bytes::from(String::from(content));
+        Self::status(
+            StatusCode::OK,
+            mime::TEXT_PLAIN.as_ref(),
+            body)
+    }
+
+    /// Produces an `OK 200` response with the file body.
+    #[inline]
+    pub fn file(file_name: &str, content: Vec<u8>) -> HttpResult {
+        let body = Bytes::from(content);
+        let file_name = format!("attachment; filename=\"{}\"", file_name);
         Self::create_default_builder()
             .status(StatusCode::OK)
-            .header(http::header::CONTENT_LENGTH, content.len())
-            .header(http::header::CONTENT_TYPE, mime::TEXT_PLAIN.as_ref())
-            .body(Bytes::from(String::from(content)))
+            .header(http::header::CONTENT_LENGTH, body.len())
+            .header(http::header::CONTENT_TYPE, mime::APPLICATION_OCTET_STREAM.as_ref())
+            .header(http::header::CONTENT_DISPOSITION, file_name)
+            .body(body)
             .map_err(|_| Self::response_error())
+    }
+
+    /// Produces an empty `OK 200` response.
+    #[inline]
+    pub fn ok() -> HttpResult {
+        Self::status(
+            StatusCode::OK,
+            mime::TEXT_PLAIN.as_ref(),
+            Bytes::new())
     }
 
     /// Produces an `NOT FOUND 400` response.
     #[inline]
     pub fn not_found() -> HttpResult {
-        Self::create_default_builder()
-            .status(StatusCode::NOT_FOUND)
-            .header(http::header::CONTENT_LENGTH, 0)
-            .header(http::header::CONTENT_TYPE, mime::TEXT_PLAIN.as_ref())
-            .body(Bytes::new())
-            .map_err(|_| Self::response_error())
+        Self::status(
+            StatusCode::NOT_FOUND,
+            mime::TEXT_PLAIN.as_ref(),
+            Bytes::new())
     }
 
     /// Produces an `INTERNAL SERVER ERROR 500` response.
     #[inline]
     pub fn internal_server_error(error: Option<String>) -> HttpResult {
-        let (len, body) = Self::get_error_info(error);
-        Self::create_default_builder()
-            .status(StatusCode::INTERNAL_SERVER_ERROR)
-            .header(http::header::CONTENT_LENGTH, len)
-            .header(http::header::CONTENT_TYPE, mime::TEXT_PLAIN.as_ref())
-            .body(body)
-            .map_err(|_| Self::response_error())
+        let body = Self::get_error_bytes(error);
+        Self::status(
+            StatusCode::INTERNAL_SERVER_ERROR,
+            mime::TEXT_PLAIN.as_ref(),
+            body)
     }
 
     /// Produces an `BAD REQUEST 400` response.
     #[inline]
     pub fn bad_request(error: Option<String>) -> HttpResult {
-        let (len, body) = Self::get_error_info(error);
-        Self::create_default_builder()
-            .status(StatusCode::BAD_REQUEST)
-            .header(http::header::CONTENT_LENGTH, len)
-            .header(http::header::CONTENT_TYPE, mime::TEXT_PLAIN.as_ref())
-            .body(body)
-            .map_err(|_| Self::response_error())
+        let body = Self::get_error_bytes(error);
+        Self::status(
+            StatusCode::BAD_REQUEST,
+            mime::TEXT_PLAIN.as_ref(),
+            body)
     }
 
     /// Produces an `CLIENT CLOSED REQUEST 499` response.
     #[inline]
     pub fn client_closed_request() -> HttpResult {
+        Self::status(
+            StatusCode::from_u16(499).unwrap(),
+            mime::TEXT_PLAIN.as_ref(),
+            Bytes::new())
+    }
+
+    #[inline]
+    pub fn status(status: StatusCode, mime: &str, content: Bytes) -> HttpResult {
         Self::create_default_builder()
-            .status(499)
-            .header(http::header::CONTENT_LENGTH, 0)
-            .header(http::header::CONTENT_TYPE, mime::TEXT_PLAIN.as_ref())
-            .body(Bytes::new())
+            .status(status)
+            .header(http::header::CONTENT_LENGTH, content.len())
+            .header(http::header::CONTENT_TYPE, mime)
+            .body(content)
             .map_err(|_| Self::response_error())
     }
 
     #[inline]
     fn create_default_builder() -> Builder {
         Response::builder()
-            .header(http::header::DATE,Utc::now().to_rfc2822())
+            .header(http::header::DATE, Utc::now().to_rfc2822())
             .header(http::header::SERVER, "Volga")
     }
     
@@ -168,11 +207,11 @@ impl Results {
     }
 
     #[inline]
-    fn get_error_info(error: Option<String>) -> (usize, Bytes) {
+    fn get_error_bytes(error: Option<String>) -> Bytes {
         if let Some(error) = error {
-            (error.len(), Bytes::from(error))
+            Bytes::from(error)
         } else {
-            (0, Bytes::new())
+            Bytes::new()
         }
     }
 }
