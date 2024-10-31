@@ -4,7 +4,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! volga = "0.2.0"
+//! volga = "0.2.1"
 //! tokio = "1.40.0"
 //! ```
 //! ```no_run
@@ -31,3 +31,6 @@ pub use crate::app::endpoints::mapping::{asynchronous::AsyncEndpointsMapping, sy
 pub use crate::app::middlewares::{Next, mapping::asynchronous::AsyncMiddlewareMapping};
 pub use crate::app::results::{HttpResponse, HttpResult, Results, ResponseContext};
 pub use crate::app::request::{HttpRequest, RequestParams, payload::Payload, params::Params, cancel::Cancel};
+
+// Exposing shortcut for CancellationToken for convenience
+pub use tokio_util::sync::CancellationToken;

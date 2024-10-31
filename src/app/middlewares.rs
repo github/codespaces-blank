@@ -19,7 +19,7 @@ impl Middlewares {
     #[inline]
     pub(crate) async fn execute(&self, ctx: Arc<HttpContext>) -> HttpResult {
         let next = self.compose();
-        next(Arc::clone(&ctx)).await
+        next(ctx.clone()).await
     }
 
     #[inline]

@@ -101,9 +101,20 @@ impl App {
 
         Self::subscribe_for_ctrl_c_signal(&shutdown_sender);
         
+        let connection = Connection { 
+            tcp_listener, 
+            shutdown_sender, 
+            shutdown_signal: shutdown_receiver
+        };
+        
+        let pipeline = Pipeline { 
+            middlewares: Middlewares::new(),
+            endpoints: Endpoints::new()
+        }; 
+        
         let server = Self {
-            connection: Connection { tcp_listener, shutdown_sender, shutdown_signal: shutdown_receiver },
-            pipeline: Pipeline { middlewares: Middlewares::new(), endpoints: Endpoints::new() }
+            connection,
+            pipeline
         };
 
         println!("Start listening: {socket}");
@@ -291,9 +302,3 @@ impl App {
         socket.flush().await
     }
 }
-
-//impl Drop for App {
-//    fn drop(mut self) {
-//        self.shutdown();
-//    }
-//}
