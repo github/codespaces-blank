@@ -31,7 +31,7 @@ async fn main() -> std::io::Result<()> {
     let mut app = App::build("127.0.0.1:7878").await?;
 
     // Example of asynchronous request handler
-    app.map_get("/hello", |request| async {
+    app.map_get("/hello", |req| async {
         ok!("Hello World!")
     });
     
@@ -48,7 +48,7 @@ async fn main() -> std::io::Result<()> {
     let mut app = App::build("127.0.0.1:7878").await?;
     
     // Example of synchronous request handler
-    app.map_get("/hello", |request| {
+    app.map_get("/hello", |req| {
         ok!("Hello World!")
     });
     
@@ -65,10 +65,10 @@ async fn main() -> std::io::Result<()> {
     let mut app = App::build("127.0.0.1:7878").await?;
 
     // Example of middleware
-    app.use_middleware(|context, next| async move {
+    app.use_middleware(|ctx, next| async move {
         // Something can be done before the next middleware
 
-        let response = next(context).await;
+        let response = next(ctx).await;
 
         // Something can be done after the next middleware is completed
 
@@ -76,7 +76,7 @@ async fn main() -> std::io::Result<()> {
     });
     
     // Example of asynchronous request handler
-    app.map_get("/hello", |request| async {
+    app.map_get("/hello", |req| async {
         ok!("Hello World!")
     });
     
