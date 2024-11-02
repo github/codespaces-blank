@@ -1,5 +1,5 @@
 ﻿use serde::{Deserialize, Serialize};
-use volga::{App, Results, AsyncEndpointsMapping, Payload};
+use volga::{App, ok, Results, AsyncEndpointsMapping, Payload};
 
 #[derive(Deserialize, Serialize)]
 struct User {
@@ -49,6 +49,50 @@ async fn it_writes_json_response() {
     let response = tokio::spawn(async {
         let client = reqwest::Client::new();
         client.get("http://127.0.0.1:7886/test").send().await.unwrap().json::<User>().await
+    }).await.unwrap().unwrap();
+
+    assert_eq!(response.name, "John");
+    assert_eq!(response.age, 35);
+}
+
+#[tokio::test]
+async fn it_writes_json_using_macro_response() {
+    tokio::spawn(async {
+        let mut app = App::build("127.0.0.1:7893").await?;
+
+        app.map_get("/test", |_req| async move {
+            let user = User { name: String::from("John"), age: 35 };
+
+            ok!(&user)
+        });
+
+        app.run().await
+    });
+
+    let response = tokio::spawn(async {
+        let client = reqwest::Client::new();
+        client.get("http://127.0.0.1:7893/test").send().await.unwrap().json::<User>().await
+    }).await.unwrap().unwrap();
+
+    assert_eq!(response.name, "John");
+    assert_eq!(response.age, 35);
+}
+
+#[tokio::test]
+async fn it_writes_untyped_json_response() {
+    tokio::spawn(async {
+        let mut app = App::build("127.0.0.1:7894").await?;
+
+        app.map_get("/test", |_req| async move {
+            ok!({ "name": "John", "age": 35 })
+        });
+
+        app.run().await
+    });
+
+    let response = tokio::spawn(async {
+        let client = reqwest::Client::new();
+        client.get("http://127.0.0.1:7894/test").send().await.unwrap().json::<User>().await
     }).await.unwrap().unwrap();
 
     assert_eq!(response.name, "John");

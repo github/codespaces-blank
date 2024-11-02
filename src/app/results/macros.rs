@@ -47,26 +47,7 @@
 ///    
 ///    app.map_get("/health", |_req| async {
 ///        let health = Health { status: "healthy".into() };
-///        ok!(&health, json)
-///    });
-///    
-///    app.run().await
-///}
-/// ```
-/// ## File
-///```no_run
-///use volga::{ok, App, AsyncEndpointsMapping};
-///use serde::Serialize;
-///
-///#[tokio::main]
-///async fn main() -> std::io::Result<()> {
-///    let mut app = App::build("127.0.0.1:7878").await?;
-///    
-///    app.map_get("/health", |_req| async {
-///        let file_name = "example.txt";
-///        let file_data = b"Hello, this is some file content!".to_vec();
-///        
-///        ok!(file_name, file_data, file)
+///        ok!(&health)
 ///    });
 ///    
 ///    app.run().await
@@ -77,13 +58,37 @@ macro_rules! ok {
     () => {
         $crate::Results::ok()
     };
-    ($e:expr) => {
-        $crate::Results::text($e)
+    ({ $($json:tt)* }) => {
+        $crate::Results::json(&serde_json::json_internal!({ $($json)* }))
     };
-    ($e:expr, json) => {
+    ($e:expr) => {
         $crate::Results::json($e)
     };
-    ($file_name:expr, $e:expr, file) => {
+}
+
+/// Produces `OK 200` response with file body
+/// # Examples
+///```no_run
+///use volga::{file, App, AsyncEndpointsMapping};
+///use serde::Serialize;
+///
+///#[tokio::main]
+///async fn main() -> std::io::Result<()> {
+///    let mut app = App::build("127.0.0.1:7878").await?;
+///    
+///    app.map_get("/download", |_req| async {
+///        let file_name = "example.txt";
+///        let file_data = b"Hello, this is some file content!".to_vec();
+///        
+///        file!(file_name, file_data)
+///    });
+///    
+///    app.run().await
+///}
+/// ```
+#[macro_export]
+macro_rules! file {
+    ($file_name:expr, $e:expr) => {
         $crate::Results::file($file_name, $e)
     };
 }
@@ -137,7 +142,7 @@ macro_rules! ok {
 ///    
 ///    app.map_get("/test", |_req| async {
 ///        let error = ErrorMessage { error: "some error message".into() };
-///        status!(401, &error, json)
+///        status!(401, &error)
 ///    });
 ///    
 ///    app.run().await
@@ -148,23 +153,23 @@ macro_rules! status {
     (200) => {
         $crate::Results::ok()
     };
-    (200, $e:expr) => {
-        $crate::Results::text($e)
+    (200, { $($json:tt)* }) => {
+        $crate::Results::json(&serde_json::json_internal!({ $($json)* }))
     };
-    (200, $e:expr, json) => {
+    (200, $e:expr) => {
         $crate::Results::json($e)
     };
-    (200, $file_name:expr, $e:expr, file) => {
+    (200, $file_name:expr, $e:expr) => {
         $crate::Results::file($file_name, $e)
     };
     (400) => {
-        $crate::Results::ok()
+        $crate::Results::bad_request(None)
+    };
+    (400, { $($json:tt)* }) => {
+        $crate::Results::json_with_status(http::StatusCode::BAD_REQUEST, &serde_json::json_internal!({ $($json)* }))
     };
     (400, $e:expr) => {
-        $crate::Results::text($e)
-    };
-    (400, $e:expr, json) => {
-        $crate::Results::json($e)
+        $crate::Results::json_with_status(http::StatusCode::BAD_REQUEST, $e)
     };
     (404) => {
         $crate::Results::not_found()
@@ -175,13 +180,10 @@ macro_rules! status {
             mime::TEXT_PLAIN.as_ref(), 
             bytes::Bytes::new())
     };
-    (401, $e:expr) => {
-        $crate::Results::status(
-            http::StatusCode::UNAUTHORIZED, 
-            mime::TEXT_PLAIN.as_ref(), 
-            bytes::Bytes::from(String::from($e)))
+    (401, { $($json:tt)* }) => {
+        $crate::Results::json_with_status(http::StatusCode::UNAUTHORIZED, &serde_json::json_internal!({ $($json)* }))
     };
-    (401, $e:expr, json) => {
+    (401, $e:expr) => {
         $crate::Results::json_with_status(http::StatusCode::UNAUTHORIZED, $e)
     };
     (403) => {
@@ -190,13 +192,10 @@ macro_rules! status {
             mime::TEXT_PLAIN.as_ref(), 
             bytes::Bytes::new())
     };
-    (403, $e:expr) => {
-        $crate::Results::status(
-            http::StatusCode::FORBIDDEN, 
-            mime::TEXT_PLAIN.as_ref(), 
-            bytes::Bytes::from(String::from($e)))
+    (403, { $($json:tt)* }) => {
+        $crate::Results::json_with_status(http::StatusCode::FORBIDDEN, &serde_json::json_internal!({ $($json)* }))
     };
-    (403, $e:expr, json) => {
+    (403, $e:expr) => {
         $crate::Results::json_with_status(http::StatusCode::FORBIDDEN, $e)
     };
 }
@@ -213,19 +212,27 @@ mod tests {
     #[test]
     fn it_creates_json_ok_response() {
         let payload = TestPayload { name: "test".into() };
-        let response = ok!(&payload, json);
+        let response = ok!(&payload);
         
         assert!(response.is_ok());
         assert_eq!(response.unwrap().body().len(), 15);
     }
 
     #[test]
+    fn it_creates_anonymous_type_json_ok_response() {
+        let response = ok!({ "name": "test" });
+        
+        assert!(response.is_ok());
+        assert_eq!(response.unwrap().body().len(), 15);
+    }
+    
+    #[test]
     fn it_creates_text_ok_response() {
         let text = "test";
         let response = ok!(text);
 
         assert!(response.is_ok());
-        assert_eq!(response.unwrap().body().len(), 4);
+        assert_eq!(response.unwrap().body().len(), 6);
     }
     
     #[test]
@@ -241,7 +248,7 @@ mod tests {
         let file_name = "example.txt";
         let file_data = b"Hello, this is some file content!";
         
-        let response = ok!(file_name, file_data.to_vec(), file);
+        let response = file!(file_name, file_data.to_vec());
 
         assert!(response.is_ok());
         assert_eq!(response.unwrap().body().len(), 33);
@@ -261,13 +268,21 @@ mod tests {
         let response = status!(200, text);
 
         assert!(response.is_ok());
-        assert_eq!(response.unwrap().body().len(), 4);
+        assert_eq!(response.unwrap().body().len(), 6);
     }
 
     #[test]
     fn it_creates_200_with_json_response() {
         let payload = TestPayload { name: "test".into() };
-        let response = status!(200, &payload, json);
+        let response = status!(200, &payload);
+
+        assert!(response.is_ok());
+        assert_eq!(response.unwrap().body().len(), 15);
+    }
+
+    #[test]
+    fn it_creates_anonymous_type_200_response_with_json_body() {
+        let response = status!(200, { "name": "test" });
 
         assert!(response.is_ok());
         assert_eq!(response.unwrap().body().len(), 15);
@@ -278,7 +293,7 @@ mod tests {
         let file_name = "example.txt";
         let file_data = b"Hello, this is some file content!";
 
-        let response = status!(200, file_name, file_data.to_vec(), file);
+        let response = status!(200, file_name, file_data.to_vec());
 
         assert!(response.is_ok());
         assert_eq!(response.unwrap().body().len(), 33);
@@ -298,13 +313,21 @@ mod tests {
         let response = status!(400, text);
 
         assert!(response.is_ok());
-        assert_eq!(response.unwrap().body().len(), 4);
+        assert_eq!(response.unwrap().body().len(), 6);
     }
 
     #[test]
     fn it_creates_400_with_json_response() {
         let payload = TestPayload { name: "test".into() };
-        let response = status!(400, &payload, json);
+        let response = status!(400, &payload);
+
+        assert!(response.is_ok());
+        assert_eq!(response.unwrap().body().len(), 15);
+    }
+
+    #[test]
+    fn it_creates_anonymous_type_400_response_with_json_body() {
+        let response = status!(400, { "name": "test" });
 
         assert!(response.is_ok());
         assert_eq!(response.unwrap().body().len(), 15);
@@ -331,13 +354,21 @@ mod tests {
         let response = status!(401, "You are not authorized!");
 
         assert!(response.is_ok());
-        assert_eq!(response.unwrap().body().len(), 23);
+        assert_eq!(response.unwrap().body().len(), 25);
     }
 
     #[test]
     fn it_creates_401_response_with_json_body() {
         let payload = TestPayload { name: "test".into() };
-        let response = status!(401, &payload, json);
+        let response = status!(401, &payload);
+
+        assert!(response.is_ok());
+        assert_eq!(response.unwrap().body().len(), 15);
+    }
+
+    #[test]
+    fn it_creates_anonymous_type_401_response_with_json_body() {
+        let response = status!(401, { "name": "test" });
 
         assert!(response.is_ok());
         assert_eq!(response.unwrap().body().len(), 15);
@@ -356,14 +387,22 @@ mod tests {
         let response = status!(403, "It's forbidden!");
 
         assert!(response.is_ok());
-        assert_eq!(response.unwrap().body().len(), 15);
+        assert_eq!(response.unwrap().body().len(), 17);
     }
 
     #[test]
     fn it_creates_403_response_with_json_body() {
         let payload = TestPayload { name: "test".into() };
-        let response = status!(403, &payload, json);
+        let response = status!(403, &payload);
         
+        assert!(response.is_ok());
+        assert_eq!(response.unwrap().body().len(), 15);
+    }
+
+    #[test]
+    fn it_creates_anonymous_type_403_response_with_json_body() {
+        let response = status!(403, { "name": "test" });
+
         assert!(response.is_ok());
         assert_eq!(response.unwrap().body().len(), 15);
     }
