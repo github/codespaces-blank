@@ -1,7 +1,7 @@
 # Volga
 Fast & Easy Web Framework for Rust based on [Tokio](https://tokio.rs/) runtime for fun and painless microservices crafting.
 
-[![latest](https://img.shields.io/badge/latest-0.2.1-blue)](https://crates.io/crates/volga)
+[![latest](https://img.shields.io/badge/latest-0.2.2-blue)](https://crates.io/crates/volga)
 [![latest](https://img.shields.io/badge/rustc-1.80+-964B00)](https://crates.io/crates/volga)
 [![License: MIT](https://img.shields.io/badge/License-MIT-violet.svg)](https://github.com/RomanEmreis/volga/blob/main/LICENSE)
 [![Build](https://github.com/RomanEmreis/volga/actions/workflows/rust.yml/badge.svg)](https://github.com/RomanEmreis/volga/actions/workflows/rust.yml)
@@ -18,8 +18,8 @@ Fast & Easy Web Framework for Rust based on [Tokio](https://tokio.rs/) runtime f
 ### Dependencies
 ```toml
 [dependencies]
-volga = "0.2.1"
-tokio = "1.40.0"
+volga = "0.2.2"
+tokio = "1.41.0"
 ```
 ### Asynchronous handler (Recommended):
 ```rust
@@ -162,6 +162,7 @@ async fn main() -> std::io::Result<()> {
 }
 ```
 ### Returning a JSON
+#### Strongly typed JSON
 ```rust
 use volga::{App, AsyncEndpointsMapping, ok, Payload};
 use serde::Serialize;
@@ -182,7 +183,22 @@ async fn main() -> std::io::Result<()> {
             age: 35
         };
 
-        ok!(&user, json) // { name: "John", age: 35 }
+        ok!(&user) // { name: "John", age: 35 }
+    });
+
+    app.run().await
+}
+```
+#### Untyped JSON
+```rust
+use volga::{App, AsyncEndpointsMapping, ok, Payload};
+
+#[tokio::main]
+async fn main() -> std::io::Result<()> {
+    let mut app = App::build("127.0.0.1:7878").await?;
+
+    app.map_get("/hello", |req| async move {
+        ok!({ "name": "John", "age": 35 }) // { name: "John", age: 35 }
     });
 
     app.run().await

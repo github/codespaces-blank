@@ -4,8 +4,8 @@
 //!
 //! ```toml
 //! [dependencies]
-//! volga = "0.2.1"
-//! tokio = "1.40.0"
+//! volga = "0.2.2"
+//! tokio = "1.41.0"
 //! ```
 //! ```no_run
 //! use volga::{App, Results, AsyncEndpointsMapping};
