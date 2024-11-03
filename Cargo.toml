@@ -1,6 +1,6 @@
 [package]
 name = "volga"
-version = "0.2.2"
+version = "0.2.3"
 edition = "2021"
 authors = ["Roman Emreis <roman.emreis@outlook.com>"]
 license = "MIT"

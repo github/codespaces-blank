@@ -1,7 +1,7 @@
 # Volga
 Fast & Easy Web Framework for Rust based on [Tokio](https://tokio.rs/) runtime for fun and painless microservices crafting.
 
-[![latest](https://img.shields.io/badge/latest-0.2.2-blue)](https://crates.io/crates/volga)
+[![latest](https://img.shields.io/badge/latest-0.2.3-blue)](https://crates.io/crates/volga)
 [![latest](https://img.shields.io/badge/rustc-1.80+-964B00)](https://crates.io/crates/volga)
 [![License: MIT](https://img.shields.io/badge/License-MIT-violet.svg)](https://github.com/RomanEmreis/volga/blob/main/LICENSE)
 [![Build](https://github.com/RomanEmreis/volga/actions/workflows/rust.yml/badge.svg)](https://github.com/RomanEmreis/volga/actions/workflows/rust.yml)
@@ -18,7 +18,7 @@ Fast & Easy Web Framework for Rust based on [Tokio](https://tokio.rs/) runtime f
 ### Dependencies
 ```toml
 [dependencies]
-volga = "0.2.2"
+volga = "0.2.3"
 tokio = "1.41.0"
 ```
 ### Asynchronous handler (Recommended):
@@ -204,9 +204,9 @@ async fn main() -> std::io::Result<()> {
     app.run().await
 }
 ```
-### Custom headers and Content-Type
+### Custom headers
 ```rust
-use volga::{App, AsyncEndpointsMapping, Results, ResponseContext};
+use volga::{App, ok, AsyncEndpointsMapping};
 use std::collections::HashMap;
 
 #[tokio::main]
@@ -214,16 +214,9 @@ async fn main() -> std::io::Result<()> {
    let mut app = App::build("127.0.0.1:7878").await?;
 
    app.map_get("/hello", |req| async move {
-       let mut headers = HashMap::new();
-
-       // Insert a custom header
-       headers.insert(String::from("x-api-key"), String::from("some api key"));
-       
-       Results::from(ResponseContext {
-           content: Box::new(String::from("Hello World!")),
-           headers: Some(headers),
-           content_type: Some(mime::TEXT_PLAIN)
-       })
+       ok!("Hello World!", [
+           ("x-api-key", "some api key")
+       ])
    });
 
    app.run().await

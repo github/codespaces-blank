@@ -53,6 +53,29 @@
 ///    app.run().await
 ///}
 /// ```
+/// ## Untyped JSON with custom headers
+///```no_run
+///use volga::{ok, App, AsyncEndpointsMapping};
+///use serde::Serialize;
+///
+///#[derive(Serialize)]
+///struct Health {
+///    status: String
+///}
+///
+///#[tokio::main]
+///async fn main() -> std::io::Result<()> {
+///    let mut app = App::build("127.0.0.1:7878").await?;
+///    
+///    app.map_get("/health", |_req| async {
+///        ok!({ "health": "healthy" }, [
+///            ("x-api-key", "some api key")
+///        ])
+///    });
+///    
+///    app.run().await
+///}
+/// ```
 #[macro_export]
 macro_rules! ok {
     () => {
@@ -61,9 +84,33 @@ macro_rules! ok {
     ({ $($json:tt)* }) => {
         $crate::Results::json(&serde_json::json_internal!({ $($json)* }))
     };
+    ({ $($json:tt)* }, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {{
+        // We're not using a headers! macro here to avoid adding unnecessary use if it's not needed
+        let mut headers = std::collections::HashMap::new();
+        $(
+            headers.insert($key.to_string(), $value.to_string());
+        )*
+        $crate::Results::from($crate::ResponseContext {
+            content: serde_json::json_internal!({ $($json)* }),
+            headers: Some(headers),
+            content_type: None
+        })
+    }};
     ($e:expr) => {
         $crate::Results::json($e)
     };
+    ($e:expr, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {{
+        // We're not using a headers! macro here to avoid adding unnecessary use if it's not needed
+        let mut headers = std::collections::HashMap::new();
+        $(
+            headers.insert($key.to_string(), $value.to_string());
+        )*
+        $crate::Results::from($crate::ResponseContext {
+            content: $e,
+            headers: Some(headers),
+            content_type: None
+        })
+    }};
 }
 
 /// Produces `OK 200` response with file body
@@ -91,6 +138,27 @@ macro_rules! file {
     ($file_name:expr, $e:expr) => {
         $crate::Results::file($file_name, $e)
     };
+}
+
+/// Creates HTTP Request/Response headers
+/// # Examples
+///```no_run
+///use volga::headers;
+///
+///let headers = headers![
+///    ("header 1", "value 1"),
+///    ("header 2", "value 2"),
+///];
+/// ```
+#[macro_export]
+macro_rules! headers {
+    ( $( ($key:expr, $value:expr) ),* $(,)? ) => {{
+        let mut map = std::collections::HashMap::new();
+        $(
+            map.insert($key.to_string(), $value.to_string());
+        )*
+        map
+    }};
 }
 
 /// Produces a response with specified `StatusCode` with plain text or JSON body
@@ -214,16 +282,18 @@ mod tests {
         let payload = TestPayload { name: "test".into() };
         let response = ok!(&payload);
         
-        assert!(response.is_ok());
-        assert_eq!(response.unwrap().body().len(), 15);
+        let response = response.unwrap();
+
+        assert_eq!(String::from_utf8_lossy(response.body()), "{\"name\":\"test\"}");
+        assert_eq!(response.headers().get("Content-Type").unwrap(), "application/json");
     }
 
     #[test]
     fn it_creates_anonymous_type_json_ok_response() {
         let response = ok!({ "name": "test" });
-        
+
         assert!(response.is_ok());
-        assert_eq!(response.unwrap().body().len(), 15);
+        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "{\"name\":\"test\"}");
     }
     
     #[test]
@@ -232,7 +302,7 @@ mod tests {
         let response = ok!(text);
 
         assert!(response.is_ok());
-        assert_eq!(response.unwrap().body().len(), 6);
+        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "\"test\"");
     }
     
     #[test]
@@ -251,7 +321,7 @@ mod tests {
         let response = file!(file_name, file_data.to_vec());
 
         assert!(response.is_ok());
-        assert_eq!(response.unwrap().body().len(), 33);
+        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "Hello, this is some file content!");
     }
 
     #[test]
@@ -268,7 +338,7 @@ mod tests {
         let response = status!(200, text);
 
         assert!(response.is_ok());
-        assert_eq!(response.unwrap().body().len(), 6);
+        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "\"test\"");
     }
 
     #[test]
@@ -277,7 +347,7 @@ mod tests {
         let response = status!(200, &payload);
 
         assert!(response.is_ok());
-        assert_eq!(response.unwrap().body().len(), 15);
+        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "{\"name\":\"test\"}");
     }
 
     #[test]
@@ -285,7 +355,7 @@ mod tests {
         let response = status!(200, { "name": "test" });
 
         assert!(response.is_ok());
-        assert_eq!(response.unwrap().body().len(), 15);
+        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "{\"name\":\"test\"}");
     }
 
     #[test]
@@ -296,7 +366,7 @@ mod tests {
         let response = status!(200, file_name, file_data.to_vec());
 
         assert!(response.is_ok());
-        assert_eq!(response.unwrap().body().len(), 33);
+        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "Hello, this is some file content!");
     }
 
     #[test]
@@ -313,7 +383,7 @@ mod tests {
         let response = status!(400, text);
 
         assert!(response.is_ok());
-        assert_eq!(response.unwrap().body().len(), 6);
+        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "\"test\"");
     }
 
     #[test]
@@ -322,7 +392,7 @@ mod tests {
         let response = status!(400, &payload);
 
         assert!(response.is_ok());
-        assert_eq!(response.unwrap().body().len(), 15);
+        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "{\"name\":\"test\"}");
     }
 
     #[test]
@@ -330,7 +400,7 @@ mod tests {
         let response = status!(400, { "name": "test" });
 
         assert!(response.is_ok());
-        assert_eq!(response.unwrap().body().len(), 15);
+        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "{\"name\":\"test\"}");
     }
     
     #[test]
@@ -354,7 +424,7 @@ mod tests {
         let response = status!(401, "You are not authorized!");
 
         assert!(response.is_ok());
-        assert_eq!(response.unwrap().body().len(), 25);
+        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "\"You are not authorized!\"");
     }
 
     #[test]
@@ -363,7 +433,7 @@ mod tests {
         let response = status!(401, &payload);
 
         assert!(response.is_ok());
-        assert_eq!(response.unwrap().body().len(), 15);
+        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "{\"name\":\"test\"}");
     }
 
     #[test]
@@ -371,7 +441,7 @@ mod tests {
         let response = status!(401, { "name": "test" });
 
         assert!(response.is_ok());
-        assert_eq!(response.unwrap().body().len(), 15);
+        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "{\"name\":\"test\"}");
     }
 
     #[test]
@@ -387,7 +457,7 @@ mod tests {
         let response = status!(403, "It's forbidden!");
 
         assert!(response.is_ok());
-        assert_eq!(response.unwrap().body().len(), 17);
+        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "\"It's forbidden!\"");
     }
 
     #[test]
@@ -396,7 +466,7 @@ mod tests {
         let response = status!(403, &payload);
         
         assert!(response.is_ok());
-        assert_eq!(response.unwrap().body().len(), 15);
+        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "{\"name\":\"test\"}");
     }
 
     #[test]
@@ -404,6 +474,66 @@ mod tests {
         let response = status!(403, { "name": "test" });
 
         assert!(response.is_ok());
-        assert_eq!(response.unwrap().body().len(), 15);
+        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "{\"name\":\"test\"}");
+    }
+    
+    #[test]
+    fn it_creates_headers() {
+        let headers = headers![
+            ("header 1", "value 1"),
+            ("header 2", "value 2")
+        ];
+        
+        assert_eq!(headers.get("header 1").unwrap(), "value 1");
+        assert_eq!(headers.get("header 2").unwrap(), "value 2")
+    }
+    
+    #[test]
+    fn in_creates_text_response_with_custom_headers() {
+        let response = ok!("ok", [
+            ("x-api-key", "some api key"),
+            ("x-req-id", "some req id"),
+        ]);
+        
+        assert!(response.is_ok());
+        
+        let response = response.unwrap();
+        
+        assert_eq!(String::from_utf8_lossy(response.body()), "\"ok\"");
+        assert_eq!(response.headers().get("x-api-key").unwrap(), "some api key");
+        assert_eq!(response.headers().get("x-req-id").unwrap(), "some req id");
+    }
+
+    #[test]
+    fn in_creates_json_response_with_custom_headers() {
+        let payload = TestPayload { name: "test".into() };
+        let response = ok!(&payload, [
+            ("x-api-key", "some api key"),
+            ("x-req-id", "some req id"),
+        ]);
+
+        assert!(response.is_ok());
+
+        let response = response.unwrap();
+
+        assert_eq!(String::from_utf8_lossy(response.body()), "{\"name\":\"test\"}");
+        assert_eq!(response.headers().get("x-api-key").unwrap(), "some api key");
+        assert_eq!(response.headers().get("x-req-id").unwrap(), "some req id");
+    }
+
+    #[test]
+    fn in_creates_anonymous_json_response_with_custom_headers() {
+        let response = ok!({ "name": "test" }, [
+            ("x-api-key", "some api key"),
+            ("x-req-id", "some req id"),
+        ]);
+
+        assert!(response.is_ok());
+
+        let response = response.unwrap();
+
+        assert_eq!(String::from_utf8_lossy(response.body()), "{\"name\":\"test\"}");
+        assert_eq!(response.headers().get("x-api-key").unwrap(), "some api key");
+        assert_eq!(response.headers().get("x-req-id").unwrap(), "some req id");
     }
 }

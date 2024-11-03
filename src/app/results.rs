@@ -25,7 +25,7 @@ pub mod macros;
 ///        headers.insert(String::from("x-api-key"), String::from("some api key"));
 ///        
 ///        Results::from(ResponseContext {
-///            content: Box::new(String::from("Hello World!")),
+///            content: "Hello World!",
 ///            headers: Some(headers),
 ///            content_type: Some(mime::TEXT_PLAIN)
 ///        })
@@ -34,8 +34,8 @@ pub mod macros;
 ///    app.run().await
 ///}
 /// ```
-pub struct ResponseContext<T: ?Sized> {
-    pub content: Box<T>,
+pub struct ResponseContext<T> {
+    pub content: T,
     pub headers: Option<HashMap<String, String>>,
     pub content_type: Option<Mime>
 }
@@ -47,10 +47,7 @@ pub struct Results;
 
 impl Results {
     /// Produces a customized `OK 200` response
-    pub fn from<T>(context: ResponseContext<T>) -> HttpResult
-    where T:
-        ?Sized + Serialize
-    {
+    pub fn from<T: Serialize>(context: ResponseContext<T>) -> HttpResult {
         let ResponseContext { content, headers, content_type } = context;
         let mut builder = Self::create_default_builder();
 
@@ -67,10 +64,11 @@ impl Results {
                 }
             }
 
+            // if the content type is not provided - using the application/json by default
             if let Some(content_type) = content_type {
                 headers_ref.insert(http::header::CONTENT_TYPE, HeaderValue::from_bytes(content_type.as_ref().as_bytes()).unwrap());
             } else {
-                headers_ref.insert(http::header::CONTENT_TYPE, HeaderValue::from_bytes(mime::TEXT_PLAIN.as_ref().as_bytes()).unwrap());
+                headers_ref.insert(http::header::CONTENT_TYPE, HeaderValue::from_bytes(mime::APPLICATION_JSON.as_ref().as_bytes()).unwrap());
             }
         } else {
             // log this issue
@@ -213,5 +211,197 @@ impl Results {
         } else {
             Bytes::new()
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::collections::HashMap;
+    use bytes::Bytes;
+    use http::StatusCode;
+    use serde::Serialize;
+    use crate::{ResponseContext, Results};
+
+    #[derive(Serialize)]
+    struct TestPayload {
+        name: String
+    }
+    
+    #[test]
+    fn in_creates_text_response_with_custom_headers() {
+        let mut headers = HashMap::new();
+        headers.insert(String::from("x-api-key"), String::from("some api key"));
+        
+        let response = Results::from(ResponseContext {
+            content: String::from("Hello World!"),
+            headers: Some(headers),
+            content_type: Some(mime::TEXT_PLAIN)
+        }).unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(String::from_utf8_lossy(response.body()), "\"Hello World!\"");
+        assert_eq!(response.headers().get("Content-Type").unwrap(), "text/plain");
+        assert_eq!(response.headers().get("x-api-key").unwrap(), "some api key");
+    }
+
+    #[test]
+    fn in_creates_str_text_response_with_custom_headers() {
+        let mut headers = HashMap::new();
+        headers.insert(String::from("x-api-key"), String::from("some api key"));
+
+        let response = Results::from(ResponseContext {
+            content: "Hello World!",
+            headers: Some(headers),
+            content_type: Some(mime::TEXT_PLAIN)
+        }).unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(String::from_utf8_lossy(response.body()), "\"Hello World!\"");
+        assert_eq!(response.headers().get("Content-Type").unwrap(), "text/plain");
+        assert_eq!(response.headers().get("x-api-key").unwrap(), "some api key");
+    }
+
+    #[test]
+    fn in_creates_json_response_with_custom_headers() {
+        let mut headers = HashMap::new();
+        headers.insert(String::from("x-api-key"), String::from("some api key"));
+
+        let payload = TestPayload { name: "test".into() };
+        
+        let response = Results::from(ResponseContext {
+            content: payload,
+            headers: Some(headers),
+            content_type: Some(mime::APPLICATION_JSON)
+        }).unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(String::from_utf8_lossy(response.body()), "{\"name\":\"test\"}");
+        assert_eq!(response.headers().get("Content-Type").unwrap(), "application/json");
+        assert_eq!(response.headers().get("x-api-key").unwrap(), "some api key");
+    }
+
+    #[test]
+    fn it_creates_json_response() {
+        let payload = TestPayload { name: "test".into() };
+        let response = Results::json(&payload).unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(String::from_utf8_lossy(response.body()), "{\"name\":\"test\"}");
+        assert_eq!(response.headers().get("Content-Type").unwrap(), "application/json");
+    }
+
+    #[test]
+    fn it_creates_json_response_with_custom_status() {
+        let payload = TestPayload { name: "test".into() };
+        let response = Results::json_with_status(StatusCode::NOT_FOUND, &payload).unwrap();
+
+        assert_eq!(response.status(), StatusCode::NOT_FOUND);
+        assert_eq!(String::from_utf8_lossy(response.body()), "{\"name\":\"test\"}");
+        assert_eq!(response.headers().get("Content-Type").unwrap(), "application/json");
+    }
+
+    #[test]
+    fn it_creates_text_response() {
+        let response = Results::text("Hello World!").unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(String::from_utf8_lossy(response.body()), "Hello World!");
+        assert_eq!(response.headers().get("Content-Type").unwrap(), "text/plain");
+    }
+    
+    #[test]
+    fn it_creates_file_response() {
+        let file_name = "example.txt";
+        let file_data = b"Hello, this is some file content!";
+
+        let response = Results::file(file_name, file_data.to_vec()).unwrap();
+        
+        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(String::from_utf8_lossy(response.body()), "Hello, this is some file content!");
+        assert_eq!(response.headers().get("Content-Type").unwrap(), "application/octet-stream");
+    }
+    
+    #[test]
+    fn it_creates_empty_ok_response() {
+        let response = Results::ok().unwrap();
+        
+        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(response.body().len(), 0);
+        assert_eq!(response.headers().get("Content-Type").unwrap(), "text/plain");
+    }
+
+    #[test]
+    fn it_creates_empty_not_found_response() {
+        let response = Results::not_found().unwrap();
+
+        assert_eq!(response.status(), StatusCode::NOT_FOUND);
+        assert_eq!(response.body().len(), 0);
+        assert_eq!(response.headers().get("Content-Type").unwrap(), "text/plain");
+    }
+
+    #[test]
+    fn it_creates_empty_internal_server_error_response() {
+        let response = Results::internal_server_error(None).unwrap();
+
+        assert_eq!(response.status(), StatusCode::INTERNAL_SERVER_ERROR);
+        assert_eq!(response.body().len(), 0);
+        assert_eq!(response.headers().get("Content-Type").unwrap(), "text/plain");
+    }
+
+    #[test]
+    fn it_creates_internal_server_error_response() {
+        let response = Results::internal_server_error(Some("Some error".into())).unwrap();
+
+        assert_eq!(response.status(), StatusCode::INTERNAL_SERVER_ERROR);
+        assert_eq!(String::from_utf8_lossy(response.body()), "Some error");
+        assert_eq!(response.headers().get("Content-Type").unwrap(), "text/plain");
+    }
+
+    #[test]
+    fn it_creates_empty_bad_request_response() {
+        let response = Results::bad_request(None).unwrap();
+
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+        assert_eq!(response.body().len(), 0);
+        assert_eq!(response.headers().get("Content-Type").unwrap(), "text/plain");
+    }
+
+    #[test]
+    fn it_creates_bad_request_response() {
+        let response = Results::bad_request(Some("Some error".into())).unwrap();
+
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+        assert_eq!(String::from_utf8_lossy(response.body()), "Some error");
+        assert_eq!(response.headers().get("Content-Type").unwrap(), "text/plain");
+    }
+
+    #[test]
+    fn it_creates_client_closed_request_response() {
+        let response = Results::client_closed_request().unwrap();
+
+        assert_eq!(response.status().as_u16(), 499);
+        assert_eq!(response.body().len(), 0);
+        assert_eq!(response.headers().get("Content-Type").unwrap(), "text/plain");
+    }
+
+    #[test]
+    fn it_creates_empty_custom_response() {
+        let response = Results::status(StatusCode::UNAUTHORIZED, mime::APPLICATION_PDF.as_ref(), Bytes::new()).unwrap();
+
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+        assert_eq!(response.body().len(), 0);
+        assert_eq!(response.headers().get("Content-Type").unwrap(), "application/pdf");
+    }
+
+    #[test]
+    fn it_creates_custom_response() {
+        let response = Results::status(
+            StatusCode::FORBIDDEN,
+            mime::TEXT_PLAIN.as_ref(), 
+            Bytes::from(String::from("Hello World!"))).unwrap();
+
+        assert_eq!(response.status(), StatusCode::FORBIDDEN);
+        assert_eq!(String::from_utf8_lossy(response.body()), "Hello World!");
+        assert_eq!(response.headers().get("Content-Type").unwrap(), "text/plain");
     }
 }

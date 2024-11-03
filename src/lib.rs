@@ -4,11 +4,11 @@
 //!
 //! ```toml
 //! [dependencies]
-//! volga = "0.2.2"
+//! volga = "0.2.3"
 //! tokio = "1.41.0"
 //! ```
 //! ```no_run
-//! use volga::{App, Results, AsyncEndpointsMapping};
+//! use volga::{App, ok, AsyncEndpointsMapping};
 //!
 //! #[tokio::main]
 //! async fn main() -> std::io::Result<()> {
@@ -17,7 +17,7 @@
 //!
 //!     // Example of asynchronous GET request handler
 //!     app.map_get("/hello", |request| async {
-//!         Results::text("Hello World!")
+//!         ok!("Hello World!")
 //!     });
 //!     
 //!     app.run().await
