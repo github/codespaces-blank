@@ -4,7 +4,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! volga = "0.2.3"
+//! volga = "0.2.4"
 //! tokio = "1.41.0"
 //! ```
 //! ```no_run

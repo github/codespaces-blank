@@ -1,7 +1,6 @@
 ﻿use std::collections::HashMap;
 use bytes::Bytes;
 use chrono::Utc;
-use mime::Mime;
 use serde::Serialize;
 use http::{HeaderName, HeaderValue, Response, StatusCode};
 use http::response::Builder;
@@ -10,7 +9,7 @@ use tokio::io;
 pub mod macros;
 
 /// A customized response context with custom response `headers` and `content_type`
-/// 
+/// > NOTE: This is not suitable for file response
 /// # Example
 /// ```no_run
 ///use volga::{App, AsyncEndpointsMapping, Results, ResponseContext};
@@ -26,8 +25,8 @@ pub mod macros;
 ///        
 ///        Results::from(ResponseContext {
 ///            content: "Hello World!",
-///            headers: Some(headers),
-///            content_type: Some(mime::TEXT_PLAIN)
+///            status: 200,
+///            headers
 ///        })
 ///    });
 ///
@@ -36,11 +35,11 @@ pub mod macros;
 /// ```
 pub struct ResponseContext<T> {
     pub content: T,
-    pub headers: Option<HashMap<String, String>>,
-    pub content_type: Option<Mime>
+    pub status: u16,
+    pub headers: HashMap<String, String>
 }
 
-pub type HttpResponse = Response<Bytes>; 
+pub type HttpResponse = Response<Bytes>;
 pub type HttpResult = io::Result<HttpResponse>;
 
 pub struct Results;
@@ -48,36 +47,11 @@ pub struct Results;
 impl Results {
     /// Produces a customized `OK 200` response
     pub fn from<T: Serialize>(context: ResponseContext<T>) -> HttpResult {
-        let ResponseContext { content, headers, content_type } = context;
-        let mut builder = Self::create_default_builder();
-
-        if let Some(headers_ref) = builder.headers_mut() {
-            if let Some(headers_map) = headers {
-                for (name, value) in headers_map {
-                    let header_name = HeaderName::from_bytes(name.as_bytes());
-                    let header_value = HeaderValue::from_bytes(value.as_bytes());
-                    
-                    match (header_name, header_value) {
-                        (Ok(header_name), Ok(header_value)) => headers_ref.insert(header_name, header_value),
-                        _ => None
-                    };
-                }
-            }
-
-            // if the content type is not provided - using the application/json by default
-            if let Some(content_type) = content_type {
-                headers_ref.insert(http::header::CONTENT_TYPE, HeaderValue::from_bytes(content_type.as_ref().as_bytes()).unwrap());
-            } else {
-                headers_ref.insert(http::header::CONTENT_TYPE, HeaderValue::from_bytes(mime::APPLICATION_JSON.as_ref().as_bytes()).unwrap());
-            }
-        } else {
-            // log this issue
-        }
-
+        let ResponseContext { content, headers, status } = context;
         let content = serde_json::to_vec(&content)?;
 
-        builder
-            .status(StatusCode::OK)
+        Self::create_custom_builder(headers)
+            .status(StatusCode::from_u16(status).unwrap_or(StatusCode::OK))
             .header(http::header::CONTENT_LENGTH, content.len())
             .body(Bytes::from(content))
             .map_err(|_| Self::response_error())
@@ -130,6 +104,24 @@ impl Results {
             .status(StatusCode::OK)
             .header(http::header::CONTENT_LENGTH, body.len())
             .header(http::header::CONTENT_TYPE, mime::APPLICATION_OCTET_STREAM.as_ref())
+            .header(http::header::CONTENT_DISPOSITION, file_name)
+            .body(body)
+            .map_err(|_| Self::response_error())
+    }
+
+    /// Produces an `OK 200` response with the file body and custom headers.
+    #[inline]
+    pub fn file_with_custom_headers(file_name: &str, content: Vec<u8>, mut headers: HashMap<String, String>) -> HttpResult {
+        headers.insert(
+            http::header::CONTENT_TYPE.as_str().into(),
+            mime::APPLICATION_OCTET_STREAM.as_ref().into()
+        );
+        
+        let body = Bytes::from(content);
+        let file_name = format!("attachment; filename=\"{}\"", file_name);
+        Self::create_custom_builder(headers)
+            .status(StatusCode::OK)
+            .header(http::header::CONTENT_LENGTH, body.len())
             .header(http::header::CONTENT_DISPOSITION, file_name)
             .body(body)
             .map_err(|_| Self::response_error())
@@ -198,6 +190,31 @@ impl Results {
             .header(http::header::DATE, Utc::now().to_rfc2822())
             .header(http::header::SERVER, "Volga")
     }
+
+    #[inline]
+    fn create_custom_builder(headers: HashMap<String, String>) -> Builder {
+        let mut builder = Self::create_default_builder();
+
+        if let Some(headers_ref) = builder.headers_mut() {
+            for (name, value) in headers {
+                let header_name = HeaderName::from_bytes(name.as_bytes());
+                let header_value = HeaderValue::from_bytes(value.as_bytes());
+
+                match (header_name, header_value) {
+                    (Ok(header_name), Ok(header_value)) => headers_ref.insert(header_name, header_value),
+                    _ => None
+                };
+            }
+            // if the content type is not provided - using the application/json by default
+            if headers_ref.get(http::header::CONTENT_TYPE).is_none() {
+                headers_ref.insert(http::header::CONTENT_TYPE, HeaderValue::from_bytes(mime::APPLICATION_JSON.as_ref().as_bytes()).unwrap());
+            }
+        } else if cfg!(debug_assertions) {
+            eprintln!("Failed to write to HTTP headers");
+        }
+
+        builder
+    }
     
     #[inline]
     fn response_error() -> io::Error {
@@ -220,7 +237,7 @@ mod tests {
     use bytes::Bytes;
     use http::StatusCode;
     use serde::Serialize;
-    use crate::{ResponseContext, Results};
+    use crate::{headers, ResponseContext, Results};
 
     #[derive(Serialize)]
     struct TestPayload {
@@ -233,14 +250,14 @@ mod tests {
         headers.insert(String::from("x-api-key"), String::from("some api key"));
         
         let response = Results::from(ResponseContext {
+            status: 400,
             content: String::from("Hello World!"),
-            headers: Some(headers),
-            content_type: Some(mime::TEXT_PLAIN)
+            headers
         }).unwrap();
 
-        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
         assert_eq!(String::from_utf8_lossy(response.body()), "\"Hello World!\"");
-        assert_eq!(response.headers().get("Content-Type").unwrap(), "text/plain");
+        assert_eq!(response.headers().get("Content-Type").unwrap(), "application/json");
         assert_eq!(response.headers().get("x-api-key").unwrap(), "some api key");
     }
 
@@ -248,11 +265,12 @@ mod tests {
     fn in_creates_str_text_response_with_custom_headers() {
         let mut headers = HashMap::new();
         headers.insert(String::from("x-api-key"), String::from("some api key"));
+        headers.insert(String::from("Content-Type"), String::from("text/plain"));
 
         let response = Results::from(ResponseContext {
+            status: 200,
             content: "Hello World!",
-            headers: Some(headers),
-            content_type: Some(mime::TEXT_PLAIN)
+            headers,
         }).unwrap();
 
         assert_eq!(response.status(), StatusCode::OK);
@@ -265,13 +283,14 @@ mod tests {
     fn in_creates_json_response_with_custom_headers() {
         let mut headers = HashMap::new();
         headers.insert(String::from("x-api-key"), String::from("some api key"));
+        headers.insert(String::from("Content-Type"), String::from("application/json"));
 
-        let payload = TestPayload { name: "test".into() };
+        let content = TestPayload { name: "test".into() };
         
         let response = Results::from(ResponseContext {
-            content: payload,
-            headers: Some(headers),
-            content_type: Some(mime::APPLICATION_JSON)
+            status: 200,
+            content,
+            headers,
         }).unwrap();
 
         assert_eq!(response.status(), StatusCode::OK);
@@ -319,6 +338,23 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
         assert_eq!(String::from_utf8_lossy(response.body()), "Hello, this is some file content!");
         assert_eq!(response.headers().get("Content-Type").unwrap(), "application/octet-stream");
+    }
+
+    #[test]
+    fn it_creates_file_response_with_custom_headers() {
+        let file_name = "example.txt";
+        let file_data = b"Hello, this is some file content!";
+
+        let headers = headers![
+            ("x-api-key", "some api key")
+        ];
+        
+        let response = Results::file_with_custom_headers(file_name, file_data.to_vec(), headers).unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(String::from_utf8_lossy(response.body()), "Hello, this is some file content!");
+        assert_eq!(response.headers().get("Content-Type").unwrap(), "application/octet-stream");
+        assert_eq!(response.headers().get("x-api-key").unwrap(), "some api key");
     }
     
     #[test]

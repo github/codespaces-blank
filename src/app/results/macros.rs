@@ -91,9 +91,9 @@ macro_rules! ok {
             headers.insert($key.to_string(), $value.to_string());
         )*
         $crate::Results::from($crate::ResponseContext {
+            status: 200,
             content: serde_json::json_internal!({ $($json)* }),
-            headers: Some(headers),
-            content_type: None
+            headers
         })
     }};
     ($e:expr) => {
@@ -106,15 +106,17 @@ macro_rules! ok {
             headers.insert($key.to_string(), $value.to_string());
         )*
         $crate::Results::from($crate::ResponseContext {
+            status: 200,
             content: $e,
-            headers: Some(headers),
-            content_type: None
+            headers
         })
     }};
 }
 
 /// Produces `OK 200` response with file body
+/// 
 /// # Examples
+/// ## Default usage
 ///```no_run
 ///use volga::{file, App, AsyncEndpointsMapping};
 ///use serde::Serialize;
@@ -133,11 +135,40 @@ macro_rules! ok {
 ///    app.run().await
 ///}
 /// ```
+/// ## Custom headers
+///```no_run
+///use volga::{file, App, AsyncEndpointsMapping};
+///use serde::Serialize;
+///
+///#[tokio::main]
+///async fn main() -> std::io::Result<()> {
+///    let mut app = App::build("127.0.0.1:7878").await?;
+///    
+///    app.map_get("/download", |_req| async {
+///        let file_name = "example.txt";
+///        let file_data = b"Hello, this is some file content!".to_vec();
+///        
+///        file!(file_name, file_data, [
+///            ("x-api-key", "some api key")
+///        ])
+///    });
+///    
+///    app.run().await
+///}
+/// ```
 #[macro_export]
 macro_rules! file {
     ($file_name:expr, $e:expr) => {
         $crate::Results::file($file_name, $e)
     };
+    ($file_name:expr, $e:expr, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {{
+        // We're not using a headers! macro here to avoid adding unnecessary use if it's not needed
+        let mut headers = std::collections::HashMap::new();
+        $(
+            headers.insert($key.to_string(), $value.to_string());
+        )*
+        $crate::Results::file_with_custom_headers($file_name, $e, headers)
+    }};
 }
 
 /// Creates HTTP Request/Response headers
@@ -325,6 +356,19 @@ mod tests {
     }
 
     #[test]
+    fn it_creates_file_with_ok_and_custom_headers_response() {
+        let file_name = "example.txt";
+        let file_data = b"Hello, this is some file content!";
+
+        let response = file!(file_name, file_data.to_vec(), [
+            ("x-api-key", "some api key")
+        ]);
+
+        assert!(response.is_ok());
+        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "Hello, this is some file content!");
+    }
+
+    #[test]
     fn it_creates_200_response() {
         let response = status!(200);
 
@@ -502,6 +546,19 @@ mod tests {
         assert_eq!(String::from_utf8_lossy(response.body()), "\"ok\"");
         assert_eq!(response.headers().get("x-api-key").unwrap(), "some api key");
         assert_eq!(response.headers().get("x-req-id").unwrap(), "some req id");
+    }
+
+    #[test]
+    fn in_creates_text_response_with_empty_custom_headers() {
+        #[allow(unused_mut)]
+        let response = ok!("ok", []);
+
+        assert!(response.is_ok());
+
+        let response = response.unwrap();
+
+        assert_eq!(String::from_utf8_lossy(response.body()), "\"ok\"");
+        assert_eq!(response.headers().len(), 4);
     }
 
     #[test]

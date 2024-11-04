@@ -2,6 +2,7 @@
 use httparse::EMPTY_HEADER;
 use std::sync::Arc;
 use std::time::Duration;
+use bytes::BytesMut;
 use tokio_util::sync::CancellationToken;
 use tokio::{
     net::{TcpListener, TcpStream},
@@ -270,8 +271,8 @@ impl App {
     }
 
     async fn write_response(socket: &mut TcpStream, response: &HttpResponse) -> io::Result<()> {
-        let mut response_bytes = vec![];
-
+        let mut response_bytes = BytesMut::new();
+        
         // Start with the HTTP status line
         let status_line = format!(
             "HTTP/1.1 {} {}\r\n",
