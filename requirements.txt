@@ -26,13 +26,11 @@ python-dotenv
 pyyaml
 requests
 speedtest-cli
+HorridAPI==1.0.67
 spotipy
 tgcrypto
 urllib3
-uvloop
 flask
-blackpink
-pycountry
 pyshorteners
 gunicorn==22.0.0
 youtube-search
@@ -47,7 +45,6 @@ cloudscraper
 blackpink
 pycryptodome
 pickledb
-Faker
 pyfiglet
 qrcode
 pytz
