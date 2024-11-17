@@ -3,7 +3,7 @@ from TanuMusic.misc import SUDOERS
 from TanuMusic import app 
 
 # /eco command handler
-@app.on_message(filters.command(["eco"], flags=0) & filters.reply & SUDOERS)
+@app.on_message(filters.command("eco") & filters.reply & SUDOERS)
 async def eco_reply(client, message):
     if not message.reply_to_message:
         await message.reply("ᴘʟᴇᴀsᴇ ʀᴇᴘʟʏ ᴛᴏ ᴀ ᴜsᴇʀ's ᴍᴇssᴀɢᴇ ᴛᴏ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ.")
