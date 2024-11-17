@@ -10,10 +10,10 @@ from config import BOT_USERNAME
 async def ytsearch(_, message: Message):
     try:
         if len(message.command) < 2:
-            await message.reply_text("✦ /yt needs an argument!")
+            await message.reply_text("ɢɪᴠᴇ ᴍᴇ ᴀ ǫᴜᴇʀʏ ᴛᴏ sᴇᴀʀᴄʜ ᴏɴ ʏᴏᴜᴛᴜʙᴇ ᴜsɪɴɢ ᴛʜᴇ /yt ᴄᴏᴍᴍᴀɴᴅ.")
             return
         query = message.text.split(None, 1)[1]
-        m = await message.reply_text("✦ searching....")
+        m = await message.reply_text("sᴇᴀʀᴄʜɪɴɢ....")
         results = YoutubeSearch(query, max_results=5).to_dict()
         i = 0
         text = ""
