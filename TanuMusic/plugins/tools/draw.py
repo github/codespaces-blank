@@ -1,5 +1,6 @@
 from pyrogram import Client, filters
 from HorridAPI import Mango
+from TanuMusic import app 
 
 @app.on_message(filters.command("draw"))
 def draw(client, message):
