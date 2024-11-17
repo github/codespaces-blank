@@ -40,19 +40,10 @@ playmode = {}
 playtype = {}
 skipmode = {}
 
-async def add_wlcm(chat_id: int):
-    return await wlcm.insert_one({"chat_id": chat_id})
-
-async def rm_wlcm(chat_id: int):   
-    chat = await wlcm.find_one({"chat_id": chat_id})
-    if chat: 
-        return await wlcm.delete_one({"chat_id": chat_id})
-
 
 async def get_assistant_number(chat_id: int) -> str:
     assistant = assistantdict.get(chat_id)
     return assistant
-
 
 async def get_client(assistant: int):
     if int(assistant) == 1:
