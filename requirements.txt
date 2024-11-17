@@ -14,6 +14,7 @@ httpx[http2]
 lyricsgenius
 motor
 wget
+pycountry
 pillow==11.0.0
 pymongo==4.9.1
 psutil
