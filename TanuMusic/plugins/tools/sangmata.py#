@@ -22,7 +22,7 @@ async def sg(client: Client, message: Message):
         try:
             user = await client.get_users(f"{args}")
         except Exception:
-            return await lol.edit("❖ <code>Please specify a valid user!</code>")
+            return await lol.edit("✦ <code>Please specify a valid user!</code>")
     bo = ["sangmata_bot", "sangmata_beta_bot"]
     sg = random.choice(bo)
     if 1 in assistants:
