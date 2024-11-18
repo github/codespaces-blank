@@ -1,6 +1,5 @@
 ﻿use std::{pin::Pin, sync::Arc, future::Future};
-use crate::{HttpResult, HttpRequest};
-use crate::app::BoxedHttpResultFuture;
+use crate::{app::BoxedHttpResultFuture, HttpResult, HttpRequest};
 
 pub(crate) type RouteHandler = Arc<dyn Handler + Send + Sync>;
 
