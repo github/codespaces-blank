@@ -4,7 +4,7 @@ from pyrogram import filters
 from pyrogram.types import Message
 
 from TanuMusic import app
-from TanuMusic.core.call import Anony
+from TanuMusic.core.call import Tanu 
 from TanuMusic.utils import bot_sys_stats
 from TanuMusic.utils.decorators.language import language
 from TanuMusic.utils.inline import supp_markup
