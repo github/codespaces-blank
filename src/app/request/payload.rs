@@ -1,7 +1,10 @@
-﻿use serde::Deserialize;
+﻿use std::future::Future;
+use serde::de::DeserializeOwned;
 
 pub trait Payload {
     /// Returns a request body deserialized to type of `T`
+    /// 
+    /// > This method is only available in async context
     /// 
     /// # Example
     /// ```no_run
@@ -21,7 +24,7 @@ pub trait Payload {
     ///    // POST /test
     ///    // { name: "John", age: 35 }
     ///    app.map_post("/test", |req| async move {
-    ///        let params: User = req.payload()?;
+    ///        let params: User = req.payload().await?;
     ///
     ///        Results::text("Pass!")
     ///    });
@@ -29,7 +32,5 @@ pub trait Payload {
     ///    app.run().await
     ///}
     /// ```
-    fn payload<'a, T>(&'a self) -> Result<T, std::io::Error>
-    where
-        T: Deserialize<'a>;
+    fn payload<T: DeserializeOwned>(self) -> impl Future<Output = Result<T, std::io::Error>>;
 }

@@ -1,10 +1,14 @@
-﻿use std::{pin::Pin, sync::Arc, future::Future};
+﻿use std::{
+    pin::Pin, 
+    sync::Arc, 
+    future::Future
+};
 use crate::{
-    HttpResult,
-    HttpContext,
-    Next,
-    app::middlewares::{Middlewares, mapping::asynchronous::AsyncMapping},
-    app::BoxedHttpResultFuture
+    app::middlewares::{Middlewares, mapping::asynchronous::AsyncMapping}, 
+    app::BoxedHttpResultFuture,
+    HttpResult, 
+    HttpContext, 
+    Next
 };
 
 pub mod asynchronous;
@@ -12,11 +16,11 @@ pub mod asynchronous;
 impl AsyncMapping for Middlewares {
     fn use_middleware<F, Fut>(&mut self, middleware: F)
     where
-        F: 'static + Send + Sync + Fn(Arc<HttpContext>, Next) -> Fut,
-        Fut: Future<Output = HttpResult> + Send + 'static,
+        F: Fn(HttpContext, Next) -> Fut + Send + Sync + 'static,
+        Fut: Future<Output = HttpResult> + Send,
     {
         let middleware = Arc::new(middleware); // wrapping the middleware into an Arc
-        let mw = Arc::new(move |ctx: Arc<HttpContext>, next: Next| {
+        let mw = Arc::new(move |ctx: HttpContext, next: Next| {
             let middleware = middleware.clone(); // cloning for each invocation
 
             Box::pin(async move {

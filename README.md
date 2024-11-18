@@ -1,5 +1,5 @@
 # Volga
-Fast & Easy Web Framework for Rust based on [Tokio](https://tokio.rs/) runtime for fun and painless microservices crafting.
+Fast, Easy, and very flexible Web Framework for Rust based on [Tokio](https://tokio.rs/) runtime and [hyper](https://hyper.rs/) for fun and painless microservices crafting.
 
 [![latest](https://img.shields.io/badge/latest-0.2.4-blue)](https://crates.io/crates/volga)
 [![latest](https://img.shields.io/badge/rustc-1.80+-964B00)](https://crates.io/crates/volga)
@@ -19,12 +19,12 @@ Fast & Easy Web Framework for Rust based on [Tokio](https://tokio.rs/) runtime f
 ### Dependencies
 ```toml
 [dependencies]
-volga = "0.2.4"
-tokio = "1.41.0"
+volga = "0.3.0"
+tokio = "1.41.1"
 ```
-### Asynchronous handler (Recommended):
+### Simple asynchronous request handler:
 ```rust
-use volga::{App, ok, AsyncEndpointsMapping};
+use volga::{App, ok, AsyncEndpointsMapping, Params};
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -32,195 +32,12 @@ async fn main() -> std::io::Result<()> {
     let mut app = App::build("127.0.0.1:7878").await?;
 
     // Example of asynchronous request handler
-    app.map_get("/hello", |req| async {
-        ok!("Hello World!")
+    app.map_get("/hello/{name}", |req| async {
+        let name = req.param("name")?;
+        ok!("Hello {}}!", name)
     });
     
     app.run().await
-}
-```
-### Synchronous handler:
-```rust
-use volga::{App, ok, SyncEndpointsMapping};
-
-#[tokio::main]
-async fn main() -> std::io::Result<()> {
-    // Start the server
-    let mut app = App::build("127.0.0.1:7878").await?;
-    
-    // Example of synchronous request handler
-    app.map_get("/hello", |req| {
-        ok!("Hello World!")
-    });
-    
-    app.run().await
-}
-```
-### Custom middleware:
-```rust
-use volga::{App, ok, AsyncEndpointsMapping, AsyncMiddlewareMapping};
-
-#[tokio::main]
-async fn main() -> std::io::Result<()> {
-    // Start the server
-    let mut app = App::build("127.0.0.1:7878").await?;
-
-    // Example of middleware
-    app.use_middleware(|ctx, next| async move {
-        // Something can be done before the next middleware
-
-        let response = next(ctx).await;
-
-        // Something can be done after the next middleware is completed
-
-        response
-    });
-    
-    // Example of asynchronous request handler
-    app.map_get("/hello", |req| async {
-        ok!("Hello World!")
-    });
-    
-    app.run().await
-}
-```
-### Reading query parameters
-```rust
-use volga::{App, AsyncEndpointsMapping, ok, Params};
-
-#[tokio::main]
-async fn main() -> std::io::Result<()> {
-    let mut app = App::build("127.0.0.1:7878").await?;
-
-    // GET /hello?id=11
-    app.map_get("/hello", |req| async move {
-        let params = req.params().unwrap();
-        let id = params.get("id").unwrap(); // "11"
-
-        ok!("Hello World!")
-    });
-
-    // GET /hello-again?id=11
-    app.map_get("/hello-again", |req| async move {
-        let id = req.param("id")?; // "11"
-
-        ok!("Hello World!")
-    });
-
-    app.run().await
-}
-```
-### Reading route parameters
-```rust
-use volga::{App, AsyncEndpointsMapping, ok, Params};
-
-#[tokio::main]
-async fn main() -> std::io::Result<()> {
-    let mut app = App::build("127.0.0.1:7878").await?;
-
-    // GET /hello/11
-    app.map_get("/hello/{id}", |req| async move {
-        let params = req.params().unwrap();
-        let id = params.get("id").unwrap(); // "11"
-
-        ok!("Hello World!")
-    });
-
-    // GET /hello-again/11
-    app.map_get("/hello-again/{id}", |req| async move {
-        let id = req.param("id")?; // "11"
-
-        ok!("Hello World!")
-    });
-
-    app.run().await
-}
-```
-### Reading JSON payload
-```rust
-use volga::{App, AsyncEndpointsMapping, ok, Payload};
-use serde::Deserialize;
- 
-#[derive(Deserialize)]
-struct User {
-    name: String,
-    age: i32
-}
-
-#[tokio::main]
-async fn main() -> std::io::Result<()> {
-    let mut app = App::build("127.0.0.1:7878").await?;
-
-    // POST /hello
-    // { name: "John", age: 35 }
-    app.map_post("/hello", |req| async move {
-        let params: User = req.payload()?;
-
-        ok!("Hello World!")
-    });
-
-    app.run().await
-}
-```
-### Returning a JSON
-#### Strongly typed JSON
-```rust
-use volga::{App, AsyncEndpointsMapping, ok, Payload};
-use serde::Serialize;
- 
-#[derive(Serialize)]
-struct User {
-    name: String,
-    age: i32
-}
-
-#[tokio::main]
-async fn main() -> std::io::Result<()> {
-    let mut app = App::build("127.0.0.1:7878").await?;
-
-    app.map_get("/hello", |req| async move {
-        let user: User = User {
-            name: String::from("John"),
-            age: 35
-        };
-
-        ok!(&user) // { name: "John", age: 35 }
-    });
-
-    app.run().await
-}
-```
-#### Untyped JSON
-```rust
-use volga::{App, AsyncEndpointsMapping, ok, Payload};
-
-#[tokio::main]
-async fn main() -> std::io::Result<()> {
-    let mut app = App::build("127.0.0.1:7878").await?;
-
-    app.map_get("/hello", |req| async move {
-        ok!({ "name": "John", "age": 35 }) // { name: "John", age: 35 }
-    });
-
-    app.run().await
-}
-```
-### Custom headers and Content Type
-```rust
-use volga::{App, ok, AsyncEndpointsMapping};
-
-#[tokio::main]
-async fn main() -> std::io::Result<()> {
-   let mut app = App::build("127.0.0.1:7878").await?;
-
-   app.map_get("/hello", |req| async move {
-       ok!("Hello World!", [
-           ("x-api-key", "some api key"),
-           ("Content-Type", "text/plain")
-       ])
-   });
-
-   app.run().await
 }
 ```
 ## Performance

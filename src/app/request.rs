@@ -1,102 +1,76 @@
-﻿use std::collections::HashMap;
-use std::io;
+﻿use bytes::{Bytes, Buf};
+use std::collections::HashMap;
+use std::path::Path;
 use std::sync::Arc;
-use bytes::Bytes;
 use cancel::Cancel;
-use http::{Request, Version};
-use http::header::{HeaderName, HeaderValue};
-use httparse::{Header, Request as HttParseRequest};
-use serde::Deserialize;
+use http_body_util::BodyExt;
+use hyper::Request;
+use hyper::body::{Body, Incoming};
+use serde::de::DeserializeOwned;
 use tokio_util::sync::CancellationToken;
-use crate::{Params, Payload};
+use tokio::io::{AsyncWriteExt, BufWriter, Error};
+use tokio::io::ErrorKind::InvalidInput;
+use crate::{File, Params, Payload};
 
 pub mod params;
 pub mod payload;
 pub mod cancel;
+pub mod file;
 
-pub type HttpRequest = Request<Bytes>;
+pub type HttpRequest = Request<Incoming>;
 pub type RequestParams = Arc<HashMap<String, String>>;
 
-pub(crate) struct RawRequest<'headers, 'buf> {
-    raw_request: HttParseRequest<'headers, 'buf>,
-    body: Bytes
+impl<B: Body<Data = Bytes> + Unpin> File for Request<B>  {
+    async fn to_file(mut self, file_path: impl AsRef<Path>) -> Result<(), Error> {
+        let file = tokio::fs::File::create(file_path).await?;
+        let mut writer = BufWriter::new(file);
+        while let Some(next) = self.frame().await {
+            match next {
+                Ok(frame) => {
+                    if let Some(chunk) = frame.data_ref() {
+                        writer.write_all(chunk).await?
+                    } else {
+                        break
+                    }
+                },
+                Err(_) => return Err(Error::new(InvalidInput, "Unable to read a file"))
+            };
+
+        }
+        writer.flush().await?;
+        Ok(())
+    }
 }
 
-impl RawRequest<'_, '_> {
+impl<B: Body> Payload for Request<B> {
     #[inline]
-    pub(crate) fn parse_request<'a>(buffer: &'a [u8], headers: &'a mut [Header<'a>]) -> Result<RawRequest<'a, 'a>, io::Error> {
-        let mut req = HttParseRequest::new(headers);
-
-        match req.parse(buffer) {
-            Ok(httparse::Status::Complete(headers_size)) => { // Parsing complete
-                // Body extraction from the buffer
-                // Note that this just takes the rest of the buffer; adjust according to the actual headers/content-length
-                let body = Bytes::copy_from_slice(&buffer[headers_size..]);
-                Ok(RawRequest { raw_request: req, body })
-            },
-            Ok(httparse::Status::Partial) => Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Request is incomplete")),
-            Err(e) => Err(io::Error::new(io::ErrorKind::InvalidData, format!("Failed to parse request: {}", e)))
+    async fn payload<T: DeserializeOwned>(self) -> Result<T, Error> {
+        let body = self.into_body();
+        if let Ok(bytes) = body.collect().await {
+            let body = bytes.aggregate();
+            let data: T = serde_json::from_reader(body.reader())?;
+            Ok(data)
+        } else {
+            Err(Error::new(InvalidInput, "Unable to read JSON"))
         }
     }
-
-    #[inline]
-    pub(crate) fn convert_to_http_request(raw_req: RawRequest) -> Result<HttpRequest, io::Error> {
-        let RawRequest {
-            raw_request: parse_req,
-            body
-        } = raw_req;
-
-        let method = parse_req.method.ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "No method specified"))?;
-        let path = parse_req.path.ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "No path specified"))?;
-
-        let mut builder = Request::builder()
-            .method(method)
-            .uri(path)
-            .version(Version::HTTP_11); // assuming HTTP/1.1
-
-        for header in parse_req.headers {
-            let header_name = HeaderName::from_bytes(header.name.as_bytes())
-                .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, format!("Invalid header name: {}", e)))?;
-
-            let header_value = HeaderValue::from_bytes(header.value)
-                .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, format!("Invalid header value: {}", e)))?;
-
-            builder = builder.header(header_name, header_value);
-        }
-
-        let request = builder.body(body)
-            .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "Failed to build request"))?;
-
-        Ok(request)
-    }
 }
 
-impl Payload for HttpRequest {
-    #[inline]
-    fn payload<'a, T>(&'a self) -> Result<T, io::Error>
-    where
-        T: Deserialize<'a>
-    {
-        let data: T = serde_json::from_slice(self.body().iter().as_slice())?;
-        Ok(data)
-    }
-}
-
-impl Params for HttpRequest {
+impl<B: Body> Params for Request<B> {
     #[inline]
     fn params(&self) -> Option<&RequestParams> {
         self.extensions().get::<RequestParams>()
     }
 
     #[inline]
-    fn param(&self, name: &str) -> Result<&String, io::Error> {
+    fn param(&self, name: &str) -> Result<&String, Error> {
         self.params()
             .and_then(|params| params.get(name))
-            .ok_or(io::Error::new(io::ErrorKind::InvalidInput, format!("Missing parameter: {name}")))
+            .ok_or(Error::new(InvalidInput, format!("Missing parameter: {name}")))
     }
 }
 
-impl Cancel for HttpRequest {
+impl<B: Body> Cancel for Request<B> {
     fn cancellation_token(&self) -> CancellationToken {
         if let Some(token) = self.extensions().get::<CancellationToken>() {
             token.clone()
@@ -109,24 +83,24 @@ impl Cancel for HttpRequest {
 #[cfg(test)]
 mod tests {
     use std::{collections::HashMap, sync::Arc};
-    use bytes::Bytes;
+    use std::path::Path;
     use serde::Deserialize;
     use tokio_util::sync::CancellationToken;
-    use crate::{Cancel, Params, Payload};
-
-    use super::HttpRequest;
+    use crate::{Cancel, File, Params, Payload};
+    use crate::app::body::HttpBody;
+    use crate::test_utils::read_file;
 
     #[derive(Deserialize)]
     struct TestPayload {
         name: String
     }
 
-    #[test]
-    fn it_parses_payload() {
+    #[tokio::test]  
+    async fn it_parses_payload() {
         let request_body = "{\"name\":\"test\"}";
-        let request = HttpRequest::new(Bytes::from(request_body));
+        let request = hyper::Request::new(HttpBody::full(request_body));
 
-        let payload: TestPayload = request.payload().unwrap();
+        let payload: TestPayload = request.payload().await.unwrap();
 
         assert_eq!(payload.name, "test");
     }
@@ -136,7 +110,7 @@ mod tests {
         let mut params = HashMap::new();
         params.insert(String::from("name"), String::from("test"));
 
-        let mut request = HttpRequest::new(Bytes::new());
+        let mut request = hyper::Request::new(HttpBody::empty());
         request.extensions_mut().insert(Arc::new(params));
 
         let request_params = request.params().unwrap();
@@ -153,7 +127,7 @@ mod tests {
         let mut params = HashMap::new();
         params.insert(String::from("name"), String::from("test"));
 
-        let mut request = HttpRequest::new(Bytes::new());
+        let mut request = hyper::Request::new(HttpBody::empty());
         request.extensions_mut().insert(Arc::new(params));
 
         let name = request.param("name").unwrap();
@@ -165,7 +139,7 @@ mod tests {
     fn it_cancels() {
         let token = CancellationToken::new();
 
-        let mut request = HttpRequest::new(Bytes::new());
+        let mut request = hyper::Request::new(HttpBody::empty());
         request.extensions_mut().insert(token.clone());
 
         let req_token = request.cancellation_token();
@@ -174,4 +148,22 @@ mod tests {
         assert!(token.is_cancelled());
     }
 
+    #[tokio::test]
+    async fn it_saves_request_body_to_file() {
+        let path = Path::new("tests/resources/test_file.txt");
+
+        let file = tokio::fs::File::open(path).await.unwrap();
+        let body = HttpBody::wrap_stream(file);
+        
+        let request = hyper::Request::new(body);
+
+        let path = Path::new("tests/resources/test_file_saved.txt");
+        request.to_file(path).await.unwrap();
+
+        let saved_bytes = read_file(path).await;        
+        let content = String::from_utf8_lossy(&saved_bytes);
+        
+        assert_eq!(content, "Hello, this is some file content!");
+        assert_eq!(content.len(), 33);
+    }
 }

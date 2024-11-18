@@ -86,7 +86,7 @@ macro_rules! ok {
     };
     ({ $($json:tt)* }, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {{
         // We're not using a headers! macro here to avoid adding unnecessary use if it's not needed
-        let mut headers = std::collections::HashMap::new();
+        let mut headers = $crate::HttpHeaders::new();
         $(
             headers.insert($key.to_string(), $value.to_string());
         )*
@@ -101,7 +101,7 @@ macro_rules! ok {
     };
     ($e:expr, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {{
         // We're not using a headers! macro here to avoid adding unnecessary use if it's not needed
-        let mut headers = std::collections::HashMap::new();
+        let mut headers = $crate::HttpHeaders::new();
         $(
             headers.insert($key.to_string(), $value.to_string());
         )*
@@ -111,15 +111,20 @@ macro_rules! ok {
             headers
         })
     }};
+    ($($arg:tt)*) => {
+        $crate::Results::json(&format!($($arg)*))
+    };
 }
 
 /// Produces `OK 200` response with file body
+/// 
+/// > This macro is working only within async context, make sure that you are using `AsyncEndpointsMapping`
 /// 
 /// # Examples
 /// ## Default usage
 ///```no_run
 ///use volga::{file, App, AsyncEndpointsMapping};
-///use serde::Serialize;
+///use tokio::fs::File;
 ///
 ///#[tokio::main]
 ///async fn main() -> std::io::Result<()> {
@@ -127,7 +132,7 @@ macro_rules! ok {
 ///    
 ///    app.map_get("/download", |_req| async {
 ///        let file_name = "example.txt";
-///        let file_data = b"Hello, this is some file content!".to_vec();
+///        let file_data = File::open(file_name).await?;
 ///        
 ///        file!(file_name, file_data)
 ///    });
@@ -138,7 +143,7 @@ macro_rules! ok {
 /// ## Custom headers
 ///```no_run
 ///use volga::{file, App, AsyncEndpointsMapping};
-///use serde::Serialize;
+///use tokio::fs::File;
 ///
 ///#[tokio::main]
 ///async fn main() -> std::io::Result<()> {
@@ -146,7 +151,7 @@ macro_rules! ok {
 ///    
 ///    app.map_get("/download", |_req| async {
 ///        let file_name = "example.txt";
-///        let file_data = b"Hello, this is some file content!".to_vec();
+///        let file_data = File::open(file_name).await?;
 ///        
 ///        file!(file_name, file_data, [
 ///            ("x-api-key", "some api key")
@@ -159,15 +164,15 @@ macro_rules! ok {
 #[macro_export]
 macro_rules! file {
     ($file_name:expr, $e:expr) => {
-        $crate::Results::file($file_name, $e)
+        $crate::Results::file($file_name, $e).await
     };
     ($file_name:expr, $e:expr, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {{
         // We're not using a headers! macro here to avoid adding unnecessary use if it's not needed
-        let mut headers = std::collections::HashMap::new();
+        let mut headers = $crate::HttpHeaders::new();
         $(
             headers.insert($key.to_string(), $value.to_string());
         )*
-        $crate::Results::file_with_custom_headers($file_name, $e, headers)
+        $crate::Results::file_with_custom_headers($file_name, $e, headers).await
     }};
 }
 
@@ -184,11 +189,11 @@ macro_rules! file {
 #[macro_export]
 macro_rules! headers {
     ( $( ($key:expr, $value:expr) ),* $(,)? ) => {{
-        let mut map = std::collections::HashMap::new();
+        let mut headers = $crate::HttpHeaders::new();
         $(
-            map.insert($key.to_string(), $value.to_string());
+            headers.insert($key.to_string(), $value.to_string());
         )*
-        map
+        headers
     }};
 }
 
@@ -252,277 +257,352 @@ macro_rules! status {
     (200) => {
         $crate::Results::ok()
     };
-    (200, { $($json:tt)* }) => {
-        $crate::Results::json(&serde_json::json_internal!({ $($json)* }))
-    };
-    (200, $e:expr) => {
-        $crate::Results::json($e)
-    };
-    (200, $file_name:expr, $e:expr) => {
-        $crate::Results::file($file_name, $e)
-    };
     (400) => {
         $crate::Results::bad_request(None)
-    };
-    (400, { $($json:tt)* }) => {
-        $crate::Results::json_with_status(http::StatusCode::BAD_REQUEST, &serde_json::json_internal!({ $($json)* }))
-    };
-    (400, $e:expr) => {
-        $crate::Results::json_with_status(http::StatusCode::BAD_REQUEST, $e)
     };
     (404) => {
         $crate::Results::not_found()
     };
-    (401) => {
+    ($status:expr, { $($json:tt)* }) => {
+        $crate::Results::json_with_status(
+            hyper::StatusCode::from_u16($status).unwrap_or(hyper::StatusCode::OK), 
+            &serde_json::json_internal!({ $($json)* }))
+    };
+    ($status:expr) => {
         $crate::Results::status(
-            http::StatusCode::UNAUTHORIZED, 
+            hyper::StatusCode::from_u16($status).unwrap_or(hyper::StatusCode::OK), 
             mime::TEXT_PLAIN.as_ref(), 
-            bytes::Bytes::new())
+            $crate::app::body::HttpBody::empty())
     };
-    (401, { $($json:tt)* }) => {
-        $crate::Results::json_with_status(http::StatusCode::UNAUTHORIZED, &serde_json::json_internal!({ $($json)* }))
-    };
-    (401, $e:expr) => {
-        $crate::Results::json_with_status(http::StatusCode::UNAUTHORIZED, $e)
-    };
-    (403) => {
-        $crate::Results::status(
-            http::StatusCode::FORBIDDEN, 
-            mime::TEXT_PLAIN.as_ref(), 
-            bytes::Bytes::new())
-    };
-    (403, { $($json:tt)* }) => {
-        $crate::Results::json_with_status(http::StatusCode::FORBIDDEN, &serde_json::json_internal!({ $($json)* }))
-    };
-    (403, $e:expr) => {
-        $crate::Results::json_with_status(http::StatusCode::FORBIDDEN, $e)
+    ($status:expr, $e:expr) => {
+        $crate::Results::json_with_status(
+            hyper::StatusCode::from_u16($status).unwrap_or(hyper::StatusCode::OK),
+            $e)
     };
 }
 
 #[cfg(test)]
 mod tests {
+    use http_body_util::BodyExt;
+    use std::path::Path;
     use serde::Serialize;
+    use tokio::fs::File;
+    use crate::test_utils::read_file_bytes;
 
     #[derive(Serialize)]
     struct TestPayload {
         name: String
     }
     
-    #[test]
-    fn it_creates_json_ok_response() {
+    #[tokio::test]
+    async fn it_creates_json_ok_response() {
         let payload = TestPayload { name: "test".into() };
         let response = ok!(&payload);
         
-        let response = response.unwrap();
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
 
-        assert_eq!(String::from_utf8_lossy(response.body()), "{\"name\":\"test\"}");
+        assert_eq!(String::from_utf8_lossy(body), "{\"name\":\"test\"}");
         assert_eq!(response.headers().get("Content-Type").unwrap(), "application/json");
     }
 
-    #[test]
-    fn it_creates_anonymous_type_json_ok_response() {
+    #[tokio::test]
+    async fn it_creates_anonymous_type_json_ok_response() {
         let response = ok!({ "name": "test" });
 
         assert!(response.is_ok());
-        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "{\"name\":\"test\"}");
+        
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+        
+        assert_eq!(String::from_utf8_lossy(body), "{\"name\":\"test\"}");
     }
     
-    #[test]
-    fn it_creates_text_ok_response() {
+    #[tokio::test]
+    async fn it_creates_text_ok_response() {
         let text = "test";
         let response = ok!(text);
 
         assert!(response.is_ok());
-        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "\"test\"");
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+        
+        assert_eq!(String::from_utf8_lossy(body), "\"test\"");
+    }
+
+    #[tokio::test]
+    async fn it_creates_formatted_text_ok_response() {
+        let text = "test";
+        let response = ok!("This is text: {}", text);
+
+        assert!(response.is_ok());
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+        
+        assert_eq!(String::from_utf8_lossy(body), "\"This is text: test\"");
     }
     
-    #[test]
-    fn it_creates_empty_ok_response() {
+    #[tokio::test]
+    async fn it_creates_empty_ok_response() {
         let response = ok!();
 
         assert!(response.is_ok());
-        assert_eq!(response.unwrap().body().len(), 0);
-    }
 
-    #[test]
-    fn it_creates_file_with_ok_response() {
-        let file_name = "example.txt";
-        let file_data = b"Hello, this is some file content!";
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
         
-        let response = file!(file_name, file_data.to_vec());
+        assert_eq!(body.len(), 0);
+    }
+    
+    #[tokio::test]
+    async fn it_creates_file_with_ok_response() {
+        let path = Path::new("tests/resources/test_file.txt");
+        let file_name = path.file_name().and_then(|name| name.to_str()).unwrap();
+        let file = File::open(path).await.unwrap();
+        
+        let response = file!(file_name, file);
 
         assert!(response.is_ok());
-        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "Hello, this is some file content!");
+
+        let mut response = response.unwrap();
+        let body = read_file_bytes(&mut response).await;
+        
+        assert_eq!(String::from_utf8_lossy(body.as_slice()), "Hello, this is some file content!");
     }
 
-    #[test]
-    fn it_creates_file_with_ok_and_custom_headers_response() {
-        let file_name = "example.txt";
-        let file_data = b"Hello, this is some file content!";
+    #[tokio::test]
+    async fn it_creates_file_with_ok_and_custom_headers_response() {
+        let path = Path::new("tests/resources/test_file.txt");
+        let file_name = path.file_name().and_then(|name| name.to_str()).unwrap();
+        
+        let file = File::open(path).await.unwrap();
 
-        let response = file!(file_name, file_data.to_vec(), [
+        let response = file!(file_name, file, [
             ("x-api-key", "some api key")
         ]);
 
         assert!(response.is_ok());
-        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "Hello, this is some file content!");
+
+        let mut response = response.unwrap();
+        let body = read_file_bytes(&mut response).await;
+        
+        assert_eq!(String::from_utf8_lossy(body.as_slice()), "Hello, this is some file content!");
     }
 
-    #[test]
-    fn it_creates_200_response() {
+    #[tokio::test]
+    async fn it_creates_200_response() {
         let response = status!(200);
 
         assert!(response.is_ok());
-        assert_eq!(response.unwrap().body().len(), 0);
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+        
+        assert_eq!(body.len(), 0);
     }
 
-    #[test]
-    fn it_creates_200_with_text_response() {
+    #[tokio::test]
+    async fn it_creates_200_with_text_response() {
         let text = "test";
         let response = status!(200, text);
 
         assert!(response.is_ok());
-        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "\"test\"");
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+        
+        assert_eq!(String::from_utf8_lossy(body), "\"test\"");
     }
 
-    #[test]
-    fn it_creates_200_with_json_response() {
+    #[tokio::test]
+    async fn it_creates_200_with_json_response() {
         let payload = TestPayload { name: "test".into() };
         let response = status!(200, &payload);
 
         assert!(response.is_ok());
-        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "{\"name\":\"test\"}");
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+        
+        assert_eq!(String::from_utf8_lossy(body), "{\"name\":\"test\"}");
     }
 
-    #[test]
-    fn it_creates_anonymous_type_200_response_with_json_body() {
+    #[tokio::test]
+    async fn it_creates_anonymous_type_200_response_with_json_body() {
         let response = status!(200, { "name": "test" });
 
         assert!(response.is_ok());
-        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "{\"name\":\"test\"}");
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+        
+        assert_eq!(String::from_utf8_lossy(body), "{\"name\":\"test\"}");
     }
 
-    #[test]
-    fn it_creates_200_with_file_response() {
-        let file_name = "example.txt";
-        let file_data = b"Hello, this is some file content!";
-
-        let response = status!(200, file_name, file_data.to_vec());
-
-        assert!(response.is_ok());
-        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "Hello, this is some file content!");
-    }
-
-    #[test]
-    fn it_creates_400_response() {
+    #[tokio::test]
+    async fn it_creates_400_response() {
         let response = status!(400);
 
         assert!(response.is_ok());
-        assert_eq!(response.unwrap().body().len(), 0);
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+        
+        assert_eq!(body.len(), 0);
     }
 
-    #[test]
-    fn it_creates_400_with_text_response() {
+    #[tokio::test]
+    async fn it_creates_400_with_text_response() {
         let text = "test";
         let response = status!(400, text);
 
         assert!(response.is_ok());
-        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "\"test\"");
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+        
+        assert_eq!(String::from_utf8_lossy(body), "\"test\"");
     }
 
-    #[test]
-    fn it_creates_400_with_json_response() {
+    #[tokio::test]
+    async fn it_creates_400_with_json_response() {
         let payload = TestPayload { name: "test".into() };
         let response = status!(400, &payload);
 
         assert!(response.is_ok());
-        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "{\"name\":\"test\"}");
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+        
+        assert_eq!(String::from_utf8_lossy(body), "{\"name\":\"test\"}");
     }
 
-    #[test]
-    fn it_creates_anonymous_type_400_response_with_json_body() {
+    #[tokio::test]
+    async fn it_creates_anonymous_type_400_response_with_json_body() {
         let response = status!(400, { "name": "test" });
 
         assert!(response.is_ok());
-        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "{\"name\":\"test\"}");
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+        
+        assert_eq!(String::from_utf8_lossy(body), "{\"name\":\"test\"}");
     }
     
-    #[test]
-    fn it_creates_404_response() {
+    #[tokio::test]
+    async fn it_creates_404_response() {
         let response = status!(404);
 
         assert!(response.is_ok());
-        assert_eq!(response.unwrap().body().len(), 0);
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+        
+        assert_eq!(body.len(), 0);
     }
 
-    #[test]
-    fn it_creates_empty_401_response() {
+    #[tokio::test]
+    async fn it_creates_empty_401_response() {
         let response = status!(401);
 
         assert!(response.is_ok());
-        assert_eq!(response.unwrap().body().len(), 0);
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+        
+        assert_eq!(body.len(), 0);
     }
 
-    #[test]
-    fn it_creates_401_response_with_text_body() {
+    #[tokio::test]
+    async fn it_creates_401_response_with_text_body() {
         let response = status!(401, "You are not authorized!");
 
         assert!(response.is_ok());
-        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "\"You are not authorized!\"");
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+        
+        assert_eq!(String::from_utf8_lossy(body), "\"You are not authorized!\"");
     }
 
-    #[test]
-    fn it_creates_401_response_with_json_body() {
+    #[tokio::test]
+    async fn it_creates_401_response_with_json_body() {
         let payload = TestPayload { name: "test".into() };
         let response = status!(401, &payload);
 
         assert!(response.is_ok());
-        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "{\"name\":\"test\"}");
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+        
+        assert_eq!(String::from_utf8_lossy(body), "{\"name\":\"test\"}");
     }
 
-    #[test]
-    fn it_creates_anonymous_type_401_response_with_json_body() {
+    #[tokio::test]
+    async fn it_creates_anonymous_type_401_response_with_json_body() {
         let response = status!(401, { "name": "test" });
 
         assert!(response.is_ok());
-        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "{\"name\":\"test\"}");
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+        
+        assert_eq!(String::from_utf8_lossy(body), "{\"name\":\"test\"}");
     }
 
-    #[test]
-    fn it_creates_empty_403_response() {
+    #[tokio::test]
+    async fn it_creates_empty_403_response() {
         let response = status!(403);
 
         assert!(response.is_ok());
-        assert_eq!(response.unwrap().body().len(), 0);
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+        
+        assert_eq!(body.len(), 0);
     }
 
-    #[test]
-    fn it_creates_403_response_with_text_body() {
+    #[tokio::test]
+    async fn it_creates_403_response_with_text_body() {
         let response = status!(403, "It's forbidden!");
 
         assert!(response.is_ok());
-        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "\"It's forbidden!\"");
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+        
+        assert_eq!(String::from_utf8_lossy(body), "\"It's forbidden!\"");
     }
 
-    #[test]
-    fn it_creates_403_response_with_json_body() {
+    #[tokio::test]
+    async fn it_creates_403_response_with_json_body() {
         let payload = TestPayload { name: "test".into() };
         let response = status!(403, &payload);
         
         assert!(response.is_ok());
-        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "{\"name\":\"test\"}");
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+        
+        assert_eq!(String::from_utf8_lossy(body), "{\"name\":\"test\"}");
     }
 
-    #[test]
-    fn it_creates_anonymous_type_403_response_with_json_body() {
+    #[tokio::test]
+    async fn it_creates_anonymous_type_403_response_with_json_body() {
         let response = status!(403, { "name": "test" });
 
         assert!(response.is_ok());
-        assert_eq!(String::from_utf8_lossy(response.unwrap().body()), "{\"name\":\"test\"}");
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+        
+        assert_eq!(String::from_utf8_lossy(body), "{\"name\":\"test\"}");
     }
     
-    #[test]
-    fn it_creates_headers() {
+    #[tokio::test]
+    async fn it_creates_headers() {
         let headers = headers![
             ("header 1", "value 1"),
             ("header 2", "value 2")
@@ -532,37 +612,39 @@ mod tests {
         assert_eq!(headers.get("header 2").unwrap(), "value 2")
     }
     
-    #[test]
-    fn in_creates_text_response_with_custom_headers() {
+    #[tokio::test]
+    async fn in_creates_text_response_with_custom_headers() {
         let response = ok!("ok", [
             ("x-api-key", "some api key"),
             ("x-req-id", "some req id"),
         ]);
         
         assert!(response.is_ok());
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
         
-        let response = response.unwrap();
-        
-        assert_eq!(String::from_utf8_lossy(response.body()), "\"ok\"");
+        assert_eq!(String::from_utf8_lossy(body), "\"ok\"");
         assert_eq!(response.headers().get("x-api-key").unwrap(), "some api key");
         assert_eq!(response.headers().get("x-req-id").unwrap(), "some req id");
     }
 
-    #[test]
-    fn in_creates_text_response_with_empty_custom_headers() {
+    #[tokio::test]
+    async fn in_creates_text_response_with_empty_custom_headers() {
         #[allow(unused_mut)]
         let response = ok!("ok", []);
 
         assert!(response.is_ok());
 
-        let response = response.unwrap();
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
 
-        assert_eq!(String::from_utf8_lossy(response.body()), "\"ok\"");
-        assert_eq!(response.headers().len(), 4);
+        assert_eq!(String::from_utf8_lossy(body), "\"ok\"");
+        assert_eq!(response.headers().len(), 2);
     }
 
-    #[test]
-    fn in_creates_json_response_with_custom_headers() {
+    #[tokio::test]
+    async fn in_creates_json_response_with_custom_headers() {
         let payload = TestPayload { name: "test".into() };
         let response = ok!(&payload, [
             ("x-api-key", "some api key"),
@@ -571,15 +653,16 @@ mod tests {
 
         assert!(response.is_ok());
 
-        let response = response.unwrap();
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
 
-        assert_eq!(String::from_utf8_lossy(response.body()), "{\"name\":\"test\"}");
+        assert_eq!(String::from_utf8_lossy(body), "{\"name\":\"test\"}");
         assert_eq!(response.headers().get("x-api-key").unwrap(), "some api key");
         assert_eq!(response.headers().get("x-req-id").unwrap(), "some req id");
     }
 
-    #[test]
-    fn in_creates_anonymous_json_response_with_custom_headers() {
+    #[tokio::test]
+    async fn in_creates_anonymous_json_response_with_custom_headers() {
         let response = ok!({ "name": "test" }, [
             ("x-api-key", "some api key"),
             ("x-req-id", "some req id"),
@@ -587,9 +670,10 @@ mod tests {
 
         assert!(response.is_ok());
 
-        let response = response.unwrap();
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
 
-        assert_eq!(String::from_utf8_lossy(response.body()), "{\"name\":\"test\"}");
+        assert_eq!(String::from_utf8_lossy(body), "{\"name\":\"test\"}");
         assert_eq!(response.headers().get("x-api-key").unwrap(), "some api key");
         assert_eq!(response.headers().get("x-req-id").unwrap(), "some req id");
     }

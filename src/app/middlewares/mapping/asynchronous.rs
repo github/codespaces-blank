@@ -1,11 +1,15 @@
-﻿use std::{sync::Arc, future::Future};
-use crate::{HttpContext, HttpResult, Next};
+﻿use std::future::Future;
+use crate::{
+    HttpContext, 
+    HttpResult, 
+    Next
+};
 
 pub trait AsyncMapping {
     fn use_middleware<F, Fut>(&mut self, middleware: F)
     where
-        F: 'static + Send + Sync + Fn(Arc<HttpContext>, Next) -> Fut,
-        Fut: Future<Output = HttpResult> + Send + 'static;
+        F: Fn(HttpContext, Next) -> Fut + Send + Sync + 'static,
+        Fut: Future<Output = HttpResult> + Send;
 }
 
 pub trait AsyncMiddlewareMapping {
@@ -17,8 +21,18 @@ pub trait AsyncMiddlewareMapping {
     ///
     ///#[tokio::main]
     ///async fn main() -> std::io::Result<()> {
-    ///    let mut app = App::build("127.0.0.1:7878").await?;
+    ///    use hyper::http::response;
+    /// let mut app = App::build("127.0.0.1:7878").await?;
     ///
+    ///    // Middleware 2
+    ///    app.use_middleware(|ctx, next| async move {
+    ///        // do something...
+    ///        let response = next(ctx).await;
+    ///        // do something...
+    ///        response
+    ///    });
+    /// 
+    ///    // Middleware 2
     ///    app.use_middleware(|ctx, next| async move {
     ///        next(ctx).await
     ///    });
@@ -28,6 +42,6 @@ pub trait AsyncMiddlewareMapping {
     /// ```
     fn use_middleware<F, Fut>(&mut self, handler: F)
     where
-        F: 'static + Send + Sync + Fn(Arc<HttpContext>, Next) -> Fut,
-        Fut: Future<Output = HttpResult> + Send + 'static;
+        F: Fn(HttpContext, Next) -> Fut + Send + Sync + 'static,
+        Fut: Future<Output = HttpResult> + Send;
 }

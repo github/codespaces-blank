@@ -1,11 +1,10 @@
 ﻿use crate::{HttpResult, HttpRequest};
-use std::sync::Arc;
-use http::Method;
+use hyper::Method;
 
 pub trait SyncMapping {
     fn map<F>(&mut self, method: Method, pattern: &str, handler: F)
     where
-        F: Fn(Arc<HttpRequest>) -> HttpResult + Send + Sync + 'static;
+        F: Fn(HttpRequest) -> HttpResult + Send + Sync + 'static;
 }
 
 pub trait SyncEndpointsMapping {
@@ -28,7 +27,7 @@ pub trait SyncEndpointsMapping {
     /// ```
     fn map_get<F>(&mut self, pattern: &str, handler: F)
     where
-        F: Fn(Arc<HttpRequest>) -> HttpResult + Send + Sync + 'static;
+        F: Fn(HttpRequest) -> HttpResult + Send + Sync + 'static;
 
     /// Adds a request handler that matches HTTP POST requests for the specified pattern.
     /// 
@@ -49,7 +48,7 @@ pub trait SyncEndpointsMapping {
     /// ```
     fn map_post<F>(&mut self, pattern: &str, handler: F)
     where
-        F: Fn(Arc<HttpRequest>) -> HttpResult + Send + Sync + 'static;
+        F: Fn(HttpRequest) -> HttpResult + Send + Sync + 'static;
 
     /// Adds a request handler that matches HTTP PUT requests for the specified pattern.
     /// 
@@ -70,7 +69,7 @@ pub trait SyncEndpointsMapping {
     /// ```
     fn map_put<F>(&mut self, pattern: &str, handler: F)
     where
-        F: Fn(Arc<HttpRequest>) -> HttpResult + Send + Sync + 'static;
+        F: Fn(HttpRequest) -> HttpResult + Send + Sync + 'static;
 
     /// Adds a request handler that matches HTTP PATCH requests for the specified pattern.
     /// 
@@ -91,7 +90,7 @@ pub trait SyncEndpointsMapping {
     /// ```
     fn map_patch<F>(&mut self, pattern: &str, handler: F)
     where
-        F: Fn(Arc<HttpRequest>) -> HttpResult + Send + Sync + 'static;
+        F: Fn(HttpRequest) -> HttpResult + Send + Sync + 'static;
 
     /// Adds a request handler that matches HTTP DELETE requests for the specified pattern.
     /// 
@@ -112,5 +111,5 @@ pub trait SyncEndpointsMapping {
     /// ```
     fn map_delete<F>(&mut self, pattern: &str, handler: F)
     where
-        F: Fn(Arc<HttpRequest>) -> HttpResult + Send + Sync + 'static;
+        F: Fn(HttpRequest) -> HttpResult + Send + Sync + 'static;
 }

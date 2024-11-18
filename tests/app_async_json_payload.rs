@@ -13,7 +13,7 @@ async fn it_reads_json_payload() {
         let mut app = App::build("127.0.0.1:7885").await?;
 
         app.map_post("/test", |req| async move {
-            let user: User = req.payload()?;
+            let user: User = req.payload().await?;
             let response = format!("My name is: {}, I'm {} years old", user.name, user.age);
             
             Results::text(&response)

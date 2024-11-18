@@ -1,6 +1,6 @@
 ﻿use std::collections::HashMap;
 use std::sync::Arc;
-use http::Method;
+use hyper::Method;
 use crate::HttpRequest;
 use crate::app::endpoints::{
     route::Route,

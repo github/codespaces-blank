@@ -1,5 +1,5 @@
 ﻿use std::{sync::Arc, future::Future};
-use http::Method;
+use hyper::Method;
 use crate::{HttpResult, HttpRequest};
 use crate::app::endpoints::{
     Endpoints,
@@ -15,7 +15,7 @@ impl AsyncMapping for Endpoints  {
     #[inline]
     fn map<F, Fut>(&mut self, method: Method, pattern: &str, handler: F)
     where
-        F: Fn(Arc<HttpRequest>) -> Fut + Send + Sync + 'static,
+        F: Fn(HttpRequest) -> Fut + Send + Sync + 'static,
         Fut: Future<Output = HttpResult> + Send + 'static,
     {
         let handler = Arc::new(AsyncHandler(handler)) as RouteHandler;
@@ -27,7 +27,7 @@ impl SyncMapping for Endpoints {
     #[inline]
     fn map<F>(&mut self, method: Method, pattern: &str, handler: F)
     where
-        F: Fn(Arc<HttpRequest>) -> HttpResult + Send + Sync + 'static,
+        F: Fn(HttpRequest) -> HttpResult + Send + Sync + 'static,
     {
         let handler = Arc::new(SyncHandler(handler)) as RouteHandler;
         self.map_route(method, pattern, handler);
