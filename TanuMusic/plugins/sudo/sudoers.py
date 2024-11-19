@@ -49,8 +49,8 @@ async def sudoers_list(client, message: Message, _):
     text = _["sudo_5"]
     
     # Handle OWNER_ID as a list
-    if isinstance(config.OWNER_ID, (list, tuple, set)):
-        for owner_id in config.OWNER_ID:
+    if isinstance(OWNER_ID, (list, tuple, set)):  # Use imported OWNER_ID directly
+        for owner_id in OWNER_ID:
             user = await app.get_users(owner_id)
             if isinstance(user, list):  # Handle multiple users returned
                 for u in user:
@@ -60,7 +60,7 @@ async def sudoers_list(client, message: Message, _):
                 user_text = user.mention if hasattr(user, "mention") else user.first_name
                 text += f"❖ {user_text}\n"
     else:
-        user = await app.get_users(config.OWNER_ID)
+        user = await app.get_users(OWNER_ID)
         if isinstance(user, list):
             for u in user:
                 user_text = u.mention if hasattr(u, "mention") else u.first_name
@@ -74,7 +74,7 @@ async def sudoers_list(client, message: Message, _):
 
     # Loop through SUDOERS to list them
     for user_id in SUDOERS:
-        if user_id not in config.OWNER_ID:  # Avoid listing owners twice
+        if user_id not in OWNER_ID:  # Avoid listing owners twice
             try:
                 user = await app.get_users(user_id)
                 if isinstance(user, list):  # Handle multiple users
