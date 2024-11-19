@@ -114,9 +114,9 @@ impl Results {
         
         Self::create_default_builder()
             .status(StatusCode::OK)
-            .header(CONTENT_TYPE, file_name)
+            .header(CONTENT_TYPE, APPLICATION_OCTET_STREAM.as_ref())
             .header(TRANSFER_ENCODING, "chunked")
-            .header(CONTENT_DISPOSITION, APPLICATION_OCTET_STREAM.as_ref())
+            .header(CONTENT_DISPOSITION, file_name)
             .body(boxed_body)
             .map_err(|_| Self::response_error())
     }

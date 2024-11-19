@@ -4,23 +4,24 @@
 //!
 //! ```toml
 //! [dependencies]
-//! volga = "0.3.0"
+//! volga = "0.3.1"
 //! tokio = "1.41.1"
 //! ```
 //! ```no_run
-//! use volga::{App, ok, AsyncEndpointsMapping};
-//!
-//! #[tokio::main]
-//! async fn main() -> std::io::Result<()> {
-//!     // Start the server
-//!     let mut app = App::build("localhost:7878").await?;
-//!
-//!     // Example of asynchronous GET request handler
-//!     app.map_get("/hello", |request| async {
-//!         ok!("Hello World!")
-//!     });
+//!use volga::{App, ok, AsyncEndpointsMapping, Params};
+//! 
+//!#[tokio::main]
+//!async fn main() -> std::io::Result<()> {
+//!    // Start the server
+//!    let mut app = App::build("127.0.0.1:7878").await?;
+//! 
+//!    // Example of asynchronous request handler
+//!    app.map_get("/hello/{name}", |req| async move {
+//!         let name = req.param("name")?;
+//!         ok!("Hello {}!", name)
+//!    });
 //!     
-//!     app.run().await
+//!    app.run().await
 //! }
 //! ```
 

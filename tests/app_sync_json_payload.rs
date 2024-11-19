@@ -47,7 +47,11 @@ async fn it_writes_json_response() {
     });
 
     let response = tokio::spawn(async {
-        let client = reqwest::Client::new();
+        let client = if cfg!(all(feature = "http1", not(feature = "http2"))) {
+            reqwest::Client::builder().http1_only().build().unwrap()
+        } else {
+            reqwest::Client::builder().http2_prior_knowledge().build().unwrap()
+        };
         client.get("http://127.0.0.1:7892/test").send().await.unwrap().json::<User>().await
     }).await.unwrap().unwrap();
 
@@ -70,7 +74,11 @@ async fn it_writes_json_using_macro_response() {
     });
 
     let response = tokio::spawn(async {
-        let client = reqwest::Client::new();
+        let client = if cfg!(all(feature = "http1", not(feature = "http2"))) {
+            reqwest::Client::builder().http1_only().build().unwrap()
+        } else {
+            reqwest::Client::builder().http2_prior_knowledge().build().unwrap()
+        };
         client.get("http://127.0.0.1:7895/test").send().await.unwrap().json::<User>().await
     }).await.unwrap().unwrap();
 
@@ -91,7 +99,11 @@ async fn it_writes_untyped_json_response() {
     });
 
     let response = tokio::spawn(async {
-        let client = reqwest::Client::new();
+        let client = if cfg!(all(feature = "http1", not(feature = "http2"))) {
+            reqwest::Client::builder().http1_only().build().unwrap()
+        } else {
+            reqwest::Client::builder().http2_prior_knowledge().build().unwrap()
+        };
         client.get("http://127.0.0.1:7896/test").send().await.unwrap().json::<User>().await
     }).await.unwrap().unwrap();
 

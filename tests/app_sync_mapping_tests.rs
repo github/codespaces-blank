@@ -11,7 +11,12 @@ async fn it_maps_to_get_request() {
     });
 
     let response = tokio::spawn(async {
-        reqwest::get("http://127.0.0.1:7879/test").await
+        let client = if cfg!(all(feature = "http1", not(feature = "http2"))) {
+            reqwest::Client::builder().http1_only().build().unwrap()
+        } else {
+            reqwest::Client::builder().http2_prior_knowledge().build().unwrap()
+        };
+        client.get("http://127.0.0.1:7879/test").send().await
     }).await.unwrap().unwrap();
 
     assert!(response.status().is_success());
@@ -29,7 +34,11 @@ async fn it_maps_to_post_request() {
     });
 
     let response = tokio::spawn(async {
-        let client = reqwest::Client::new();
+        let client = if cfg!(all(feature = "http1", not(feature = "http2"))) {
+            reqwest::Client::builder().http1_only().build().unwrap()
+        } else {
+            reqwest::Client::builder().http2_prior_knowledge().build().unwrap()
+        };
         client.post("http://127.0.0.1:7880/test").send().await
     }).await.unwrap().unwrap();
 
@@ -48,7 +57,11 @@ async fn it_maps_to_put_request() {
     });
 
     let response = tokio::spawn(async {
-        let client = reqwest::Client::new();
+        let client = if cfg!(all(feature = "http1", not(feature = "http2"))) {
+            reqwest::Client::builder().http1_only().build().unwrap()
+        } else {
+            reqwest::Client::builder().http2_prior_knowledge().build().unwrap()
+        };
         client.put("http://127.0.0.1:7881/test").send().await
     }).await.unwrap().unwrap();
 
@@ -67,7 +80,11 @@ async fn it_maps_to_patch_request() {
     });
 
     let response = tokio::spawn(async {
-        let client = reqwest::Client::new();
+        let client = if cfg!(all(feature = "http1", not(feature = "http2"))) {
+            reqwest::Client::builder().http1_only().build().unwrap()
+        } else {
+            reqwest::Client::builder().http2_prior_knowledge().build().unwrap()
+        };
         client.patch("http://127.0.0.1:7882/test").send().await
     }).await.unwrap().unwrap();
 
@@ -86,7 +103,11 @@ async fn it_maps_to_delete_request() {
     });
 
     let response = tokio::spawn(async {
-        let client = reqwest::Client::new();
+        let client = if cfg!(all(feature = "http1", not(feature = "http2"))) {
+            reqwest::Client::builder().http1_only().build().unwrap()
+        } else {
+            reqwest::Client::builder().http2_prior_knowledge().build().unwrap()
+        };
         client.delete("http://127.0.0.1:7883/test").send().await
     }).await.unwrap().unwrap();
 

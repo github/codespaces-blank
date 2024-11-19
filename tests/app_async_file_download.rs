@@ -6,7 +6,7 @@ async fn it_writes_file_response() {
     tokio::spawn(async {
         let mut app = App::build("127.0.0.1:7897").await?;
 
-        app.map_get("/test", |_req| async move {
+        app.map_get("/download", |_req| async move {
             let file_name = "tests/resources/test_file.txt";
             let file = File::open(file_name).await?;
 
@@ -17,9 +17,13 @@ async fn it_writes_file_response() {
     });
 
     let response = tokio::spawn(async {
-        let client = reqwest::Client::new();
-        client.get("http://127.0.0.1:7897/test").send().await.unwrap().bytes().await
-    }).await.unwrap().unwrap();
+        let client = if cfg!(all(feature = "http1", not(feature = "http2"))) {
+            reqwest::Client::builder().http1_only().build().unwrap()
+        } else {
+            reqwest::Client::builder().http2_prior_knowledge().build().unwrap()
+        };
+        client.get("http://127.0.0.1:7897/download").send().await.unwrap().bytes().await.unwrap()
+    }).await.unwrap();
 
     let mut bytes = response.to_vec();
     // If the file starts with a UTF-8 BOM (EF BB BF), remove it

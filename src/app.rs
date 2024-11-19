@@ -1,7 +1,7 @@
 ﻿use std::future::Future;
 use std::sync::Arc;
-use hyper::server::conn::http1;
 use hyper_util::rt::TokioIo;
+
 use tokio::{
     net::{TcpListener, TcpStream},
     io::{self, Error},
@@ -17,6 +17,7 @@ use crate::app::{
     endpoints::Endpoints,
     results::HttpResult,
     scope::Scope,
+    server::Server
 };
 
 pub mod middlewares;
@@ -28,6 +29,7 @@ pub mod mapping;
 pub(crate) mod scope;
 pub(crate) mod http_context;
 pub(crate) mod pipeline;
+mod server;
 
 /// The web application used to configure the HTTP pipeline, and routes.
 ///
@@ -55,6 +57,7 @@ struct Connection {
 
 pub(crate) type BoxedHttpResultFuture = Box<dyn Future<Output = HttpResult> + Send>;
 
+#[cfg(any(feature = "http1", feature = "http2"))]
 impl App {
     /// Initializes a new instance of the `App` on specified `socket`.
     /// 
@@ -166,13 +169,8 @@ impl App {
     #[inline]
     async fn handle_connection(io: TokioIo<TcpStream>, pipeline: Arc<Pipeline>) {
         let scope = Scope::new(pipeline);
-        let scoped_cancellation_token = scope.cancellation_token.clone();
+        let server = Server::new(io);
         
-        let connection_builder = http1::Builder::new();
-        let connection = connection_builder.serve_connection(io, scope);
-        if let Err(err) = connection.await {
-            eprintln!("Error serving connection: {:?}", err);
-            scoped_cancellation_token.cancel();
-        }
+        server.serve(scope).await;
     }
 }

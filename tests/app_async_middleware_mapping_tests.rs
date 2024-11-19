@@ -20,7 +20,12 @@ async fn it_adds_middleware_request() {
     });
 
     let response = tokio::spawn(async {
-        reqwest::get("http://127.0.0.1:7884/test").await
+        let client = if cfg!(all(feature = "http1", not(feature = "http2"))) {
+            reqwest::Client::builder().http1_only().build().unwrap()
+        } else {
+            reqwest::Client::builder().http2_prior_knowledge().build().unwrap()
+        };
+        client.get("http://127.0.0.1:7884/test").send().await
     }).await.unwrap().unwrap();
 
     assert!(response.status().is_success());

@@ -18,7 +18,11 @@ async fn it_reads_route_params() {
     });
 
     let response = tokio::spawn(async {
-        let client = reqwest::Client::new();
+        let client = if cfg!(all(feature = "http1", not(feature = "http2"))) {
+            reqwest::Client::builder().http1_only().build().unwrap()
+        } else {
+            reqwest::Client::builder().http2_prior_knowledge().build().unwrap()
+        };
         client.get("http://127.0.0.1:7887/test/John/35").send().await
     }).await.unwrap().unwrap();
 
@@ -44,7 +48,11 @@ async fn it_reads_query_params() {
     });
 
     let response = tokio::spawn(async {
-        let client = reqwest::Client::new();
+        let client = if cfg!(all(feature = "http1", not(feature = "http2"))) {
+            reqwest::Client::builder().http1_only().build().unwrap()
+        } else {
+            reqwest::Client::builder().http2_prior_knowledge().build().unwrap()
+        };
         client.get("http://127.0.0.1:7888/test?name=John&age=35").send().await
     }).await.unwrap().unwrap();
 
