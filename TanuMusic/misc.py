@@ -45,7 +45,7 @@ def dbb():
     LOGGER(__name__).info(f"✦ Local Database Initialized...💛.")
 
 
-def sudo():
+async def sudo():
     global SUDOERS
     OWNER = config.OWNER_ID
     if config.MONGO_DB_URI is None:
@@ -53,13 +53,13 @@ def sudo():
             SUDOERS.add(user_id)
     else:
         sudoersdb = mongodb.sudoers
-        sudoers = sudoersdb.find_one({"sudo": "sudo"})
-        sudoers = [] if not sudoers else sudoers["sudoers"]
+        sudoers = await sudoersdb.find_one({"sudo": "sudo"})  # Await the database call
+        sudoers = [] if not sudoers else sudoers.get("sudoers", [])
         for user_id in OWNER:
             SUDOERS.add(user_id)
             if user_id not in sudoers:
                 sudoers.append(user_id)
-                sudoersdb.update_one(
+                await sudoersdb.update_one(
                     {"sudo": "sudo"},
                     {"$set": {"sudoers": sudoers}},
                     upsert=True,
