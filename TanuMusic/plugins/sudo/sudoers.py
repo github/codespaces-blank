@@ -47,36 +47,56 @@ async def userdel(client, message: Message, _):
 @language
 async def sudoers_list(client, message: Message, _):
     text = _["sudo_5"]
+    
+    # Handle OWNER_ID as a list
+    if isinstance(config.OWNER_ID, (list, tuple, set)):
+        for owner_id in config.OWNER_ID:
+            user = await app.get_users(owner_id)
+            if isinstance(user, list):  # Handle multiple users returned
+                for u in user:
+                    user_text = u.mention if hasattr(u, "mention") else u.first_name
+                    text += f"❖ {user_text}\n"
+            else:
+                user_text = user.mention if hasattr(user, "mention") else user.first_name
+                text += f"❖ {user_text}\n"
+    else:
+        user = await app.get_users(config.OWNER_ID)
+        if isinstance(user, list):
+            for u in user:
+                user_text = u.mention if hasattr(u, "mention") else u.first_name
+                text += f"❖ {user_text}\n"
+        else:
+            user_text = user.mention if hasattr(user, "mention") else user.first_name
+            text += f"❖ {user_text}\n"
+    
     count = 0
     smex = 0
 
-    # Ensure OWNER_ID is a single user ID or handle multiple owners
-    if isinstance(config.OWNER_ID, list):
-        for owner_id in config.OWNER_ID:
-            user = await app.get_users(owner_id)
-            user = user.first_name if not hasattr(user, "mention") else user.mention
-            text += f"❖ {user}\n"
-    else:
-        user = await app.get_users(config.OWNER_ID)
-        user = user.first_name if not hasattr(user, "mention") else user.mention
-        text += f"❖ {user}\n"
-
-    # Loop through SUDOERS and list them
+    # Loop through SUDOERS to list them
     for user_id in SUDOERS:
-        if user_id != config.OWNER_ID:
+        if user_id not in config.OWNER_ID:  # Avoid listing owners twice
             try:
                 user = await app.get_users(user_id)
-                user = user.first_name if not hasattr(user, "mention") else user.mention
-                if smex == 0:
-                    smex += 1
-                    text += _["sudo_6"]
-                count += 1
-                text += f"❖ {count} ➥ {user}\n"
+                if isinstance(user, list):  # Handle multiple users
+                    for u in user:
+                        user_text = u.mention if hasattr(u, "mention") else u.first_name
+                        if smex == 0:
+                            smex += 1
+                            text += _["sudo_6"]
+                        count += 1
+                        text += f"❖ {count} ➥ {user_text}\n"
+                else:
+                    user_text = user.mention if hasattr(user, "mention") else user.first_name
+                    if smex == 0:
+                        smex += 1
+                        text += _["sudo_6"]
+                    count += 1
+                    text += f"❖ {count} ➥ {user_text}\n"
             except Exception as e:
-                continue  # Skip if fetching user details fails
-
+                continue  # Skip if user lookup fails
+    
     if count == 0:
         text += _["sudo_7"]
 
-    # Send response
+    # Reply with the sudoers list
     await message.reply_text(text, reply_markup=close_markup(_))
