@@ -10,7 +10,17 @@ use serde::de::DeserializeOwned;
 use tokio_util::sync::CancellationToken;
 use tokio::io::{AsyncWriteExt, BufWriter, Error};
 use tokio::io::ErrorKind::InvalidInput;
-use crate::{File, Params, Payload};
+use crate::Params;
+
+#[cfg(feature = "async")]
+use crate::Payload;
+#[cfg(feature = "sync")]
+use crate::SyncPayload;
+
+#[cfg(feature = "async")]
+use crate::File;
+#[cfg(feature = "sync")]
+use crate::SyncFile;
 
 pub mod params;
 pub mod payload;
@@ -20,11 +30,26 @@ pub mod file;
 pub type HttpRequest = Request<Incoming>;
 pub type RequestParams = Arc<HashMap<String, String>>;
 
-impl<B: Body<Data = Bytes> + Unpin> File for Request<B>  {
-    async fn to_file(mut self, file_path: impl AsRef<Path>) -> Result<(), Error> {
+struct Utils;
+
+impl Utils {
+    #[inline]
+    async fn deserialize<B: Body, T: DeserializeOwned>(req: Request<B>) -> Result<T, Error> {
+        let body = req.into_body();
+        if let Ok(bytes) = body.collect().await {
+            let body = bytes.aggregate();
+            let data: T = serde_json::from_reader(body.reader())?;
+            Ok(data)
+        } else {
+            Err(Error::new(InvalidInput, "Unable to read JSON"))
+        }
+    }
+    
+    #[inline]
+    async fn save_file<B: Body<Data = Bytes> + Unpin>(mut req: Request<B>, file_path: impl AsRef<Path>) -> Result<(), Error> {
         let file = tokio::fs::File::create(file_path).await?;
         let mut writer = BufWriter::new(file);
-        while let Some(next) = self.frame().await {
+        while let Some(next) = req.frame().await {
             match next {
                 Ok(frame) => {
                     if let Some(chunk) = frame.data_ref() {
@@ -37,22 +62,39 @@ impl<B: Body<Data = Bytes> + Unpin> File for Request<B>  {
             };
 
         }
-        writer.flush().await?;
-        Ok(())
+        writer.flush().await
     }
 }
 
+#[cfg(feature = "async")]
+impl<B: Body<Data = Bytes> + Unpin> File for Request<B>  {
+    async fn to_file(self, file_path: impl AsRef<Path>) -> Result<(), Error> {
+        Utils::save_file(self, file_path).await
+    }
+}
+
+#[cfg(feature = "sync")]
+impl<B: Body<Data = Bytes> + Unpin> SyncFile for Request<B>  {
+    fn to_file(self, file_path: impl AsRef<Path>) -> Result<(), Error> {
+        let rt = tokio::runtime::Runtime::new()?;
+        rt.block_on(Utils::save_file(self, file_path))
+    }
+}
+
+#[cfg(feature = "async")]
 impl<B: Body> Payload for Request<B> {
     #[inline]
     async fn payload<T: DeserializeOwned>(self) -> Result<T, Error> {
-        let body = self.into_body();
-        if let Ok(bytes) = body.collect().await {
-            let body = bytes.aggregate();
-            let data: T = serde_json::from_reader(body.reader())?;
-            Ok(data)
-        } else {
-            Err(Error::new(InvalidInput, "Unable to read JSON"))
-        }
+        Utils::deserialize(self).await
+    }
+}
+
+#[cfg(feature = "sync")]
+impl<B: Body> SyncPayload for Request<B> {
+    #[inline]
+    fn payload<T: DeserializeOwned>(self) -> Result<T, Error> {
+        let rt = tokio::runtime::Runtime::new()?;
+        rt.block_on(Utils::deserialize(self))
     }
 }
 

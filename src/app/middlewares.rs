@@ -20,11 +20,13 @@ impl Middlewares {
         Self { pipeline: Vec::new() }
     }
 
-    pub(crate) fn compose(&self) -> Next {
-        // Check if the pipeline is empty or not as a safeguard.
+    pub(crate) fn is_empty(&self) -> bool {
+        self.pipeline.is_empty()
+    }
+
+    pub(crate) fn compose(&self) -> Option<Next> {
         if self.pipeline.is_empty() {
-            // Return a default handler if there is actually nothing in the pipeline.
-            return Arc::new(|_ctx| Box::pin(async { Results::not_found() }));
+            return None;
         }
 
         // Fetching the last middleware which is the request handler to be the initial `next`.
@@ -49,7 +51,7 @@ impl Middlewares {
                 })
             });
         }
-        next
+        Some(next)
     }
 }
 

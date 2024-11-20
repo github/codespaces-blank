@@ -4,11 +4,11 @@ use crate::{
     App, 
     HttpResult, 
     HttpRequest, 
-    HttpContext, 
-    Next,
-    AsyncMiddlewareMapping, 
     AsyncEndpointsMapping
 };
+#[cfg(feature = "middleware")]
+use crate::{HttpContext, Next, AsyncMiddlewareMapping};
+
 
 impl AsyncEndpointsMapping for App {
     fn map_get<F, Fut>(&mut self, pattern: &str, handler: F)
@@ -67,6 +67,7 @@ impl AsyncEndpointsMapping for App {
     }
 }
 
+#[cfg(feature = "middleware")]
 impl AsyncMiddlewareMapping for App {
     fn use_middleware<F, Fut>(&mut self, handler: F)
     where

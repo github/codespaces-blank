@@ -24,7 +24,7 @@ tokio = "1.41.1"
 ```
 ### Simple asynchronous request handler:
 ```rust
-use volga::{App, ok, AsyncEndpointsMapping, Params};
+use volga::*;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {

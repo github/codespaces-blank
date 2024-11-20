@@ -12,7 +12,6 @@ use tokio::io::ErrorKind::{
     InvalidData
 };
 use crate::app::{
-    middlewares::{Middlewares, mapping::asynchronous::AsyncMiddlewareMapping},
     pipeline::{Pipeline, PipelineBuilder},
     endpoints::Endpoints,
     results::HttpResult,
@@ -20,13 +19,22 @@ use crate::app::{
     server::Server
 };
 
+#[cfg(feature = "middleware")]
+use crate::app::middlewares::{
+    Middlewares, 
+    mapping::asynchronous::AsyncMiddlewareMapping
+};
+
+#[cfg(feature = "middleware")]
 pub mod middlewares;
+
 pub mod endpoints;
 pub mod body;
 pub mod request;
 pub mod results;
 pub mod mapping;
 pub(crate) mod scope;
+#[cfg(feature = "middleware")]
 pub(crate) mod http_context;
 pub(crate) mod pipeline;
 mod server;
@@ -57,7 +65,6 @@ struct Connection {
 
 pub(crate) type BoxedHttpResultFuture = Box<dyn Future<Output = HttpResult> + Send>;
 
-#[cfg(any(feature = "http1", feature = "http2"))]
 impl App {
     /// Initializes a new instance of the `App` on specified `socket`.
     /// 
@@ -100,8 +107,11 @@ impl App {
 
     /// Runs the Web Server
     pub async fn run(mut self) -> io::Result<()> {
-        // Register default middleware
-        self.use_endpoints();
+        #[cfg(feature = "middleware")]
+        {
+            // Register default middleware
+            self.use_endpoints();
+        }
 
         let connection = &mut self.connection;
         let pipeline = Arc::new(self.pipeline.build());
@@ -112,9 +122,7 @@ impl App {
                     let pipeline = pipeline.clone();
                     let io = TokioIo::new(stream);
                     
-                    tokio::spawn(async move {
-                        Self::handle_connection(io, pipeline).await;
-                    });
+                    tokio::spawn(Self::handle_connection(io, pipeline));
                 }
                 _ = connection.shutdown_signal.recv() => {
                     println!("Shutting down server...");
@@ -136,6 +144,7 @@ impl App {
         };
     }
 
+    #[cfg(feature = "middleware")]
     pub(crate) fn middlewares_mut(&mut self) -> &mut Middlewares {
         self.pipeline.middlewares_mut()
     }
@@ -159,11 +168,14 @@ impl App {
             }
         });
     }
-    
+
+    #[cfg(feature = "middleware")]
     fn use_endpoints(&mut self) {
-        self.use_middleware(|ctx, _| async move {
-            ctx.execute().await
-        });
+        if self.pipeline.has_middleware_pipeline() {
+            self.use_middleware(|ctx, _| async move {
+                ctx.execute().await
+            });
+        }
     }
     
     #[inline]

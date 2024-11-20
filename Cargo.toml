@@ -16,24 +16,51 @@ keywords = ["volga", "server", "http", "web", "framework"]
 bytes = "1.8.0"
 futures-util = "0.3.31"
 http-body-util = "0.1.2"
-hyper = { version = "1.5.0", features = ["server"], optional = true }
+hyper = { version = "1.5.1", features = ["server"], optional = true }
 hyper-util = { version = "0.1.10", features = ["server", "server-auto", "server-graceful", "service", "tokio"], optional = true }
 mime = "0.3.17"
 tokio = { version = "1.41.1", features = ["full"] }
 tokio-util = "0.7.12"
 tokio-stream = "0.1.16"
-serde_json = "1.0.132"
-serde = { version = "1.0.214", features = ["derive"] }
+serde_json = "1.0.133"
+serde = { version = "1.0.215", features = ["derive"] }
 
 [dev-dependencies]
 reqwest = { version = "0.12.9", features = ["blocking", "json", "http2"] }
 
 [features]
-default = ["http1"]
-full = ["http1", "http2"]
+# Default HTTP/1 only server with async endpoints mapping
+default = ["http1", "async", "middleware"]
+# HTTP/1 and HTTP/2 server with sync and async endpoints mappings
+full = ["http1", "http2", "async", "sync", "middleware"]
+
+# Mimimal HTTP/1
+mini = ["http1", "async"]
+# Mimimal HTTP/2
+mini2 = ["http2", "async"]
 
 http1 = ["dep:hyper", "hyper?/http1", "dep:hyper-util", "hyper-util?/http1"]
 http2 = ["dep:hyper", "hyper?/http2", "dep:hyper-util", "hyper-util?/http2"]
+
+sync = []
+async = []
+middleware = []
+
+[[test]]
+name = "app_sync_json_payload"
+required-features = ["sync"]
+
+[[test]]
+name = "app_sync_mapping_tests"
+required-features = ["sync"]
+
+[[test]]
+name = "app_sync_request_params"
+required-features = ["sync"]
+
+[[test]]
+name = "app_async_middleware_mapping_tests"
+required-features = ["middleware"]
 
 [[example]]
 name = "hello_world"
@@ -42,10 +69,12 @@ path = "examples/hello_world.rs"
 [[example]]
 name = "sync_api"
 path = "examples/sync_api.rs"
+required-features = ["sync"]
 
 [[example]]
 name = "middleware"
 path = "examples/middleware.rs"
+required-features = ["middleware"]
 
 [[example]]
 name = "query_params"

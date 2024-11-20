@@ -1,4 +1,5 @@
-﻿use volga::{App, Results, SyncEndpointsMapping, Params};
+﻿use volga::{App, Results, Params};
+use volga::SyncEndpointsMapping;
 
 #[tokio::test]
 async fn it_reads_route_params() {

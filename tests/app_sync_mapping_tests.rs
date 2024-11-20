@@ -1,4 +1,5 @@
-﻿use volga::{App, Results, SyncEndpointsMapping};
+﻿use volga::{App, Results};
+use volga::SyncEndpointsMapping;
 
 #[tokio::test]
 async fn it_maps_to_get_request() {

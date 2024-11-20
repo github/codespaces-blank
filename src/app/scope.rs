@@ -13,10 +13,12 @@ use hyper::{
 };
 use crate::{
     app::Pipeline, 
-    HttpContext, 
     HttpResponse, 
-    Results
+    Results, 
+    HttpResult
 };
+#[cfg(feature = "middleware")]
+use crate::HttpContext;
 
 #[derive(Clone)]
 pub(crate) struct Scope {
@@ -51,8 +53,22 @@ impl Scope {
                 extensions.insert(endpoint_context.params.clone());
             }
             
-            let ctx = HttpContext::new(request, endpoint_context.handler);
-            match pipeline.execute(ctx).await {
+            let response: HttpResult;
+            #[cfg(feature = "middleware")]
+            {
+                response = if pipeline.has_middleware_pipeline() {
+                    let ctx = HttpContext::new(request, endpoint_context.handler);
+                    pipeline.execute(ctx).await
+                } else {
+                    endpoint_context.handler.call(request).await
+                };
+            }
+            #[cfg(not(feature = "middleware"))]
+            {
+                response = endpoint_context.handler.call(request).await;
+            }
+
+            match response {
                 Ok(response) => Ok(response),
                 Err(error) if error.kind() == InvalidInput => Results::bad_request(Some(error.to_string())),
                 Err(error) => Results::internal_server_error(Some(error.to_string()))

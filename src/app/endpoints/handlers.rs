@@ -8,8 +8,10 @@ pub(crate) trait Handler {
     fn call(&self, req: HttpRequest) -> Pin<BoxedHttpResultFuture>;
 }
 
+#[cfg(feature = "async")]
 pub(crate) struct AsyncHandler<F>(pub F);
 
+#[cfg(feature = "async")]
 impl<F, Fut> Handler for AsyncHandler<F>
 where
     F: Fn(HttpRequest) -> Fut + Send + Sync + 'static,
@@ -20,8 +22,10 @@ where
     }
 }
 
+#[cfg(feature = "sync")]
 pub(crate) struct SyncHandler<F>(pub F);
 
+#[cfg(feature = "sync")]
 impl<F> Handler for SyncHandler<F>
 where
     F: Fn(HttpRequest) -> HttpResult + Send + Sync + 'static,

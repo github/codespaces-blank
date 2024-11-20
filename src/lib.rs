@@ -30,11 +30,31 @@ pub mod app;
 #[cfg(test)]
 pub mod test_utils;
 
-pub use crate::app::{App, http_context::HttpContext};
-pub use crate::app::endpoints::mapping::{asynchronous::AsyncEndpointsMapping, synchronous::SyncEndpointsMapping};
-pub use crate::app::middlewares::{Next, mapping::asynchronous::AsyncMiddlewareMapping};
+pub use crate::app::App;
 pub use crate::app::results::{HttpResponse, HttpResult, HttpHeaders, Results, ResponseContext};
-pub use crate::app::request::{HttpRequest, RequestParams, payload::Payload, params::Params, cancel::Cancel, file::File};
+pub use crate::app::request::{HttpRequest, RequestParams, params::Params, cancel::Cancel};
+
+#[cfg(feature = "middleware")]
+pub use crate::app::http_context::HttpContext;
+
+#[cfg(feature = "middleware")]
+pub use crate::app::middlewares::{Next, mapping::asynchronous::AsyncMiddlewareMapping};
+
+#[cfg(feature = "async")]
+pub use crate::app::endpoints::mapping::asynchronous::AsyncEndpointsMapping;
+#[cfg(feature = "sync")]
+pub use crate::app::endpoints::mapping::synchronous::SyncEndpointsMapping;
+
+#[cfg(feature = "async")]
+pub use crate::app::request::payload::Payload;
+#[cfg(feature = "sync")]
+pub use crate::app::request::payload::SyncPayload;
+
+#[cfg(feature = "async")]
+pub use crate::app::request::file::File;
+#[cfg(feature = "sync")]
+pub use crate::app::request::file::SyncFile;
+
 pub use crate::app::body::BoxBody;
 
 // Exposing shortcut for CancellationToken for convenience
