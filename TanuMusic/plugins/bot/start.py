@@ -23,95 +23,86 @@ from TanuMusic.utils.inline import help_pannel, private_panel, start_panel
 from config import BANNED_USERS
 from strings import get_string
 
+# Image List
 IMAGE = [
     "https://graph.org/file/f76fd86d1936d45a63c64.jpg",
     "https://graph.org/file/69ba894371860cd22d92e.jpg",
     "https://graph.org/file/67fde88d8c3aa8327d363.jpg",
-    # Add more images here...
+    # Add other URLs here
 ]
-
 
 @app.on_message(filters.command(["start"]) & filters.private & ~BANNED_USERS)
 @LanguageStart
 async def start_pm(client, message: Message, _):
     await add_served_user(message.from_user.id)
-    args = message.text.split()
-    
-    if len(args) > 1:
-        name = args[1]
-        if name.startswith("help"):
+    if len(message.text.split()) > 1:
+        name = message.text.split(None, 1)[1]
+        if name[0:4] == "help":
             keyboard = help_pannel(_)
             return await message.reply_photo(
-                photo=random.choice(IMAGE),
+                random.choice(IMAGE),
                 caption=_["help_1"].format(config.SUPPORT_CHAT),
                 reply_markup=keyboard,
             )
-        if name.startswith("sud"):
+        if name[0:3] == "sud":
             await sudoers_list(client=client, message=message, _=_)
             if await is_on_off(2):
                 return await app.send_message(
                     chat_id=config.LOGGER_ID,
-                    text=(
-                        f"❖ {message.from_user.mention} started the bot to check <b>Sudo List</b>.\n\n"
-                        f"<b>● User ID ➥</b> <code>{message.from_user.id}</code>\n"
-                        f"<b>● Username ➥</b> @{message.from_user.username}"
-                    ),
+                    text=f"❖ {message.from_user.mention} started the bot to check <b>sudolist</b>.\n\n<b>● User ID ➥</b> <code>{message.from_user.id}</code>\n<b>● Username ➥</b> @{message.from_user.username}",
                 )
-        if name.startswith("inf"):
-            m = await message.reply_text("🔎 Searching...")
-            query = f"https://www.youtube.com/watch?v={name[5:]}"
+            return
+        if name[0:3] == "inf":
+            m = await message.reply_text("🔎")
+            query = name.replace("info_", "", 1)
+            query = f"https://www.youtube.com/watch?v={query}"
             results = VideosSearch(query, limit=1)
-            for result in (await results.next())["result"]:
-                title = result["title"]
-                duration = result["duration"]
-                views = result["viewCount"]["short"]
-                thumbnail = result["thumbnails"][0]["url"].split("?")[0]
-                channellink = result["channel"]["link"]
-                channel = result["channel"]["name"]
-                link = result["link"]
-                published = result["publishedTime"]
-            searched_text = _["start_6"].format(
-                title, duration, views, published, channellink, channel, app.mention
-            )
-            key = InlineKeyboardMarkup(
-                [
+            try:
+                for result in (await results.next())["result"]:
+                    title = result["title"]
+                    duration = result["duration"]
+                    views = result["viewCount"]["short"]
+                    thumbnail = result["thumbnails"][0]["url"].split("?")[0]
+                    channellink = result["channel"]["link"]
+                    channel = result["channel"]["name"]
+                    link = result["link"]
+                    published = result["publishedTime"]
+                searched_text = _["start_6"].format(
+                    title, duration, views, published, channellink, channel, app.mention
+                )
+                key = InlineKeyboardMarkup(
                     [
-                        InlineKeyboardButton(text=_["S_B_8"], url=link),
-                        InlineKeyboardButton(text=_["S_B_9"], url=config.SUPPORT_CHAT),
+                        [
+                            InlineKeyboardButton(text=_["S_B_8"], url=link),
+                            InlineKeyboardButton(text=_["S_B_9"], url=config.SUPPORT_CHAT),
+                        ],
                     ]
-                ]
-            )
-            await m.delete()
-            await app.send_photo(
-                chat_id=message.chat.id,
-                photo=thumbnail,
-                caption=searched_text,
-                reply_markup=key,
-            )
+                )
+                await m.delete()
+                await app.send_photo(
+                    chat_id=message.chat.id,
+                    photo=thumbnail,
+                    caption=searched_text,
+                    reply_markup=key,
+                )
+            except Exception as e:
+                print(f"Error fetching video details: {e}")
             if await is_on_off(2):
                 return await app.send_message(
                     chat_id=config.LOGGER_ID,
-                    text=(
-                        f"❖ {message.from_user.mention} started the bot to check <b>Track Information</b>.\n\n"
-                        f"<b>● User ID ➥</b> <code>{message.from_user.id}</code>\n"
-                        f"<b>● Username ➥</b> @{message.from_user.username}"
-                    ),
+                    text=f"❖ {message.from_user.mention} started the bot to check <b>track information</b>.\n\n<b>● User ID ➥</b> <code>{message.from_user.id}</code>\n<b>● Username ➥</b> @{message.from_user.username}",
                 )
     else:
         out = private_panel(_)
         await message.reply_photo(
-            photo=random.choice(IMAGE),
+            random.choice(IMAGE),
             caption=_["start_2"].format(message.from_user.mention, app.mention),
             reply_markup=InlineKeyboardMarkup(out),
         )
         if await is_on_off(2):
             return await app.send_message(
                 chat_id=config.LOGGER_ID,
-                text=(
-                    f"❖ {message.from_user.mention} started the bot.\n\n"
-                    f"<b>● User ID ➥</b> <code>{message.from_user.id}</code>\n"
-                    f"<b>● Username ➥</b> @{message.from_user.username}"
-                ),
+                text=f"❖ {message.from_user.mention} started the bot.\n\n<b>● User ID ➥</b> <code>{message.from_user.id}</code>\n<b>● Username ➥</b> @{message.from_user.username}",
             )
 
 
@@ -121,7 +112,7 @@ async def start_gp(client, message: Message, _):
     out = start_panel(_)
     uptime = int(time.time() - _boot_)
     await message.reply_photo(
-        photo=random.choice(IMAGE),
+        random.choice(IMAGE),
         caption=_["start_1"].format(app.mention, get_readable_time(uptime)),
         reply_markup=InlineKeyboardMarkup(out),
     )
@@ -135,7 +126,10 @@ async def welcome(client, message: Message):
             language = await get_lang(message.chat.id)
             _ = get_string(language)
             if await is_banned_user(member.id):
-                await message.chat.ban_member(member.id)
+                try:
+                    await message.chat.ban_member(member.id)
+                except:
+                    pass
             if member.id == app.id:
                 if message.chat.type != ChatType.SUPERGROUP:
                     await message.reply_text(_["start_4"])
@@ -153,7 +147,7 @@ async def welcome(client, message: Message):
 
                 out = start_panel(_)
                 await message.reply_photo(
-                    photo=random.choice(IMAGE),
+                    random.choice(IMAGE),
                     caption=_["start_3"].format(
                         message.from_user.first_name,
                         app.mention,
@@ -165,4 +159,4 @@ async def welcome(client, message: Message):
                 await add_served_chat(message.chat.id)
                 await message.stop_propagation()
         except Exception as ex:
-            print(f"Error: {ex}")
+            print(f"Error during welcome: {ex}")
