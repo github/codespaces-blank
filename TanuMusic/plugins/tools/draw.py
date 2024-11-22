@@ -17,7 +17,7 @@ async def draw_image(client, message):
     query = generate_long_query(user_query)
 
     # Send initial message
-    wait_message = await message.reply_text("**Generating image, please wait...** ⏳")
+    wait_message = await message.reply_text("<b>Generating image, please wait...</b> ⏳")
 
     # Asynchronous request using aiohttp
     url = f"https://text2img.codesearch.workers.dev/?prompt={query}"
