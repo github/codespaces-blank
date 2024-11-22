@@ -3,78 +3,42 @@
 /// # Examples
 /// ## plain/text
 /// ```no_run
-///use volga::{ok, App, AsyncEndpointsMapping};
+/// use volga::ok;
 ///
-///#[tokio::main]
-///async fn main() -> std::io::Result<()> {
-///    let mut app = App::build("127.0.0.1:7878").await?;
-///    
-///    app.map_get("/health", |_req| async {
-///        ok!("healthy")
-///    });
-///    
-///    app.run().await
-///}
+/// ok!("healthy");
 /// ```
 /// ## plain/text without body
 /// ```no_run
-///use volga::{ok, App, AsyncEndpointsMapping};
+/// use volga::ok;
 ///
-///#[tokio::main]
-///async fn main() -> std::io::Result<()> {
-///    let mut app = App::build("127.0.0.1:7878").await?;
-///    
-///    app.map_get("/health", |_req| async {
-///        ok!()
-///    });
-///    
-///    app.run().await
-///}
+/// ok!();
 /// ```
 /// ## JSON
 ///```no_run
-///use volga::{ok, App, AsyncEndpointsMapping};
-///use serde::Serialize;
+/// use volga::ok;
+/// use serde::Serialize;
 ///
-///#[derive(Serialize)]
-///struct Health {
+/// #[derive(Serialize)]
+/// struct Health {
 ///    status: String
-///}
+/// }
 ///
-///#[tokio::main]
-///async fn main() -> std::io::Result<()> {
-///    let mut app = App::build("127.0.0.1:7878").await?;
-///    
-///    app.map_get("/health", |_req| async {
-///        let health = Health { status: "healthy".into() };
-///        ok!(&health)
-///    });
-///    
-///    app.run().await
-///}
+/// let health = Health { status: "healthy".into() };
+/// ok!(&health);
 /// ```
 /// ## Untyped JSON with custom headers
 ///```no_run
-///use volga::{ok, App, AsyncEndpointsMapping};
-///use serde::Serialize;
+/// use volga::ok;
+/// use serde::Serialize;
 ///
-///#[derive(Serialize)]
-///struct Health {
+/// #[derive(Serialize)]
+/// struct Health {
 ///    status: String
-///}
+/// }
 ///
-///#[tokio::main]
-///async fn main() -> std::io::Result<()> {
-///    let mut app = App::build("127.0.0.1:7878").await?;
-///    
-///    app.map_get("/health", |_req| async {
-///        ok!({ "health": "healthy" }, [
-///            ("x-api-key", "some api key")
-///        ])
-///    });
-///    
-///    app.run().await
-///}
+/// ok!({ "health": "healthy" }, [
+///    ("x-api-key", "some api key")
+/// ]);
 /// ```
 #[macro_export]
 macro_rules! ok {
@@ -123,43 +87,31 @@ macro_rules! ok {
 /// # Examples
 /// ## Default usage
 ///```no_run
-///use volga::{file, App, AsyncEndpointsMapping};
-///use tokio::fs::File;
+/// use volga::file;
+/// use tokio::fs::File;
 ///
-///#[tokio::main]
-///async fn main() -> std::io::Result<()> {
-///    let mut app = App::build("127.0.0.1:7878").await?;
-///    
-///    app.map_get("/download", |_req| async {
-///        let file_name = "example.txt";
-///        let file_data = File::open(file_name).await?;
-///        
-///        file!(file_name, file_data)
-///    });
-///    
-///    app.run().await
-///}
+/// # async fn dox() -> std::io::Result<()> {
+/// let file_name = "example.txt";
+/// let file_data = File::open(file_name).await?;
+///
+/// file!(file_name, file_data);
+/// # Ok(())
+/// # }
 /// ```
 /// ## Custom headers
 ///```no_run
-///use volga::{file, App, AsyncEndpointsMapping};
-///use tokio::fs::File;
+/// use volga::{file, App, AsyncEndpointsMapping};
+/// use tokio::fs::File;
 ///
-///#[tokio::main]
-///async fn main() -> std::io::Result<()> {
-///    let mut app = App::build("127.0.0.1:7878").await?;
-///    
-///    app.map_get("/download", |_req| async {
-///        let file_name = "example.txt";
-///        let file_data = File::open(file_name).await?;
-///        
-///        file!(file_name, file_data, [
-///            ("x-api-key", "some api key")
-///        ])
-///    });
-///    
-///    app.run().await
-///}
+/// # async fn dox() -> std::io::Result<()> {
+/// let file_name = "example.txt";
+/// let file_data = File::open(file_name).await?;
+/// 
+/// file!(file_name, file_data, [
+///    ("x-api-key", "some api key")
+/// ]);
+/// # Ok(())   
+/// # }
 /// ```
 #[macro_export]
 macro_rules! file {
@@ -202,55 +154,28 @@ macro_rules! headers {
 /// # Examples
 /// ## Without body
 /// ```no_run
-///use volga::{status, App, AsyncEndpointsMapping};
+/// use volga::status;
 ///
-///#[tokio::main]
-///async fn main() -> std::io::Result<()> {
-///    let mut app = App::build("127.0.0.1:7878").await?;
-///    
-///    app.map_get("/test", |_req| async {
-///        status!(404)
-///    });
-///    
-///    app.run().await
-///}
+/// status!(404);
 /// ```
-/// ## With plain/text body
+/// ## plain/text body
 /// ```no_run
-///use volga::{status, App, AsyncEndpointsMapping};
+/// use volga::status;
 ///
-///#[tokio::main]
-///async fn main() -> std::io::Result<()> {
-///    let mut app = App::build("127.0.0.1:7878").await?;
-///    
-///    app.map_get("/test", |_req| async {
-///        status!(401, "Unauthorized!")
-///    });
-///    
-///    app.run().await
-///}
+/// status!(401, "Unauthorized!");
 /// ```
-/// ## With JSON body
+/// ## JSON body
 /// ```no_run
-///use volga::{status, App, AsyncEndpointsMapping};
-///use serde::Serialize;
+/// use volga::status;
+/// use serde::Serialize;
 /// 
-///#[derive(Serialize)]
-///struct ErrorMessage {
-///    error: String
-///}
+/// #[derive(Serialize)]
+/// struct ErrorMessage {
+///     error: String
+/// }
 /// 
-///#[tokio::main]
-///async fn main() -> std::io::Result<()> {
-///    let mut app = App::build("127.0.0.1:7878").await?;
-///    
-///    app.map_get("/test", |_req| async {
-///        let error = ErrorMessage { error: "some error message".into() };
-///        status!(401, &error)
-///    });
-///    
-///    app.run().await
-///}
+/// let error = ErrorMessage { error: "some error message".into() };
+/// status!(401, &error);
 /// ```
 #[macro_export]
 macro_rules! status {

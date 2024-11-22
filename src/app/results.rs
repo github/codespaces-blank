@@ -22,29 +22,34 @@ use mime::{
 pub mod macros;
 
 /// A customized response context with custom response `headers` and `content_type`
-/// > NOTE: This is not suitable for file response
+/// > NOTE: This is not suitable for file response use the `file!` or `Results::file()` instead
 /// # Example
 /// ```no_run
-///use volga::{App, AsyncEndpointsMapping, Results, ResponseContext};
-///use std::collections::HashMap;
+/// use volga::{Results, ResponseContext};
+/// use std::collections::HashMap;
 ///
-///#[tokio::main]
-///async fn main() -> std::io::Result<()> {
-///    let mut app = App::build("127.0.0.1:7878").await?;
+/// let mut headers = HashMap::new();
+/// headers.insert(String::from("x-api-key"), String::from("some api key"));
 ///
-///    app.map_get("/test", |req| async move {
-///        let mut headers = HashMap::new();
-///        headers.insert(String::from("x-api-key"), String::from("some api key"));
-///        
-///        Results::from(ResponseContext {
-///            content: "Hello World!",
-///            status: 200,
-///            headers
-///        })
-///    });
+/// Results::from(ResponseContext {
+///     content: "Hello World!",
+///     status: 200,
+///     headers
+/// });
+/// ```
+/// or alternative way by using `From` trait
+/// ```no_run
+/// use volga::{ResponseContext, HttpResult};
+/// use std::collections::HashMap;
 ///
-///    app.run().await
-///}
+/// let mut headers = HashMap::new();
+/// headers.insert(String::from("x-api-key"), String::from("some api key"));
+///
+/// HttpResult::from(ResponseContext {
+///     content: "Hello World!",
+///     status: 200,
+///     headers
+/// });
 /// ```
 pub struct ResponseContext<T: Serialize> {
     pub content: T,
@@ -60,14 +65,9 @@ pub struct Results;
 
 impl Results {
     /// Produces a customized `OK 200` response
+    #[inline]
     pub fn from<T: Serialize>(context: ResponseContext<T>) -> HttpResult {
-        let ResponseContext { content, headers, status } = context;
-        let content = serde_json::to_vec(&content)?;
-        
-        Self::create_custom_builder(headers)
-            .status(StatusCode::from_u16(status).unwrap_or(StatusCode::OK))
-            .body(HttpBody::full(content))
-            .map_err(|_| Self::response_error())
+        HttpResult::from(context)
     }
 
     /// Produces an `OK 200` response with the `JSON` body.
@@ -214,8 +214,8 @@ impl Results {
                 };
             }
             // if the content type is not provided - using the application/json by default
-            if headers_ref.get(CONTENT_TYPE).is_none() {
-                headers_ref.insert(CONTENT_TYPE, HeaderValue::from_bytes(APPLICATION_JSON.as_ref().as_bytes()).unwrap());
+            if headers_ref.get(&CONTENT_TYPE).is_none() {
+                headers_ref.insert(CONTENT_TYPE, HeaderValue::from_static(APPLICATION_JSON.as_ref()));
             }
         } else if cfg!(debug_assertions) {
             eprintln!("Failed to write to HTTP headers");
@@ -239,6 +239,18 @@ impl Results {
     }
 }
 
+impl<T: Serialize> From<ResponseContext<T>> for HttpResult {
+    fn from(value: ResponseContext<T>) -> Self {
+        let ResponseContext { content, headers, status } = value;
+        let content = serde_json::to_vec(&content)?;
+
+        Results::create_custom_builder(headers)
+            .status(StatusCode::from_u16(status).unwrap_or(StatusCode::OK))
+            .body(HttpBody::full(content))
+            .map_err(|_| Results::response_error())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
@@ -247,7 +259,7 @@ mod tests {
     use http_body_util::BodyExt;
     use serde::Serialize;
     use tokio::fs::File;
-    use crate::{headers, ResponseContext, Results};
+    use crate::{headers, HttpResult, ResponseContext, Results};
     use crate::app::body::HttpBody;
     use crate::test_utils::read_file_bytes;
 
@@ -261,7 +273,7 @@ mod tests {
         let mut headers = HashMap::new();
         headers.insert(String::from("x-api-key"), String::from("some api key"));
         
-        let mut response = Results::from(ResponseContext {
+        let mut response = HttpResult::from(ResponseContext {
             status: 400,
             content: String::from("Hello World!"),
             headers
@@ -281,7 +293,7 @@ mod tests {
         headers.insert(String::from("x-api-key"), String::from("some api key"));
         headers.insert(String::from("Content-Type"), String::from("text/plain"));
 
-        let mut response = Results::from(ResponseContext {
+        let mut response = HttpResult::from(ResponseContext {
             status: 200,
             content: "Hello World!",
             headers,
@@ -303,7 +315,7 @@ mod tests {
 
         let content = TestPayload { name: "test".into() };
         
-        let mut response = Results::from(ResponseContext {
+        let mut response = HttpResult::from(ResponseContext {
             status: 200,
             content,
             headers,

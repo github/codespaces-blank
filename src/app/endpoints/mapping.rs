@@ -2,7 +2,6 @@
 use std::{sync::Arc, future::Future};
 use crate::{HttpResult, HttpRequest};
 use crate::app::endpoints::Endpoints;
-use crate::app::endpoints::handlers::RouteHandler;
 
 #[cfg(feature = "async")]
 pub mod asynchronous;
@@ -11,25 +10,23 @@ pub mod synchronous;
 
 #[cfg(feature = "async")]
 impl asynchronous::AsyncMapping for Endpoints  {
-    #[inline]
     fn map<F, Fut>(&mut self, method: Method, pattern: &str, handler: F)
     where
         F: Fn(HttpRequest) -> Fut + Send + Sync + 'static,
         Fut: Future<Output = HttpResult> + Send + 'static,
     {
-        let handler = Arc::new(crate::app::endpoints::handlers::AsyncHandler(handler)) as RouteHandler;
+        let handler = Arc::new(crate::app::endpoints::handlers::AsyncHandler(handler));
         self.map_route(method, pattern, handler);
     }
 }
 
 #[cfg(feature = "sync")]
 impl synchronous::SyncMapping for Endpoints {
-    #[inline]
     fn map<F>(&mut self, method: Method, pattern: &str, handler: F)
     where
         F: Fn(HttpRequest) -> HttpResult + Send + Sync + 'static,
     {
-        let handler = Arc::new(crate::app::endpoints::handlers::SyncHandler(handler)) as RouteHandler;
+        let handler = Arc::new(crate::app::endpoints::handlers::SyncHandler(handler));
         self.map_route(method, pattern, handler);
     }
 }

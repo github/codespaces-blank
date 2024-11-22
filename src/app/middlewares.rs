@@ -1,15 +1,11 @@
 ﻿use std::sync::Arc;
-use std::pin::Pin;
-use crate::{
-    app::BoxedHttpResultFuture,
-    HttpContext, 
-    Results
-};
+use futures_util::future::BoxFuture;
+use crate::{HttpContext, HttpResult, Results};
 
 pub mod mapping;
 
-pub type Next = Arc<dyn Fn(HttpContext) -> Pin<BoxedHttpResultFuture> + Send + Sync>;
-pub(crate) type Middleware = Arc<dyn Fn(HttpContext, Next) -> Pin<BoxedHttpResultFuture> + Send + Sync>;
+pub type Next = Arc<dyn Fn(HttpContext) -> BoxFuture<'static, HttpResult> + Send + Sync>;
+pub(crate) type Middleware = Arc<dyn Fn(HttpContext, Next) -> BoxFuture<'static, HttpResult> + Send + Sync>;
 
 pub(crate) struct Middlewares {
     pipeline: Vec<Middleware>

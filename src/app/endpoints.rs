@@ -1,5 +1,4 @@
 ﻿use std::collections::HashMap;
-use std::sync::Arc;
 use hyper::Method;
 use crate::HttpRequest;
 use crate::app::endpoints::{
@@ -18,14 +17,18 @@ pub(crate) struct Endpoints {
 
 pub(crate) struct EndpointContext {
     pub(crate) handler: RouteHandler,
-    pub(crate) params: Arc<HashMap<String, String>>
+    pub(crate) params: HashMap<String, String>
+}
+
+impl EndpointContext {
+    pub(crate) fn into_parts(self) -> (RouteHandler, HashMap<String, String>) {
+        (self.handler, self.params)
+    }
 }
 
 impl Endpoints {
     pub(crate) fn new() -> Self {
-        Self {
-            routes: HashMap::new()
-        }
+        Self { routes: HashMap::new() }
     }
 
     #[inline]
@@ -48,7 +51,7 @@ impl Endpoints {
             .and_then(|mut route_params| {
                 route_params.params.extend(query_map);
                 match route_params.route {
-                    Route::Handler(handler) => Some(EndpointContext { handler: handler.clone(), params: Arc::new(route_params.params) }),
+                    Route::Handler(handler) => Some(EndpointContext { handler: handler.clone(), params: route_params.params }),
                     _ => None
                 }
             })

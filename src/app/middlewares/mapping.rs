@@ -1,11 +1,10 @@
 ﻿use std::{
-    pin::Pin, 
     sync::Arc, 
     future::Future
 };
+use futures_util::future::BoxFuture;
 use crate::{
     app::middlewares::{Middlewares, mapping::asynchronous::AsyncMapping}, 
-    app::BoxedHttpResultFuture,
     HttpResult, 
     HttpContext, 
     Next
@@ -26,7 +25,7 @@ impl AsyncMapping for Middlewares {
             Box::pin(async move {
                 // Here, middleware() can be invoked repeatedly because it’s wrapped in an Arc and cloned.
                 middleware(ctx, next).await
-            }) as Pin<BoxedHttpResultFuture>
+            }) as BoxFuture<HttpResult>
         });
         
         self.pipeline.push(mw);

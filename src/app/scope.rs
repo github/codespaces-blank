@@ -46,26 +46,28 @@ impl Scope {
     
     pub(crate) async fn handle_request(mut request: Request<Incoming>, pipeline: Arc<Pipeline>, cancellation_token: CancellationToken) -> io::Result<HttpResponse> {
         if let Some(endpoint_context) = pipeline.endpoints().get_endpoint(&request).await {
+            let (handler, params) = endpoint_context.into_parts();
+            
             let extensions = request.extensions_mut();
             extensions.insert(cancellation_token);
 
-            if !endpoint_context.params.is_empty() {
-                extensions.insert(endpoint_context.params.clone());
+            if !params.is_empty() {
+                extensions.insert(params);
             }
             
             let response: HttpResult;
             #[cfg(feature = "middleware")]
             {
                 response = if pipeline.has_middleware_pipeline() {
-                    let ctx = HttpContext::new(request, endpoint_context.handler);
+                    let ctx = HttpContext::new(request, handler);
                     pipeline.execute(ctx).await
                 } else {
-                    endpoint_context.handler.call(request).await
+                    handler.call(request).await
                 };
             }
             #[cfg(not(feature = "middleware"))]
             {
-                response = endpoint_context.handler.call(request).await;
+                response = handler.call(request).await;
             }
 
             match response {

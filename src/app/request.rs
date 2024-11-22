@@ -1,7 +1,6 @@
 ﻿use bytes::{Bytes, Buf};
 use std::collections::HashMap;
 use std::path::Path;
-use std::sync::Arc;
 use cancel::Cancel;
 use http_body_util::BodyExt;
 use hyper::Request;
@@ -28,7 +27,7 @@ pub mod cancel;
 pub mod file;
 
 pub type HttpRequest = Request<Incoming>;
-pub type RequestParams = Arc<HashMap<String, String>>;
+pub type RequestParams = HashMap<String, String>;
 
 struct Utils;
 
@@ -124,7 +123,7 @@ impl<B: Body> Cancel for Request<B> {
 
 #[cfg(test)]
 mod tests {
-    use std::{collections::HashMap, sync::Arc};
+    use std::collections::HashMap;
     use std::path::Path;
     use serde::Deserialize;
     use tokio_util::sync::CancellationToken;
@@ -153,7 +152,7 @@ mod tests {
         params.insert(String::from("name"), String::from("test"));
 
         let mut request = hyper::Request::new(HttpBody::empty());
-        request.extensions_mut().insert(Arc::new(params));
+        request.extensions_mut().insert(params);
 
         let request_params = request.params().unwrap();
 
@@ -170,7 +169,7 @@ mod tests {
         params.insert(String::from("name"), String::from("test"));
 
         let mut request = hyper::Request::new(HttpBody::empty());
-        request.extensions_mut().insert(Arc::new(params));
+        request.extensions_mut().insert(params);
 
         let name = request.param("name").unwrap();
 

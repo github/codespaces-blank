@@ -9,7 +9,6 @@ use crate::{
 #[cfg(feature = "middleware")]
 use crate::{HttpContext, Next, AsyncMiddlewareMapping};
 
-
 impl AsyncEndpointsMapping for App {
     fn map_get<F, Fut>(&mut self, pattern: &str, handler: F)
     where

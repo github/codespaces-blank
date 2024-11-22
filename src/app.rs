@@ -1,5 +1,4 @@
-﻿use std::future::Future;
-use std::sync::Arc;
+﻿use std::sync::Arc;
 use hyper_util::rt::TokioIo;
 
 use tokio::{
@@ -14,7 +13,6 @@ use tokio::io::ErrorKind::{
 use crate::app::{
     pipeline::{Pipeline, PipelineBuilder},
     endpoints::Endpoints,
-    results::HttpResult,
     scope::Scope,
     server::Server
 };
@@ -62,8 +60,6 @@ struct Connection {
     shutdown_signal: broadcast::Receiver<()>,
     shutdown_sender: broadcast::Sender<()>
 }
-
-pub(crate) type BoxedHttpResultFuture = Box<dyn Future<Output = HttpResult> + Send>;
 
 impl App {
     /// Initializes a new instance of the `App` on specified `socket`.
@@ -178,10 +174,9 @@ impl App {
         }
     }
     
-    #[inline]
     async fn handle_connection(io: TokioIo<TcpStream>, pipeline: Arc<Pipeline>) {
-        let scope = Scope::new(pipeline);
         let server = Server::new(io);
+        let scope = Scope::new(pipeline);
         
         server.serve(scope).await;
     }
