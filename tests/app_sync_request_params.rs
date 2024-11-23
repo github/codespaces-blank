@@ -7,8 +7,8 @@ async fn it_reads_route_params() {
         let mut app = App::build("127.0.0.1:7889").await?;
 
         app.map_get("/test/{name}/{age}", |req| {
-            let name = req.param("name")?;
-            let age = req.param("age")?;
+            let name: String = req.param("name")?;
+            let age: u32 = req.param("age")?;
 
             let response = format!("My name is: {}, I'm {} years old", name, age);
 
@@ -37,8 +37,8 @@ async fn it_reads_query_params() {
         let mut app = App::build("127.0.0.1:7890").await?;
 
         app.map_get("/test", |req| {
-            let name = req.param("name")?;
-            let age = req.param("age")?;
+            let name = req.param_str("name")?;
+            let age: u32 = req.param("age")?;
 
             let response = format!("My name is: {}, I'm {} years old", name, age);
 

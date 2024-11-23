@@ -5,24 +5,22 @@ pub trait Cancel {
     /// 
     ///# Example
     /// ```no_run
-    ///use volga::{App, AsyncEndpointsMapping, Results, Cancel};
-    ///
-    ///#[tokio::main]
-    ///async fn main() -> std::io::Result<()> {
-    ///    let mut app = App::build("127.0.0.1:7878").await?;
-    ///
-    ///    app.map_get("/test", |req| async move {
-    ///        let token = req.cancellation_token();
-    ///
-    ///         if token.is_cancelled() { 
-    ///             Results::text("Cancelled!")
-    ///         } else {
-    ///             Results::text("Pass!")
-    ///         } 
-    ///    });
-    ///
-    ///    app.run().await
-    ///}
+    /// use volga::{App, AsyncEndpointsMapping, ok, Cancel};
+    /// 
+    /// # #[tokio::main]
+    /// # async fn main() -> std::io::Result<()> {
+    /// # let mut app = App::build("127.0.0.1:7878").await?;
+    /// app.map_get("/test", |req| async move {
+    ///     let token = req.cancellation_token();
+    /// 
+    ///     if token.is_cancelled() { 
+    ///         ok!("Cancelled!")
+    ///     } else {
+    ///         ok!("Pass!")
+    ///     } 
+    /// });
+    /// # app.run().await
+    /// # }
     /// ```
     fn cancellation_token(&self) -> CancellationToken;
 }

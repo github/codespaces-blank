@@ -103,3 +103,45 @@ impl Route {
         segment.starts_with("{") && segment.ends_with("}")
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::collections::HashMap;
+    use std::sync::Arc;
+    use crate::{ok, HttpRequest};
+    use crate::app::endpoints::handlers::AsyncHandler;
+    use crate::app::endpoints::route::Route;
+
+    #[test]
+    fn it_inserts_and_finds_route() {
+        let handler = |_req: HttpRequest| async { ok!() };
+        let handler = Arc::new(AsyncHandler(handler));
+        
+        let path = ["test".into()];
+        
+        let mut route = Route::Static(HashMap::new());
+        route.insert(&path, handler);
+        
+        let route_params = route.find(&path);
+        
+        assert!(route_params.is_some());
+    }
+
+    #[test]
+    fn it_inserts_and_finds_route_with_params() {
+        let handler = |_req: HttpRequest| async { ok!() };
+        let handler = Arc::new(AsyncHandler(handler));
+
+        let path = ["test".into(), "{value}".into()];
+
+        let mut route = Route::Static(HashMap::new());
+        route.insert(&path, handler);
+
+        let path = ["test".into(), "some".into()];
+        
+        let route_params = route.find(&path).unwrap();
+        let val = route_params.params.get("value").unwrap();
+        
+        assert_eq!(val, "some");
+    }
+}

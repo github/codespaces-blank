@@ -9,29 +9,27 @@ pub trait Payload {
     /// 
     /// # Example
     /// ```no_run
-    ///use volga::{App, AsyncEndpointsMapping, Results, Payload};
-    ///use serde::Deserialize;
+    /// use volga::{App, AsyncEndpointsMapping, ok, Payload};
+    /// use serde::Deserialize;
+    ///  
+    /// #[derive(Deserialize)]
+    /// struct User {
+    ///     name: String,
+    ///     age: i32
+    /// }
     /// 
-    ///#[derive(Deserialize)]
-    ///struct User {
-    ///    name: String,
-    ///    age: i32
-    ///}
-    ///
-    ///#[tokio::main]
-    ///async fn main() -> std::io::Result<()> {
-    ///    let mut app = App::build("127.0.0.1:7878").await?;
-    ///
-    ///    // POST /test
-    ///    // { name: "John", age: 35 }
-    ///    app.map_post("/test", |req| async move {
-    ///        let params: User = req.payload().await?;
-    ///
-    ///        Results::text("Pass!")
-    ///    });
-    ///
-    ///    app.run().await
-    ///}
+    /// # #[tokio::main]
+    /// # async fn main() -> std::io::Result<()> {
+    /// # let mut app = App::build("127.0.0.1:7878").await?;
+    /// // POST /test
+    /// // { name: "John", age: 35 }
+    /// app.map_post("/test", |req| async move {
+    ///     let params: User = req.payload().await?;
+    /// 
+    ///     ok!("Pass!")
+    /// });
+    /// # app.run().await
+    /// # }
     /// ```
     fn payload<T: DeserializeOwned>(self) -> impl Future<Output = Result<T, std::io::Error>>;
 }
@@ -44,29 +42,27 @@ pub trait SyncPayload {
     /// 
     /// # Example
     /// ```no_run
-    ///use volga::{App, SyncEndpointsMapping, Results, SyncPayload};
-    ///use serde::Deserialize;
+    /// use volga::{App, SyncEndpointsMapping, ok, SyncPayload};
+    /// use serde::Deserialize;
+    ///  
+    /// #[derive(Deserialize)]
+    /// struct User {
+    ///     name: String,
+    ///     age: i32
+    /// }
     /// 
-    ///#[derive(Deserialize)]
-    ///struct User {
-    ///    name: String,
-    ///    age: i32
-    ///}
-    ///
-    ///#[tokio::main]
-    ///async fn main() -> std::io::Result<()> {
-    ///    let mut app = App::build("127.0.0.1:7878").await?;
-    ///
-    ///    // POST /test
-    ///    // { name: "John", age: 35 }
-    ///    app.map_post("/test", |req| move {
-    ///        let params: User = req.payload()?;
-    ///
-    ///        Results::text("Pass!")
-    ///    });
-    ///
-    ///    app.run().await
-    ///}
+    /// # #[tokio::main]
+    /// # async fn main() -> std::io::Result<()> {
+    /// # let mut app = App::build("127.0.0.1:7878").await?;
+    /// // POST /test
+    /// // { name: "John", age: 35 }
+    /// app.map_post("/test", |req| move {
+    ///     let params: User = req.payload()?;
+    /// 
+    ///     ok!("Pass!")
+    /// });
+    /// # app.run().await
+    /// # }
     /// ```
     fn payload<T: DeserializeOwned>(self) -> Result<T, std::io::Error>;
 }

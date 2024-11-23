@@ -16,22 +16,25 @@
 //! tokio = "1.41.1"
 //! ```
 //! ```no_run
-//!use volga::*;
+//! use volga::*;
 //! 
-//!#[tokio::main]
-//!async fn main() -> std::io::Result<()> {
-//!    // Start the server
-//!    let mut app = App::build("127.0.0.1:7878").await?;
+//! #[tokio::main]
+//! async fn main() -> std::io::Result<()> {
+//!     // Start the server
+//!     let mut app = App::build("127.0.0.1:7878").await?;
 //! 
-//!    // Example of asynchronous request handler
-//!    app.map_get("/hello/{name}", |req| async move {
-//!         let name = req.param("name")?;
-//!         ok!("Hello {}!", name)
-//!    });
+//!     // Example of asynchronous request handler
+//!     app.map_get("/hello/{name}", |req| async move {
+//!          let name = req.param_str("name")?;
+//!          ok!("Hello {}!", name)
+//!     });
 //!     
-//!    app.run().await
+//!     app.run().await
 //! }
 //! ```
+
+#![forbid(unsafe_code)]
+#![deny(unreachable_pub)]
 
 pub mod app;
 

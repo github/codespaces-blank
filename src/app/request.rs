@@ -1,6 +1,7 @@
 ﻿use bytes::{Bytes, Buf};
 use std::collections::HashMap;
 use std::path::Path;
+use std::str::FromStr;
 use cancel::Cancel;
 use http_body_util::BodyExt;
 use hyper::Request;
@@ -25,7 +26,6 @@ pub mod params;
 pub mod payload;
 pub mod cancel;
 pub mod file;
-
 pub type HttpRequest = Request<Incoming>;
 pub type RequestParams = HashMap<String, String>;
 
@@ -103,10 +103,17 @@ impl<B: Body> Params for Request<B> {
         self.extensions().get::<RequestParams>()
     }
 
-    #[inline]
-    fn param(&self, name: &str) -> Result<&String, Error> {
+    fn param<T: FromStr>(&self, name: &str) -> Result<T, Error> {
         self.params()
             .and_then(|params| params.get(name))
+            .and_then(|param| param.parse().ok())
+            .ok_or(Error::new(InvalidInput, format!("Missing parameter: {name}")))
+    }
+
+    fn param_str(&self, name: &str) -> Result<&str, Error> {
+        self.params()
+            .and_then(|params| params.get(name))
+            .map(|param| param.as_str())
             .ok_or(Error::new(InvalidInput, format!("Missing parameter: {name}")))
     }
 }
@@ -166,12 +173,25 @@ mod tests {
     #[test]
     fn it_reads_param() {
         let mut params = HashMap::new();
+        params.insert(String::from("age"), String::from("33"));
+
+        let mut request = hyper::Request::new(HttpBody::empty());
+        request.extensions_mut().insert(params);
+
+        let age: u32 = request.param("age").unwrap();
+
+        assert_eq!(age, 33);
+    }
+    
+    #[test]
+    fn it_reads_param_str() {
+        let mut params = HashMap::new();
         params.insert(String::from("name"), String::from("test"));
 
         let mut request = hyper::Request::new(HttpBody::empty());
         request.extensions_mut().insert(params);
 
-        let name = request.param("name").unwrap();
+        let name = request.param_str("name").unwrap();
 
         assert_eq!(name, "test");
     }

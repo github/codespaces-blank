@@ -8,20 +8,18 @@ pub trait File {
     /// 
     /// # Example
     /// ```no_run
-    ///use volga::{App, AsyncEndpointsMapping, Results, File};
+    /// use volga::{App, AsyncEndpointsMapping, ok, File};
+    /// 
+    /// # #[tokio::main]
+    /// # async fn main() -> std::io::Result<()> {
+    /// # let mut app = App::build("127.0.0.1:7878").await?;
+    /// app.map_post("/test", |req| async move {
+    ///     req.to_file("file.dat").await?;
     ///
-    ///#[tokio::main]
-    ///async fn main() -> std::io::Result<()> {
-    ///    let mut app = App::build("127.0.0.1:7878").await?;
-    ///
-    ///    app.map_post("/test", |req| async move {
-    ///        req.to_file("file.dat").await?;
-    ///
-    ///        Results::text("Pass!")
-    ///    });
-    ///
-    ///    app.run().await
-    ///}
+    ///     ok!("Pass!")
+    /// });
+    /// # app.run().await
+    /// # }
     /// ```
     fn to_file(self, file_name: impl AsRef<Path>) -> impl Future<Output = Result<(), Error>>;
 }
@@ -34,20 +32,18 @@ pub trait SyncFile {
     /// 
     /// # Example
     /// ```no_run
-    ///use volga::{App, SyncEndpointsMapping, Results, SyncFile};
-    ///
-    ///#[tokio::main]
-    ///async fn main() -> std::io::Result<()> {
-    ///    let mut app = App::build("127.0.0.1:7878").await?;
-    ///
-    ///    app.map_post("/test", |req| move {
-    ///        req.to_file("file.dat")?;
-    ///
-    ///        Results::text("Pass!")
-    ///    });
-    ///
-    ///    app.run().await
-    ///}
+    /// use volga::{App, SyncEndpointsMapping, ok, SyncFile};
+    /// 
+    /// # #[tokio::main]
+    /// # async fn main() -> std::io::Result<()> {
+    /// # let mut app = App::build("127.0.0.1:7878").await?;
+    /// app.map_post("/test", |req| move {
+    ///     req.to_file("file.dat")?;
+    /// 
+    ///     ok!("Pass!")
+    /// });
+    /// # app.run().await
+    /// # }
     /// ```
     fn to_file(self, file_name: impl AsRef<Path>) -> Result<(), Error>;
 }

@@ -22,9 +22,9 @@ async fn main() -> std::io::Result<()> {
     // Return strongly typed JSON
     // GET /user/John
     app.map_get("/user/{name}", |req| async move {
-        let name = req.param("name")?; 
+        let name: String = req.param("name")?; 
         let user: User = User {
-            name: name.into(),
+            name,
             age: 35
         };
 
