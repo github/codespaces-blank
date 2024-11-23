@@ -16,7 +16,7 @@ pub trait File {
     /// app.map_post("/test", |req| async move {
     ///     req.to_file("file.dat").await?;
     ///
-    ///     ok!("Pass!")
+    ///     ok!("Done!")
     /// });
     /// # app.run().await
     /// # }
@@ -40,7 +40,7 @@ pub trait SyncFile {
     /// app.map_post("/test", |req| move {
     ///     req.to_file("file.dat")?;
     /// 
-    ///     ok!("Pass!")
+    ///     ok!("Done!")
     /// });
     /// # app.run().await
     /// # }
