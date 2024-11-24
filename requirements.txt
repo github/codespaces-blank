@@ -1,5 +1,4 @@
 deep-translator
-pyromod
 openai
 aiofiles
 aiohttp
@@ -21,7 +20,6 @@ psutil
 pytube
 pykeyboard
 unidecode
-pyromod
 ntgcalls==1.1.2
 python-dotenv
 pyyaml
