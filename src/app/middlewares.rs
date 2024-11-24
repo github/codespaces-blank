@@ -5,14 +5,14 @@ use crate::{HttpContext, HttpResult, Results};
 pub mod mapping;
 
 pub type Next = Arc<dyn Fn(HttpContext) -> BoxFuture<'static, HttpResult> + Send + Sync>;
-pub(crate) type Middleware = Arc<dyn Fn(HttpContext, Next) -> BoxFuture<'static, HttpResult> + Send + Sync>;
+type Middleware = Arc<dyn Fn(HttpContext, Next) -> BoxFuture<'static, HttpResult> + Send + Sync>;
 
 pub(crate) struct Middlewares {
     pipeline: Vec<Middleware>
 }
 
 impl Middlewares {
-    pub(crate) fn new() -> Self {
+    pub(super) fn new() -> Self {
         Self { pipeline: Vec::new() }
     }
 

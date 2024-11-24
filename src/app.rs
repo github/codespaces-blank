@@ -25,16 +25,15 @@ use crate::app::middlewares::{
 
 #[cfg(feature = "middleware")]
 pub mod middlewares;
-
+#[cfg(feature = "middleware")]
+pub mod http_context;
 pub mod endpoints;
 pub mod body;
 pub mod request;
 pub mod results;
 pub mod mapping;
-pub(crate) mod scope;
-#[cfg(feature = "middleware")]
-pub(crate) mod http_context;
 pub(crate) mod pipeline;
+mod scope;
 mod server;
 
 /// The web application used to configure the HTTP pipeline, and routes.

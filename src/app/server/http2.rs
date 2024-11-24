@@ -1,8 +1,7 @@
-﻿use hyper::server::conn::http2;
+﻿use crate::app::{scope::Scope, server::Server};
+use hyper::server::conn::http2;
 use hyper_util::rt::{TokioExecutor, TokioIo};
 use tokio::net::TcpStream;
-use crate::app::scope::Scope;
-use crate::app::server::Server;
 
 impl Server {
     #[inline]

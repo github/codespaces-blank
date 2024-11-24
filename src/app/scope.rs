@@ -17,13 +17,14 @@ use crate::{
     Results, 
     HttpResult
 };
+
 #[cfg(feature = "middleware")]
 use crate::HttpContext;
 
 #[derive(Clone)]
-pub(crate) struct Scope {
-    pub(crate) pipeline: Arc<Pipeline>,
-    pub(crate) cancellation_token: CancellationToken
+pub(super) struct Scope {
+    pub(super) pipeline: Arc<Pipeline>,
+    pub(super) cancellation_token: CancellationToken
 }
 
 impl Service<Request<Incoming>> for Scope {
@@ -37,14 +38,14 @@ impl Service<Request<Incoming>> for Scope {
 }
 
 impl Scope {
-    pub(crate) fn new(pipeline: Arc<Pipeline>) -> Self {
+    pub(super) fn new(pipeline: Arc<Pipeline>) -> Self {
         Self { 
             cancellation_token: CancellationToken::new(),
             pipeline
         }
     }
     
-    pub(crate) async fn handle_request(mut request: Request<Incoming>, pipeline: Arc<Pipeline>, cancellation_token: CancellationToken) -> io::Result<HttpResponse> {
+    pub(super) async fn handle_request(mut request: Request<Incoming>, pipeline: Arc<Pipeline>, cancellation_token: CancellationToken) -> io::Result<HttpResponse> {
         if let Some(endpoint_context) = pipeline.endpoints().get_endpoint(&request).await {
             let (handler, params) = endpoint_context.into_parts();
             

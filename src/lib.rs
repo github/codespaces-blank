@@ -25,7 +25,7 @@
 //! 
 //!     // Example of asynchronous request handler
 //!     app.map_get("/hello/{name}", |req| async move {
-//!          let name = req.param_str("name")?;
+//!          let name: String = req.param("name")?;
 //!          ok!("Hello {}!", name)
 //!     });
 //!     

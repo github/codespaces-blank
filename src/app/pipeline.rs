@@ -1,4 +1,5 @@
 ﻿use crate:: app::endpoints::Endpoints;
+
 #[cfg(feature = "middleware")]
 use crate::{
     app::middlewares::Middlewares,
@@ -7,7 +8,7 @@ use crate::{
     Next
 };
 
-pub(crate) struct PipelineBuilder {
+pub(super) struct PipelineBuilder {
     #[cfg(feature = "middleware")]
     middlewares: Middlewares,
     endpoints: Endpoints
@@ -21,7 +22,7 @@ pub(crate) struct Pipeline {
 
 impl PipelineBuilder {
     #[cfg(feature = "middleware")]
-    pub(crate) fn new() -> Self {
+    pub(super) fn new() -> Self {
         Self {
             middlewares: Middlewares::new(),
             endpoints: Endpoints::new()
@@ -29,12 +30,12 @@ impl PipelineBuilder {
     }
 
     #[cfg(not(feature = "middleware"))]
-    pub(crate) fn new() -> Self {
+    pub(super) fn new() -> Self {
         Self { endpoints: Endpoints::new() }
     }
 
     #[cfg(feature = "middleware")]
-    pub(crate) fn build(self) -> Pipeline {
+    pub(super) fn build(self) -> Pipeline {
         let start = self.middlewares.compose();
         Pipeline {
             endpoints: self.endpoints,
@@ -43,21 +44,21 @@ impl PipelineBuilder {
     }
 
     #[cfg(not(feature = "middleware"))]
-    pub(crate) fn build(self) -> Pipeline {
+    pub(super) fn build(self) -> Pipeline {
         Pipeline { endpoints: self.endpoints }
     }
 
     #[cfg(feature = "middleware")]
-    pub(crate) fn has_middleware_pipeline(&self) -> bool {
+    pub(super) fn has_middleware_pipeline(&self) -> bool {
         self.middlewares.is_empty()
     }
 
     #[cfg(feature = "middleware")]
-    pub(crate) fn middlewares_mut(&mut self) -> &mut Middlewares {
+    pub(super) fn middlewares_mut(&mut self) -> &mut Middlewares {
         &mut self.middlewares
     }
 
-    pub(crate) fn endpoints_mut(&mut self) -> &mut Endpoints {
+    pub(super) fn endpoints_mut(&mut self) -> &mut Endpoints {
         &mut self.endpoints
     }
 }

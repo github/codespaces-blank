@@ -1,19 +1,19 @@
 ﻿use std::collections::HashMap;
 use crate::app::endpoints::handlers::RouteHandler;
 
-pub(crate) enum Route {
+pub(super) enum Route {
     Static(HashMap<String, Route>),
     Dynamic(HashMap<String, Route>),
     Handler(RouteHandler)
 }
 
-pub(crate) struct RouteParams<'route> {
-    pub(crate) route: &'route Route,
-    pub(crate) params: HashMap<String, String>
+pub(super) struct RouteParams<'route> {
+    pub(super) route: &'route Route,
+    pub(super) params: HashMap<String, String>
 }
 
 impl Route {
-    pub(crate) fn insert(&mut self, path_segments: &[String], handler: RouteHandler) {
+    pub(super) fn insert(&mut self, path_segments: &[String], handler: RouteHandler) {
         let mut current = self;
 
         for (index, segment) in path_segments.iter().enumerate() {
@@ -49,7 +49,7 @@ impl Route {
         }
     }
 
-    pub(crate) fn find(&self, path_segments: &[String]) -> Option<RouteParams> {
+    pub(super) fn find(&self, path_segments: &[String]) -> Option<RouteParams> {
         let mut current = Some(self);
         let mut params: HashMap<String, String> = HashMap::new();
 

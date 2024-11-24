@@ -7,7 +7,7 @@ use crate::app::endpoints::{
 };
 
 pub(crate) mod handlers;
-pub(crate) mod route;
+pub(super) mod route;
 
 pub mod mapping;
 
@@ -27,7 +27,7 @@ impl EndpointContext {
 }
 
 impl Endpoints {
-    pub(crate) fn new() -> Self {
+    pub(super) fn new() -> Self {
         Self { routes: HashMap::new() }
     }
 
