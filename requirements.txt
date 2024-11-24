@@ -27,7 +27,6 @@ python-dotenv
 pyyaml
 requests
 speedtest-cli
-HorridAPI==1.0.67
 spotipy
 tgcrypto
 urllib3
