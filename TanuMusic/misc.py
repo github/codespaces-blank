@@ -5,7 +5,7 @@ import heroku3
 from pyrogram import filters
 
 import config
-from ERAVIBES.core.mongo import mongodb
+from TanuMusic.core.mongo import mongodb
 
 from .logging import LOGGER
 
