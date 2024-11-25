@@ -4,7 +4,7 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 import config
 from TanuMusic import app
-
+from config import SUPPORT_CHAT 
 
 @app.on_message(filters.command("privacy"))
 async def privacy(client, message: Message):
