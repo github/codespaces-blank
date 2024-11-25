@@ -16,7 +16,7 @@ async def privacy(client, message: Message):
 
 Your privacy is important to us. To learn more about how we collect, use, and protect your data, please review our Privacy Policy here: [Privacy Policy]({config.PRIVACY_LINK}).
 
-If you have any questions or concerns, feel free to reach out to our [Support Team]({config.SUPPORT_GROUP}).
+If you have any questions or concerns, feel free to reach out to our [Support Team]({config.SUPPORT_CHAT}).
     """
 
     await message.reply_text(
