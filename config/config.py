@@ -55,7 +55,7 @@ GIT_TOKEN = getenv(
 
 #❖ Make your bots privacy from telegra.ph and put your url here
 PRIVACY_LINK = getenv(
-    "PRIVACY_LINK", "https://telegra.ph/Privacy-Policy-for-DV-MUSIC-08-30"
+    "PRIVACY_LINK", "https://telegra.ph/"
 )
 
 SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/C0DE_SEARCH")
