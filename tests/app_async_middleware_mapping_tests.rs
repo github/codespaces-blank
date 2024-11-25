@@ -3,7 +3,7 @@
 #[tokio::test]
 async fn it_adds_middleware_request() {
     tokio::spawn(async {
-        let mut app = App::build("127.0.0.1:7884").await?;
+        let mut app = App::new().bind("127.0.0.1:7884");
 
         app.use_middleware(|context, next| async move {
             next(context).await

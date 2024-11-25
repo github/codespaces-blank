@@ -3,7 +3,7 @@
 #[tokio::test]
 async fn it_reads_route_params() {
     tokio::spawn(async {
-        let mut app = App::build("127.0.0.1:7887").await?;
+        let mut app = App::new().bind("127.0.0.1:7887");
 
         app.map_get("/test/{name}/{age}", |req| async move {
             let name = req.param_str("name")?;
@@ -33,7 +33,7 @@ async fn it_reads_route_params() {
 #[tokio::test]
 async fn it_reads_query_params() {
     tokio::spawn(async {
-        let mut app = App::build("127.0.0.1:7888").await?;
+        let mut app = App::new().bind("127.0.0.1:7888");
 
         app.map_get("/test", |req| async move {
             let name = req.param_str("name")?;

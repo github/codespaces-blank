@@ -9,7 +9,7 @@
 #[allow(clippy::all)]
 async fn main() -> std::io::Result<()> {
     // Start the server
-    let mut app = App::build("127.0.0.1:7878").await?;
+    let mut app = App::new();
 
     // Middleware 1
     app.use_middleware(|ctx, next| async move {

@@ -33,7 +33,7 @@ async fn another_long_running_task(cancellation_token: CancellationToken) {
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
     // Start the server
-    let mut app = App::build("127.0.0.1:7878").await?;
+    let mut app = App::new();
 
     // Example of long-running task
     app.map_get("/long-task", |req| async move {

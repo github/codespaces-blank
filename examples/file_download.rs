@@ -7,7 +7,7 @@ use volga::{
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
-    let mut app = App::build("127.0.0.1:7878").await?;
+    let mut app = App::new();
     
     app.map_get("/download", |_req| async {
         let file = File::open("examples/files/download.txt").await?;

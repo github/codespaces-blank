@@ -11,7 +11,7 @@ struct User {
 #[tokio::test]
 async fn it_reads_json_payload() {
     tokio::spawn(async {
-        let mut app = App::build("127.0.0.1:7891").await?;
+        let mut app = App::new().bind("127.0.0.1:7891");
 
         app.map_post("/test", |req| {
             let user: User = req.payload()?;
@@ -36,7 +36,7 @@ async fn it_reads_json_payload() {
 #[tokio::test]
 async fn it_writes_json_response() {
     tokio::spawn(async {
-        let mut app = App::build("127.0.0.1:7892").await?;
+        let mut app = App::new().bind("127.0.0.1:7897");
 
         app.map_get("/test", |_req| {
             let user = User { name: String::from("John"), age: 35 };
@@ -63,7 +63,7 @@ async fn it_writes_json_response() {
 #[tokio::test]
 async fn it_writes_json_using_macro_response() {
     tokio::spawn(async {
-        let mut app = App::build("127.0.0.1:7895").await?;
+        let mut app = App::new().bind("127.0.0.1:7895");
 
         app.map_get("/test", |_req| {
             let user = User { name: String::from("John"), age: 35 };
@@ -90,7 +90,7 @@ async fn it_writes_json_using_macro_response() {
 #[tokio::test]
 async fn it_writes_untyped_json_response() {
     tokio::spawn(async {
-        let mut app = App::build("127.0.0.1:7896").await?;
+        let mut app = App::new().bind("127.0.0.1:7896");
 
         app.map_get("/test", |_req| {
             ok!({ "name": "John", "age": 35 })

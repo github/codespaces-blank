@@ -1,4 +1,5 @@
-﻿use std::sync::Arc;
+﻿use std::net::SocketAddr;
+use std::sync::Arc;
 use hyper_util::rt::TokioIo;
 
 use tokio::{
@@ -36,6 +37,8 @@ pub(crate) mod pipeline;
 mod scope;
 mod server;
 
+const DEFAULT_PORT: u16 = 7878;
+
 /// The web application used to configure the HTTP pipeline, and routes.
 ///
 /// # Examples
@@ -44,7 +47,7 @@ mod server;
 ///
 ///#[tokio::main]
 ///async fn main() -> std::io::Result<()> {
-///    let mut app = App::build("127.0.0.1:7878").await?;
+///    let mut app = App::new().bind("127.0.0.1:8080");
 ///    
 ///    app.run().await
 ///}
@@ -55,12 +58,61 @@ pub struct App {
 }
 
 struct Connection {
-    tcp_listener: TcpListener,
-    shutdown_signal: broadcast::Receiver<()>,
-    shutdown_sender: broadcast::Sender<()>
+    socket: SocketAddr
+}
+
+impl Default for Connection {
+    fn default() -> Self {
+        let socket = SocketAddr::from(([127, 0, 0, 1], DEFAULT_PORT));
+        Self { socket }
+    }
+}
+
+impl Connection {
+    fn new(socket: &str) -> Self {
+        if let Ok(socket) = socket.parse::<SocketAddr>() {
+            Self { socket }    
+        } else { 
+            Self::default()
+        }
+    }
+}
+
+impl Default for App {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl App {
+    /// Initializes a new instance of the `App` which will be bound to the 127.0.0.1:7878 socket by default.
+    /// 
+    ///# Examples
+    /// ```no_run
+    /// use volga::App;
+    ///
+    /// let app = App::new();
+    /// ```
+    pub fn new() -> Self {
+        Self {
+            pipeline:PipelineBuilder::new(),
+            connection: Default::default()
+        }
+    }
+
+    /// Binds the `App` to the specified `socket` address.
+    /// 
+    ///# Examples
+    /// ```no_run
+    ///use volga::App;
+    ///
+    ///let app = App::new().bind("127.0.0.1:7878");
+    /// ```
+    pub fn bind(mut self, socket: &str) -> Self {
+        self.connection = Connection::new(socket);
+        self
+    }
+    
     /// Initializes a new instance of the `App` on specified `socket`.
     /// 
     ///# Examples
@@ -69,38 +121,26 @@ impl App {
     ///
     ///#[tokio::main]
     ///async fn main() -> std::io::Result<()> {
-    ///    let mut app = App::build("127.0.0.1:7878").await?;
+    ///    let app = App::build("127.0.0.1:7878").await?;
     ///    
     ///    app.run().await
     ///}
     /// ```
+    #[deprecated(note = "This method is obsolete, use `App::new()` or `App::new().bind()` instead.")]
     pub async fn build(socket: &str) -> io::Result<App> {
         if socket.is_empty() {
             return Err(Error::new(InvalidData, "An empty socket has been provided."));
         }
-
-        let tcp_listener = TcpListener::bind(socket).await?;
-        let (shutdown_sender, shutdown_receiver) = broadcast::channel::<()>(1);
-
-        Self::subscribe_for_ctrl_c_signal(&shutdown_sender);
-        
-        let connection = Connection { 
-            tcp_listener, 
-            shutdown_sender, 
-            shutdown_signal: shutdown_receiver
-        };
         
         let server = Self {
-            connection,
+            connection: Connection::new(socket),
             pipeline:PipelineBuilder::new()
         };
-
-        println!("Start listening: {socket}");
         
         Ok(server)
     }
 
-    /// Runs the Web Server
+    /// Runs the `App`
     pub async fn run(mut self) -> io::Result<()> {
         #[cfg(feature = "middleware")]
         {
@@ -108,18 +148,25 @@ impl App {
             self.use_endpoints();
         }
 
-        let connection = &mut self.connection;
+        let socket = self.connection.socket;
+        let tcp_listener = TcpListener::bind(socket).await?;
+        println!("Start listening: {socket}");
+        
+        let (shutdown_sender, mut shutdown_signal) = broadcast::channel::<()>(1);
+        
+        Self::subscribe_for_ctrl_c_signal(&shutdown_sender);
+        
         let pipeline = Arc::new(self.pipeline.build());
         
         loop {
             tokio::select! {
-                Ok((stream, _)) = connection.tcp_listener.accept() => {
+                Ok((stream, _)) = tcp_listener.accept() => {
                     let pipeline = pipeline.clone();
                     let io = TokioIo::new(stream);
                     
                     tokio::spawn(Self::handle_connection(io, pipeline));
                 }
-                _ = connection.shutdown_signal.recv() => {
+                _ = shutdown_signal.recv() => {
                     println!("Shutting down server...");
                     break;
                 }
@@ -127,16 +174,6 @@ impl App {
         }
 
         Ok(())
-    }
-
-    /// Gracefully shutdown the server
-    pub fn shutdown(&self) {
-        match self.connection.shutdown_sender.send(()) {
-            Ok(_) => (),
-            Err(err) => {
-                eprintln!("Failed to send shutdown the server: {}", err);
-            }
-        };
     }
 
     #[cfg(feature = "middleware")]
@@ -178,5 +215,40 @@ impl App {
         let scope = Scope::new(pipeline);
         
         server.serve(scope).await;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::net::SocketAddr;
+    use crate::App;
+    use crate::app::Connection;
+
+    #[test]
+    fn it_creates_connection_with_default_socket() {
+        let connection = Connection::default();
+
+        assert_eq!(connection.socket, SocketAddr::from(([127, 0, 0, 1], 7878)));
+    }
+
+    #[test]
+    fn it_creates_connection_with_specified_socket() {
+        let connection = Connection::new("127.0.0.1:5000");
+
+        assert_eq!(connection.socket, SocketAddr::from(([127, 0, 0, 1], 5000)));
+    }
+    
+    #[test]
+    fn it_creates_app_with_default_socket() {
+        let app = App::new();
+        
+        assert_eq!(app.connection.socket, SocketAddr::from(([127, 0, 0, 1], 7878)));
+    }
+
+    #[test]
+    fn it_binds_app_to_socket() {
+        let app = App::new().bind("127.0.0.1:5001");
+
+        assert_eq!(app.connection.socket, SocketAddr::from(([127, 0, 0, 1], 5001)));
     }
 }

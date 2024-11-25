@@ -1,7 +1,7 @@
 # Volga
 Fast, Easy, and very flexible Web Framework for Rust based on [Tokio](https://tokio.rs/) runtime and [hyper](https://hyper.rs/) for fun and painless microservices crafting.
 
-[![latest](https://img.shields.io/badge/latest-0.3.2-blue)](https://crates.io/crates/volga)
+[![latest](https://img.shields.io/badge/latest-0.3.3-blue)](https://crates.io/crates/volga)
 [![latest](https://img.shields.io/badge/rustc-1.80+-964B00)](https://crates.io/crates/volga)
 [![License: MIT](https://img.shields.io/badge/License-MIT-violet.svg)](https://github.com/RomanEmreis/volga/blob/main/LICENSE)
 [![Build](https://github.com/RomanEmreis/volga/actions/workflows/rust.yml/badge.svg)](https://github.com/RomanEmreis/volga/actions/workflows/rust.yml)
@@ -19,7 +19,7 @@ Fast, Easy, and very flexible Web Framework for Rust based on [Tokio](https://to
 ### Dependencies
 ```toml
 [dependencies]
-volga = "0.3.2"
+volga = "0.3.3"
 tokio = "1.41.1"
 ```
 ### Simple asynchronous request handler:
@@ -29,7 +29,7 @@ use volga::*;
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
     // Start the server
-    let mut app = App::build("127.0.0.1:7878").await?;
+    let mut app = App::new();
 
     // Example of asynchronous request handler
     app.map_get("/hello/{name}", |req| async move {

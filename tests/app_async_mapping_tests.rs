@@ -3,7 +3,7 @@
 #[tokio::test]
 async fn it_maps_to_get_request() {
     tokio::spawn(async {
-        let mut app = App::build("127.0.0.1:7877").await?;
+        let mut app = App::new().bind("127.0.0.1:7877");
         app.map_get("/test", |_req| async {
             Results::text("Pass!")
         });
@@ -26,7 +26,7 @@ async fn it_maps_to_get_request() {
 #[tokio::test]
 async fn it_maps_to_post_request() {
     tokio::spawn(async {
-        let mut app = App::build("127.0.0.1:7876").await?;
+        let mut app = App::new().bind("127.0.0.1:7876");
         app.map_post("/test", |_req| async {
             Results::text("Pass!")
         });
@@ -49,7 +49,7 @@ async fn it_maps_to_post_request() {
 #[tokio::test]
 async fn it_maps_to_put_request() {
     tokio::spawn(async {
-        let mut app = App::build("127.0.0.1:7875").await?;
+        let mut app = App::new().bind("127.0.0.1:7875");
         app.map_put("/test", |_req| async {
             Results::text("Pass!")
         });
@@ -72,7 +72,7 @@ async fn it_maps_to_put_request() {
 #[tokio::test]
 async fn it_maps_to_patch_request() {
     tokio::spawn(async {
-        let mut app = App::build("127.0.0.1:7874").await?;
+        let mut app = App::new().bind("127.0.0.1:7874");
         app.map_patch("/test", |_req| async {
             Results::text("Pass!")
         });
@@ -95,7 +95,7 @@ async fn it_maps_to_patch_request() {
 #[tokio::test]
 async fn it_maps_to_delete_request() {
     tokio::spawn(async {
-        let mut app = App::build("127.0.0.1:7873").await?;
+        let mut app = App::new().bind("127.0.0.1:7873");
         app.map_delete("/test", |_req| async {
             Results::text("Pass!")
         });

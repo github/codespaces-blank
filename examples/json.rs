@@ -11,7 +11,7 @@ struct User {
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
-    let mut app = App::build("127.0.0.1:7878").await?;
+    let mut app = App::new();
 
     // Return untyped JSON
     // GET /health

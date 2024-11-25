@@ -4,7 +4,7 @@ use volga::SyncEndpointsMapping;
 #[tokio::test]
 async fn it_reads_route_params() {
     tokio::spawn(async {
-        let mut app = App::build("127.0.0.1:7889").await?;
+        let mut app = App::new().bind("127.0.0.1:7889");
 
         app.map_get("/test/{name}/{age}", |req| {
             let name: String = req.param("name")?;
@@ -34,7 +34,7 @@ async fn it_reads_route_params() {
 #[tokio::test]
 async fn it_reads_query_params() {
     tokio::spawn(async {
-        let mut app = App::build("127.0.0.1:7890").await?;
+        let mut app = App::new().bind("127.0.0.1:7890");
 
         app.map_get("/test", |req| {
             let name = req.param_str("name")?;
