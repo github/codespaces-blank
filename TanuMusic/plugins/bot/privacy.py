@@ -2,7 +2,6 @@ from pyrogram import filters
 from pyrogram.enums import ParseMode
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
-import config
 from TanuMusic import app
 from config import SUPPORT_CHAT 
 
