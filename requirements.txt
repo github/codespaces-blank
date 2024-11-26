@@ -34,7 +34,6 @@ gunicorn==22.0.0
 youtube-search
 youtube-search-python
 pornhub-api==0.3.0
-telegraph
 async_pymongo
 gpytranslate
 search_engine_parser
@@ -55,4 +54,4 @@ git+https://github.com/KurimuzonAkuma/pyrogram@dev
 git+https://github.com/yt-dlp/yt-dlp
 git+https://github.com/alexmercerind/youtube-search-python@main
 git+https://github.com/joetats/youtube_search@master
-git+https://github.com/Vivekkumar-IN/yt-dlp-youtube-oauth2
+
