@@ -156,6 +156,6 @@ async def rm_file(_, message):
 
     if exists(file):
         os.remove(file)
-        await eor(message, text=f"`{file}` has been deleted.")
+        await eor(message, text=f"{file} has been deleted.")
     else:
-        await eor(message, text=f"`{file}` doesn't exist!")
+        await eor(message, text=f"{file} doesn't exist!")
