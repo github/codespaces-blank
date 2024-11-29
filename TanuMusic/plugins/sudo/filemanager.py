@@ -23,18 +23,22 @@ def humanbytes(size):
 
 def split_limits(text, limit=MAX_MESSAGE_SIZE_LIMIT):
     """Split text into chunks that do not exceed the given limit."""
-    return [text[i : i + limit] for i in range(0, len(text), limit)]
+    return [text[i: i + limit] for i in range(0, len(text), limit)]
 
 
 async def eor(msg: Message, **kwargs):
     """Edit or reply to a message."""
-    func = (
-        (msg.edit_text if msg.from_user.is_self else msg.reply)
-        if msg.from_user
-        else msg.reply
-    )
-    spec = getfullargspec(func.__wrapped__).args
-    return await func(**{k: v for k, v in kwargs.items() if k in spec})
+    if msg.from_user and msg.from_user.is_self:
+        func = msg.edit_text
+    else:
+        func = msg.reply
+
+    # Ensure we only pass valid arguments
+    spec = getfullargspec(func).args
+    valid_kwargs = {k: v for k, v in kwargs.items() if k in spec}
+
+    # Call the function with await
+    return await func(**valid_kwargs)
 
 
 async def capture_err(func):
@@ -45,7 +49,8 @@ async def capture_err(func):
         except Exception as e:
             error_feedback = split_limits(str(e))
             for feedback in error_feedback:
-                await message.reply(feedback)
+                if isinstance(message, Message):
+                    await message.reply(feedback)
             raise e
     return wrapper
 
