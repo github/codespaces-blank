@@ -50,7 +50,7 @@ impl PipelineBuilder {
 
     #[cfg(feature = "middleware")]
     pub(super) fn has_middleware_pipeline(&self) -> bool {
-        self.middlewares.is_empty()
+        !self.middlewares.is_empty()
     }
 
     #[cfg(feature = "middleware")]

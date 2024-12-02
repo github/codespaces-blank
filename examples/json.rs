@@ -1,9 +1,7 @@
 ﻿use serde::{Deserialize, Serialize};
-use volga::{App, ok, AsyncEndpointsMapping, Payload, Params};
+use volga::{App, ok, Router, Json};
 
-#[derive(Deserialize)]
-#[derive(Serialize)]
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 struct User {
     name: String,
     age: i32
@@ -15,14 +13,13 @@ async fn main() -> std::io::Result<()> {
 
     // Return untyped JSON
     // GET /health
-    app.map_get("/health", |_req| async {
+    app.map_get("/health", || async {
         ok!({ "status": "healthy" }) // { status: "healthy" }
     });
     
     // Return strongly typed JSON
     // GET /user/John
-    app.map_get("/user/{name}", |req| async move {
-        let name: String = req.param("name")?; 
+    app.map_get("/user/{name}", |name: String| async move {
         let user: User = User {
             name,
             age: 35
@@ -34,9 +31,7 @@ async fn main() -> std::io::Result<()> {
     // Read JSON body
     // POST /user
     // { name: "John", age: 35 }
-    app.map_post("/user", |req| async move {
-        let user: User = req.payload().await?;
-
+    app.map_post("/user", |user: Json<User>| async move {
         ok!("User payload: {:?}", user)
     });
 

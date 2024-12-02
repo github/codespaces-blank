@@ -1,8 +1,9 @@
 ﻿use volga::{
     App,
+    Router,
     ok,
     headers,
-    AsyncEndpointsMapping,
+    Headers,
     Results,
     ResponseContext
 };
@@ -11,14 +12,24 @@
 async fn main() -> std::io::Result<()> {
     let mut app = App::new();
 
-    app.map_get("/hello", |_req| async move {
+    // Read request headers
+    app.map_get("/hi", |headers: Headers|async move { 
+        let request_headers = headers.into_inner();
+        let api_key = request_headers.get("x-api-key").unwrap();
+        
+        ok!(api_key.to_str().unwrap())
+    });
+    
+    // Respond with headers
+    app.map_get("/hello", || async {
         ok!("Hello World!", [
            ("x-api-key", "some api key"),
            ("Content-Type", "text/plain")
        ])
     });
 
-    app.map_get("/hello-again", |_req| async move {
+    // Respond with headers using headers! macro
+    app.map_get("/hello-again", || async {
         let headers = headers![
             ("x-api-key", "some api key"),
             ("Content-Type", "text/plain")

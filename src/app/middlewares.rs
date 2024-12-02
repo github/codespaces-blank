@@ -1,14 +1,20 @@
-﻿use std::sync::Arc;
-use futures_util::future::BoxFuture;
-use crate::{HttpContext, HttpResult, Results};
+﻿use std::future::Future;
+use std::sync::Arc;
 
-pub mod mapping;
+use futures_util::future::BoxFuture;
+
+use crate::{
+    App, 
+    HttpContext, 
+    HttpResult, 
+    Results
+};
 
 pub type Next = Arc<dyn Fn(HttpContext) -> BoxFuture<'static, HttpResult> + Send + Sync>;
-type Middleware = Arc<dyn Fn(HttpContext, Next) -> BoxFuture<'static, HttpResult> + Send + Sync>;
+type MiddlewareFn = Arc<dyn Fn(HttpContext, Next) -> BoxFuture<'static, HttpResult> + Send + Sync>;
 
 pub(crate) struct Middlewares {
-    pipeline: Vec<Middleware>
+    pipeline: Vec<MiddlewareFn>
 }
 
 impl Middlewares {
@@ -36,7 +42,7 @@ impl Middlewares {
         });
 
         for mw in self.pipeline.iter().rev().skip(1) {
-            let current_mw: Middleware = mw.clone();
+            let current_mw: MiddlewareFn = mw.clone();
             let prev_next: Next = next.clone();
 
             next = Arc::new(move |ctx| {
@@ -48,6 +54,75 @@ impl Middlewares {
             });
         }
         Some(next)
+    }
+}
+
+/// Declares a set of methods that help to add a middleware handler to the application request pipeline
+/// 
+/// # Examples
+/// ```no_run
+///use volga::{App, Middleware, Results};
+///
+///#[tokio::main]
+///async fn main() -> std::io::Result<()> {
+///    let mut app = App::new();
+///
+///    // Middleware 2
+///    app.use_middleware(|ctx, next| async move {
+///        // do something...
+///        let response = next(ctx).await;
+///        // do something...
+///        response
+///    });
+/// 
+///    // Middleware 2
+///    app.use_middleware(|ctx, next| async move {
+///        next(ctx).await
+///    });
+///
+///    app.run().await
+///}
+/// ```
+pub trait Middleware {
+    /// Adds a middleware handler to the application request pipeline
+    /// 
+    /// # Examples
+    /// ```no_run
+    /// use volga::{App, Middleware, Results};
+    ///
+    ///# #[tokio::main]
+    ///# async fn main() -> std::io::Result<()> {
+    /// let mut app = App::new();
+    /// 
+    /// app.use_middleware(|ctx, next| async move {
+    ///     next(ctx).await
+    /// });
+    ///# app.run().await
+    ///# }
+    /// ```
+    fn use_middleware<F, Fut>(&mut self, middleware: F)
+    where
+        F: Fn(HttpContext, Next) -> Fut + Send + Sync + 'static,
+        Fut: Future<Output = HttpResult> + Send;
+}
+
+impl Middleware for App {
+    fn use_middleware<F, Fut>(&mut self, middleware: F)
+    where
+        F: Fn(HttpContext, Next) -> Fut + Send + Sync + 'static,
+        Fut: Future<Output = HttpResult> + Send,
+    {
+        let middleware = Arc::new(middleware);
+        let mw = Arc::new(move |ctx: HttpContext, next: Next| {
+            let middleware = middleware.clone(); // cloning for each invocation
+            Box::pin(async move {
+                // Here, middleware() can be invoked repeatedly because it’s wrapped in an Arc and cloned.
+                middleware(ctx, next).await
+            }) as BoxFuture<HttpResult>
+        });
+
+        let middlewares = self.middlewares_mut();
+        middlewares.pipeline.push(mw);
     }
 }
 

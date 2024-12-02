@@ -1,6 +1,8 @@
 ﻿use std::collections::HashMap;
 use crate::app::endpoints::handlers::RouteHandler;
 
+pub(crate) type PathArguments = Vec<(String, String)>;
+
 pub(super) enum Route {
     Static(HashMap<String, Route>),
     Dynamic(HashMap<String, Route>),
@@ -9,7 +11,7 @@ pub(super) enum Route {
 
 pub(super) struct RouteParams<'route> {
     pub(super) route: &'route Route,
-    pub(super) params: HashMap<String, String>
+    pub(super) params: PathArguments
 }
 
 impl Route {
@@ -51,7 +53,7 @@ impl Route {
 
     pub(super) fn find(&self, path_segments: &[String]) -> Option<RouteParams> {
         let mut current = Some(self);
-        let mut params: HashMap<String, String> = HashMap::new();
+        let mut params = Vec::new();
 
         for (index, segment) in path_segments.iter().enumerate() {
             let is_last = index == path_segments.len() - 1;
@@ -67,7 +69,7 @@ impl Route {
                             .filter(|(key, _)| Self::is_dynamic_segment(key))
                             .map(|(key, route)| {
                                 if let Some(param_name) = key.strip_prefix('{').and_then(|k| k.strip_suffix('}')) {
-                                    params.insert(String::from(param_name), segment.clone());
+                                    params.push((param_name.to_string(), segment.clone()));
                                 }
                                 route
                             })
@@ -108,14 +110,15 @@ impl Route {
 mod tests {
     use std::collections::HashMap;
     use std::sync::Arc;
-    use crate::{ok, HttpRequest};
-    use crate::app::endpoints::handlers::AsyncHandler;
+    
+    use crate::ok;
+    use crate::app::endpoints::handlers::Func;
     use crate::app::endpoints::route::Route;
 
     #[test]
     fn it_inserts_and_finds_route() {
-        let handler = |_req: HttpRequest| async { ok!() };
-        let handler = Arc::new(AsyncHandler(handler));
+        let handler = || async { ok!() };
+        let handler = Arc::new(Func::new(handler));
         
         let path = ["test".into()];
         
@@ -129,8 +132,8 @@ mod tests {
 
     #[test]
     fn it_inserts_and_finds_route_with_params() {
-        let handler = |_req: HttpRequest| async { ok!() };
-        let handler = Arc::new(AsyncHandler(handler));
+        let handler = || async { ok!() };
+        let handler = Arc::new(Func::new(handler));
 
         let path = ["test".into(), "{value}".into()];
 
@@ -140,7 +143,8 @@ mod tests {
         let path = ["test".into(), "some".into()];
         
         let route_params = route.find(&path).unwrap();
-        let val = route_params.params.get("value").unwrap();
+        let param = route_params.params.first().unwrap();
+        let (_param, val) = param;
         
         assert_eq!(val, "some");
     }

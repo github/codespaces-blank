@@ -1,4 +1,4 @@
-﻿use volga::{App, AsyncEndpointsMapping, AsyncMiddlewareMapping, Results};
+﻿use volga::{App, Router, Middleware, Results};
 
 #[tokio::test]
 async fn it_adds_middleware_request() {
@@ -12,7 +12,7 @@ async fn it_adds_middleware_request() {
             Results::text("Pass!")
         });
 
-        app.map_get("/test", |_req| async {
+        app.map_get("/test", || async {
             Results::text("Unreachable!")
         });
 

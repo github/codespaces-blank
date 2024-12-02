@@ -1,6 +1,6 @@
 [package]
 name = "volga"
-version = "0.3.3"
+version = "0.4.0"
 edition = "2021"
 rust-version = "1.80.0"
 authors = ["Roman Emreis <roman.emreis@outlook.com>"]
@@ -24,52 +24,34 @@ tokio = { version = "1.41.1", features = ["full"] }
 tokio-util = "0.7.12"
 serde_json = "1.0.133"
 serde = { version = "1.0.215", features = ["derive"] }
+serde_urlencoded = "0.7.1"
 
 [dev-dependencies]
 reqwest = { version = "0.12.9", features = ["blocking", "json", "http2"] }
 
 [features]
-# Default HTTP/1 only server with async endpoints mapping
-default = ["http1", "async", "middleware"]
-# HTTP/1 and HTTP/2 server with sync and async endpoints mappings
-full = ["http1", "http2", "async", "sync", "middleware"]
+# Default HTTP/1 only server
+default = ["http1", "middleware"]
+# HTTP/1 and HTTP/2 server
+full = ["http1", "http2", "middleware"]
 
 # Mimimal HTTP/1
-mini = ["http1", "async"]
+mini = ["http1"]
 # Mimimal HTTP/2
-mini2 = ["http2", "async"]
+mini2 = ["http2"]
 
 http1 = ["dep:hyper", "hyper?/http1", "dep:hyper-util", "hyper-util?/http1"]
 http2 = ["dep:hyper", "hyper?/http2", "dep:hyper-util", "hyper-util?/http2"]
 
-sync = []
-async = []
 middleware = []
 
 [[test]]
-name = "app_sync_json_payload"
-required-features = ["sync"]
-
-[[test]]
-name = "app_sync_mapping_tests"
-required-features = ["sync"]
-
-[[test]]
-name = "app_sync_request_params"
-required-features = ["sync"]
-
-[[test]]
-name = "app_async_middleware_mapping_tests"
+name = "middleware_mapping_tests"
 required-features = ["middleware"]
 
 [[example]]
 name = "hello_world"
 path = "examples/hello_world.rs"
-
-[[example]]
-name = "sync_api"
-path = "examples/sync_api.rs"
-required-features = ["sync"]
 
 [[example]]
 name = "middleware"

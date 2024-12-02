@@ -1,7 +1,7 @@
 ﻿use volga::{
     App,
+    Router,
     ok,
-    AsyncEndpointsMapping
 };
 
 #[tokio::main]
@@ -10,7 +10,7 @@ async fn main() -> std::io::Result<()> {
     let mut app = App::new();
 
     // Example of asynchronous request handler
-    app.map_get("/hello", |_req| async {
+    app.map_get("/hello", || async {
         ok!("Hello World!")
     });
 

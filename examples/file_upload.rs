@@ -1,7 +1,7 @@
 ﻿use volga::{
     App,
+    Router,
     ok,
-    AsyncEndpointsMapping,
     File
 };
 
@@ -9,8 +9,8 @@
 async fn main() -> std::io::Result<()> {
     let mut app = App::new();
 
-    app.map_post("/upload", |req| async move {
-        req.to_file("examples/files/upload_test.txt").await?;
+    app.map_post("/upload", |file: File| async move {
+        file.save("examples/files/upload_test.txt").await?;
 
         ok!()
     });

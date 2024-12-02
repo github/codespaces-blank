@@ -12,7 +12,7 @@
 //! ## Example
 //! ```toml
 //! [dependencies]
-//! volga = "0.3.3"
+//! volga = "0.4.0"
 //! tokio = "1.41.1"
 //! ```
 //! ```no_run
@@ -24,8 +24,7 @@
 //!     let mut app = App::new();
 //! 
 //!     // Example of asynchronous request handler
-//!     app.map_get("/hello/{name}", |req| async move {
-//!          let name: String = req.param("name")?;
+//!     app.map_get("/hello/{name}", |name: String| async move {
 //!          ok!("Hello {}!", name)
 //!     });
 //!     
@@ -41,32 +40,21 @@ pub mod app;
 #[cfg(test)]
 pub mod test_utils;
 
-pub use crate::app::App;
+pub use crate::app::{App, router::Router, body::{BoxBody, HttpBody}};
 pub use crate::app::results::{HttpResponse, HttpResult, HttpHeaders, Results, ResponseContext};
-pub use crate::app::request::{HttpRequest, RequestParams, params::Params, cancel::Cancel};
+pub use crate::app::request::HttpRequest;
 
 #[cfg(feature = "middleware")]
 pub use crate::app::http_context::HttpContext;
 
 #[cfg(feature = "middleware")]
-pub use crate::app::middlewares::{Next, mapping::asynchronous::AsyncMiddlewareMapping};
+pub use crate::app::middlewares::{Next, Middleware};
 
-#[cfg(feature = "async")]
-pub use crate::app::endpoints::mapping::asynchronous::AsyncEndpointsMapping;
-#[cfg(feature = "sync")]
-pub use crate::app::endpoints::mapping::synchronous::SyncEndpointsMapping;
-
-#[cfg(feature = "async")]
-pub use crate::app::request::payload::Payload;
-#[cfg(feature = "sync")]
-pub use crate::app::request::payload::SyncPayload;
-
-#[cfg(feature = "async")]
-pub use crate::app::request::file::File;
-#[cfg(feature = "sync")]
-pub use crate::app::request::file::SyncFile;
-
-pub use crate::app::body::BoxBody;
-
-// Exposing shortcut for CancellationToken for convenience
-pub use tokio_util::sync::CancellationToken;
+pub use crate::app::endpoints::args::{
+    path::Path,
+    query::Query,
+    headers::{self, Header, Headers},
+    json::Json,
+    file::File,
+    cancellation_token::CancellationToken,
+};

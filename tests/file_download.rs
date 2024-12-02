@@ -1,4 +1,4 @@
-﻿use volga::{App, file, AsyncEndpointsMapping};
+﻿use volga::{App, file, Router};
 use tokio::fs::File;
 
 #[tokio::test]
@@ -6,7 +6,7 @@ async fn it_writes_file_response() {
     tokio::spawn(async {
         let mut app = App::new().bind("127.0.0.1:7897");
 
-        app.map_get("/download", |_req| async move {
+        app.map_get("/download", || async move {
             let file_name = "tests/resources/test_file.txt";
             let file = File::open(file_name).await?;
 

@@ -1,10 +1,9 @@
 ﻿use tokio::time::{interval, Duration};
-use tokio_util::sync::CancellationToken;
 use volga::{
     App,
+    Router,
     ok,
-    AsyncEndpointsMapping,
-    Cancel
+    CancellationToken
 };
 
 async fn long_running_task() {
@@ -36,9 +35,8 @@ async fn main() -> std::io::Result<()> {
     let mut app = App::new();
 
     // Example of long-running task
-    app.map_get("/long-task", |req| async move {
-        let cancellation_token = req.cancellation_token();
-        
+    app.map_get("/long-task", |cancellation_token: CancellationToken| async move {
+        let cancellation_token = cancellation_token.into_inner();
         tokio::select! {
             _ = cancellation_token.cancelled() => {
                 println!("Task was cancelled");
@@ -50,9 +48,7 @@ async fn main() -> std::io::Result<()> {
     });
 
     // Example of long-running task with spawned task
-    app.map_get("/another-long-task", |req| async move {
-        let cancellation_token = req.cancellation_token();
-
+    app.map_get("/another-long-task", |cancellation_token: CancellationToken| async move {
         let long_running_task = tokio::task::spawn(async move {
             another_long_running_task(cancellation_token.clone()).await;
         });

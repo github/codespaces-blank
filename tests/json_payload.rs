@@ -1,6 +1,5 @@
 ﻿use serde::{Deserialize, Serialize};
-use volga::{App, Results, ok, SyncPayload};
-use volga::SyncEndpointsMapping;
+use volga::{App, ok, Results, Router, Json};
 
 #[derive(Deserialize, Serialize)]
 struct User {
@@ -11,22 +10,25 @@ struct User {
 #[tokio::test]
 async fn it_reads_json_payload() {
     tokio::spawn(async {
-        let mut app = App::new().bind("127.0.0.1:7891");
+        let mut app = App::new().bind("127.0.0.1:7885");
 
-        app.map_post("/test", |req| {
-            let user: User = req.payload()?;
+        app.map_post("/test", |user: Json<User>| async move {
             let response = format!("My name is: {}, I'm {} years old", user.name, user.age);
-
+            
             Results::text(&response)
         });
 
         app.run().await
     });
-
+    
     let response = tokio::spawn(async {
         let user = User { name: String::from("John"), age: 35 };
-        let client = reqwest::Client::new();
-        client.post("http://127.0.0.1:7891/test").json(&user).send().await
+        let client = if cfg!(all(feature = "http1", not(feature = "http2"))) {
+            reqwest::Client::builder().http1_only().build().unwrap()
+        } else {
+            reqwest::Client::builder().http2_prior_knowledge().build().unwrap()
+        };
+        client.post("http://127.0.0.1:7885/test").json(&user).send().await
     }).await.unwrap().unwrap();
 
     assert!(response.status().is_success());
@@ -36,11 +38,11 @@ async fn it_reads_json_payload() {
 #[tokio::test]
 async fn it_writes_json_response() {
     tokio::spawn(async {
-        let mut app = App::new().bind("127.0.0.1:7897");
+        let mut app = App::new().bind("127.0.0.1:7886");
 
-        app.map_get("/test", |_req| {
+        app.map_get("/test", || async move {
             let user = User { name: String::from("John"), age: 35 };
-
+            
             Results::json(&user)
         });
 
@@ -53,7 +55,7 @@ async fn it_writes_json_response() {
         } else {
             reqwest::Client::builder().http2_prior_knowledge().build().unwrap()
         };
-        client.get("http://127.0.0.1:7892/test").send().await.unwrap().json::<User>().await
+        client.get("http://127.0.0.1:7886/test").send().await.unwrap().json::<User>().await
     }).await.unwrap().unwrap();
 
     assert_eq!(response.name, "John");
@@ -63,9 +65,9 @@ async fn it_writes_json_response() {
 #[tokio::test]
 async fn it_writes_json_using_macro_response() {
     tokio::spawn(async {
-        let mut app = App::new().bind("127.0.0.1:7895");
+        let mut app = App::new().bind("127.0.0.1:7893");
 
-        app.map_get("/test", |_req| {
+        app.map_get("/test", || async move {
             let user = User { name: String::from("John"), age: 35 };
 
             ok!(&user)
@@ -80,7 +82,7 @@ async fn it_writes_json_using_macro_response() {
         } else {
             reqwest::Client::builder().http2_prior_knowledge().build().unwrap()
         };
-        client.get("http://127.0.0.1:7895/test").send().await.unwrap().json::<User>().await
+        client.get("http://127.0.0.1:7893/test").send().await.unwrap().json::<User>().await
     }).await.unwrap().unwrap();
 
     assert_eq!(response.name, "John");
@@ -90,9 +92,9 @@ async fn it_writes_json_using_macro_response() {
 #[tokio::test]
 async fn it_writes_untyped_json_response() {
     tokio::spawn(async {
-        let mut app = App::new().bind("127.0.0.1:7896");
+        let mut app = App::new().bind("127.0.0.1:7894");
 
-        app.map_get("/test", |_req| {
+        app.map_get("/test", || async move {
             ok!({ "name": "John", "age": 35 })
         });
 
@@ -105,7 +107,7 @@ async fn it_writes_untyped_json_response() {
         } else {
             reqwest::Client::builder().http2_prior_knowledge().build().unwrap()
         };
-        client.get("http://127.0.0.1:7896/test").send().await.unwrap().json::<User>().await
+        client.get("http://127.0.0.1:7894/test").send().await.unwrap().json::<User>().await
     }).await.unwrap().unwrap();
 
     assert_eq!(response.name, "John");
