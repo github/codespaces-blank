@@ -9,7 +9,8 @@ use futures_util::future::{Ready, ready};
 use hyper::http::request::Parts;
 use serde::de::DeserializeOwned;
 
-use crate::app::endpoints::args::{FromPayload, Payload, PayloadType};
+use crate::app::endpoints::args::{FromPayload, FromRequestRef, Payload, PayloadType};
+use crate::HttpRequest;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Query<T>(pub T);
@@ -59,16 +60,24 @@ impl<T: DeserializeOwned> Query<T> {
     }
 }
 
+impl<T: DeserializeOwned> FromRequestRef for Query<T> {
+    #[inline]
+    fn from_request(req: &HttpRequest) -> Result<Self, Error> {
+        req.uri().query()
+            .ok_or_else(Self::missing_query_params_error)
+            .and_then(Self::from_query_str)
+    }
+}
+
 impl<T: DeserializeOwned + Send> FromPayload for Query<T> {
     type Future = Ready<Result<Self, Error>>;
 
     #[inline]
     fn from_payload(req: &Parts, _payload: Payload) -> Self::Future {
-        let result = match req.uri.query() {
-            Some(query_str) => Self::from_query_str(query_str),
-            None => Err(Self::missing_query_params_error())
-        };
-        ready(result)
+        let query = req.uri.query()
+            .ok_or_else(Self::missing_query_params_error)
+            .and_then(Self::from_query_str);
+        ready(query)
     }
 
     #[inline]

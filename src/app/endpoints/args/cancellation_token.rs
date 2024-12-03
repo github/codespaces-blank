@@ -3,12 +3,13 @@
     ops::{Deref, DerefMut}
 };
 
-use futures_util::future::{ready, Ready};
+use futures_util::future::{ok, Ready};
 use tokio_util::sync::CancellationToken as TokioCancellationToken;
 
 use hyper::http::request::Parts;
 
-use crate::app::endpoints::args::{FromPayload, Payload};
+use crate::app::endpoints::args::{FromPayload, FromRequestRef, Payload};
+use crate::HttpRequest;
 
 pub type CancellationToken = TokenGuard;
 
@@ -49,15 +50,25 @@ impl Clone for TokenGuard {
     }
 }
 
+impl FromRequestRef for TokenGuard {
+    fn from_request(req: &HttpRequest) -> Result<Self, Error> {
+        let token = req.extensions()
+            .get::<TokioCancellationToken>()
+            .cloned()
+            .unwrap_or_else(TokioCancellationToken::new);
+        Ok(TokenGuard::new(token))
+    }
+}
+
 impl FromPayload for TokenGuard {
     type Future = Ready<Result<Self, Error>>;
 
     #[inline]
     fn from_payload(req: &Parts, _: Payload) -> Self::Future {
-        let token = match req.extensions.get::<TokioCancellationToken>() {
-            Some(token) => token.clone(),
-            None => TokioCancellationToken::new(),
-        };
-        ready(Ok(TokenGuard::new(token)))
+        let token = req.extensions
+            .get::<TokioCancellationToken>()
+            .cloned()
+            .unwrap_or_else(TokioCancellationToken::new);
+        ok(TokenGuard::new(token))
     }
 }

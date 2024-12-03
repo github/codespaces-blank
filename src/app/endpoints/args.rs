@@ -32,6 +32,10 @@ pub trait FromRequest: Sized {
     fn from_request(req: HttpRequest) -> impl Future<Output = Result<Self, Error>> + Send;
 }
 
+pub trait FromRequestRef: Sized {
+    fn from_request(req: &HttpRequest) -> Result<Self, Error>;
+}
+
 pub(crate) trait FromPayload: Send + Sized {
     type Future: Future<Output = Result<Self, Error>> + Send;
     

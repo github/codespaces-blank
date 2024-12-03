@@ -3,12 +3,14 @@
     fmt::{self, Display, Formatter},
     ops::{Deref, DerefMut}
 };
+
 use std::str::FromStr;
 use futures_util::future::{ready, Ready};
 use hyper::http::request::Parts;
 use serde::de::DeserializeOwned;
-use crate::app::endpoints::args::{FromPayload, Payload, PayloadType};
+use crate::app::endpoints::args::{FromPayload, FromRequestRef, Payload, PayloadType};
 use crate::app::endpoints::route::PathArguments;
+use crate::HttpRequest;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Path<T>(pub T);
@@ -64,8 +66,21 @@ impl<T: DeserializeOwned + Send> FromPayload for Path<T> {
 
     #[inline]
     fn from_payload(req: &Parts, _payload: Payload) -> Self::Future {
-        let result = Self::from_str(req.extensions.get::<PathArguments>().unwrap());
-        ready(result)
+        let path = req.extensions
+            .get::<PathArguments>()
+            .ok_or_else(|| Error::new(InvalidData, "Arguments parse error"))
+            .and_then(|params| Self::from_str(params));
+        ready(path)
+    }
+}
+
+impl<T: DeserializeOwned + Send> FromRequestRef for Path<T> {
+    #[inline]
+    fn from_request(req: &HttpRequest) -> Result<Self, Error> {
+        req.extensions()
+            .get::<PathArguments>()
+            .ok_or_else(|| Error::new(InvalidData, "Arguments parse error"))
+            .and_then(|params| Self::from_str(params))
     }
 }
 

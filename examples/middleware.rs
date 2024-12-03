@@ -1,4 +1,5 @@
-﻿use volga::{App, Router, Middleware, ok, status};
+﻿use volga::{App, Router, Middleware, ok, status, CancellationToken};
+use volga::headers::{Header, Accept};
 
 #[tokio::main]
 #[allow(clippy::all)]
@@ -8,10 +9,13 @@ async fn main() -> std::io::Result<()> {
 
     // Example of middleware
     app.use_middleware(|ctx, next| async move {
-        if ctx.request.headers().contains_key("user-agent") {
+        let cancellation_token: CancellationToken = ctx.extract()?;
+        let user_agent: Header<Accept> = ctx.extract()?;
+        
+        if !cancellation_token.is_cancelled() && *user_agent == "*/*" {
             next(ctx).await
         } else { 
-            status!(404)
+            status!(406)
         }
     });
 

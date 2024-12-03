@@ -13,13 +13,10 @@ use hyper::{
     HeaderMap
 };
 
-use crate::app::endpoints::args::{
-    FromPayload,
-    PayloadType,
-    Payload
-};
+use crate::app::endpoints::args::{FromPayload, PayloadType, Payload, FromRequestRef};
 
 pub use extract::*;
+use crate::HttpRequest;
 
 pub mod extract;
 
@@ -52,6 +49,7 @@ pub trait FromHeaders {
     fn from_headers(headers: &HeaderMap) -> &HeaderValue;
 }
 
+/// Wraps a `HeaderValue`
 pub struct Header<T: FromHeaders> {
     value: HeaderValue,
     _marker: PhantomData<T>
@@ -100,6 +98,13 @@ impl FromPayload for Headers {
     #[inline]
     fn payload_type() -> PayloadType {
         PayloadType::Headers
+    }
+}
+
+impl<T: FromHeaders + Send> FromRequestRef for Header<T> {
+    fn from_request(req: &HttpRequest) -> Result<Self, Error> {
+        let header_value = T::from_headers(req.headers());
+        Ok(Header::new(header_value))
     }
 }
 
