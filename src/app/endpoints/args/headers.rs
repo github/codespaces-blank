@@ -19,6 +19,8 @@ use crate::app::endpoints::args::{
     Payload
 };
 
+pub use extract::*;
+
 pub mod extract;
 
 #[derive(Debug)]

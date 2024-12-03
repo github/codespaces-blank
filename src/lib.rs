@@ -25,7 +25,7 @@
 //! 
 //!     // Example of asynchronous request handler
 //!     app.map_get("/hello/{name}", |name: String| async move {
-//!          ok!("Hello {}!", name)
+//!          ok!("Hello {name}!")
 //!     });
 //!     
 //!     app.run().await
@@ -43,18 +43,17 @@ pub mod test_utils;
 pub use crate::app::{App, router::Router, body::{BoxBody, HttpBody}};
 pub use crate::app::results::{HttpResponse, HttpResult, HttpHeaders, Results, ResponseContext};
 pub use crate::app::request::HttpRequest;
+pub use crate::app::endpoints::args::{
+    path::Path,
+    json::Json,
+    file::File,
+    query::Query,
+    headers::{self},
+    cancellation_token::CancellationToken,
+};
 
 #[cfg(feature = "middleware")]
 pub use crate::app::http_context::HttpContext;
 
 #[cfg(feature = "middleware")]
 pub use crate::app::middlewares::{Next, Middleware};
-
-pub use crate::app::endpoints::args::{
-    path::Path,
-    query::Query,
-    headers::{self, Header, Headers},
-    json::Json,
-    file::File,
-    cancellation_token::CancellationToken,
-};

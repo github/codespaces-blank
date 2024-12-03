@@ -1,7 +1,5 @@
-﻿use volga::{
-    App, Router, Headers, Header,
-    headers::extract::ContentType, ok
-};
+﻿use volga::{App, Router, ok};
+use volga::headers::{Header, Headers, ContentType};
 
 #[tokio::test]
 async fn it_reads_headers() {

@@ -33,7 +33,7 @@ async fn main() -> std::io::Result<()> {
 
     // Example of asynchronous request handler
     app.map_get("/hello/{name}", |name: String| async move {
-        ok!("Hello {}!", name)
+        ok!("Hello {name}!")
     });
     
     app.run().await

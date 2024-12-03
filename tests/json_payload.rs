@@ -69,8 +69,7 @@ async fn it_writes_json_using_macro_response() {
 
         app.map_get("/test", || async move {
             let user = User { name: String::from("John"), age: 35 };
-
-            ok!(&user)
+            ok!(user)
         });
 
         app.run().await

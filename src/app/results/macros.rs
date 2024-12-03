@@ -24,7 +24,7 @@
 /// }
 ///
 /// let health = Health { status: "healthy".into() };
-/// ok!(&health);
+/// ok!(health);
 /// ```
 /// ## Untyped JSON with custom headers
 ///```no_run
@@ -42,12 +42,17 @@
 /// ```
 #[macro_export]
 macro_rules! ok {
+    // handles ok!()
     () => {
         $crate::Results::ok()
     };
+    
+    // handles ok!({ json })
     ({ $($json:tt)* }) => {
-        $crate::Results::json(&serde_json::json_internal!({ $($json)* }))
+        $crate::Results::json(serde_json::json_internal!({ $($json)* }))
     };
+    
+    // handles ok!({ json }, [("key", "val")])
     ({ $($json:tt)* }, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {{
         // We're not using a headers! macro here to avoid adding unnecessary use if it's not needed
         let mut headers = $crate::HttpHeaders::new();
@@ -60,9 +65,13 @@ macro_rules! ok {
             headers
         })
     }};
-    ($e:expr) => {
-        $crate::Results::json($e)
+    
+    // handles ok!(json)
+    ($var:ident) => {
+        $crate::Results::json($var)
     };
+    
+    // handles ok!(json, [("key", "val")])
     ($e:expr, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {{
         // We're not using a headers! macro here to avoid adding unnecessary use if it's not needed
         let mut headers = $crate::HttpHeaders::new();
@@ -75,8 +84,20 @@ macro_rules! ok {
             headers
         })
     }};
-    ($($arg:tt)*) => {
-        $crate::Results::json(&format!($($arg)*))
+    
+    // handles ok!("Hello {name}")
+    ($fmt:tt) => {
+        $crate::Results::json(format!($fmt))
+    };
+    
+    // handles ok!(thing.to_string()) or ok!(5 + 5)
+    ($e:expr) => {
+        $crate::Results::json($e)
+    };
+    
+    // handles ok!("Hello {}", name)
+    ($($fmt:tt)*) => {
+        $crate::Results::json(format!($($fmt)*))
     };
 }
 
@@ -175,7 +196,7 @@ macro_rules! headers {
 /// }
 /// 
 /// let error = ErrorMessage { error: "some error message".into() };
-/// status!(401, &error);
+/// status!(401, error);
 /// ```
 #[macro_export]
 macro_rules! status {
@@ -191,7 +212,7 @@ macro_rules! status {
     ($status:expr, { $($json:tt)* }) => {
         $crate::Results::json_with_status(
             hyper::StatusCode::from_u16($status).unwrap_or(hyper::StatusCode::OK), 
-            &serde_json::json_internal!({ $($json)* }))
+            serde_json::json_internal!({ $($json)* }))
     };
     ($status:expr) => {
         $crate::Results::status(
@@ -222,8 +243,19 @@ mod tests {
     #[tokio::test]
     async fn it_creates_json_ok_response() {
         let payload = TestPayload { name: "test".into() };
-        let response = ok!(&payload);
+        let response = ok!(payload);
         
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+
+        assert_eq!(String::from_utf8_lossy(body), "{\"name\":\"test\"}");
+        assert_eq!(response.headers().get("Content-Type").unwrap(), "application/json");
+    }
+
+    #[tokio::test]
+    async fn it_creates_json_from_inline_struct_ok_response() {
+        let response = ok!(TestPayload { name: "test".into() });
+
         let mut response = response.unwrap();
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
 
@@ -257,6 +289,85 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn it_creates_literal_text_ok_response() {
+        let response = ok!("test");
+
+        assert!(response.is_ok());
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+
+        assert_eq!(String::from_utf8_lossy(body), "\"test\"");
+    }
+
+    #[tokio::test]
+    async fn it_creates_expr_ok_response() {
+        let response = ok!(5 + 5);
+
+        assert!(response.is_ok());
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+
+        assert_eq!(String::from_utf8_lossy(body), "10");
+    }
+
+    #[tokio::test]
+    async fn it_creates_number_ok_response() {
+        let number = 100;
+        let response = ok!(number);
+        // this is known issue will be fixed in future releases.
+        //let response = ok!(100);
+
+        assert!(response.is_ok());
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+
+        assert_eq!(String::from_utf8_lossy(body), "100");
+    }
+
+    #[tokio::test]
+    async fn it_creates_boolean_ok_response() {
+        let response = ok!(true);
+
+        assert!(response.is_ok());
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+
+        assert_eq!(String::from_utf8_lossy(body), "true");
+    }
+
+    #[tokio::test]
+    async fn it_creates_char_ok_response() {
+        let ch = 'a';
+        let response = ok!(ch);
+        // this is known issue will be fixed in future releases.
+        //let response = ok!('a');
+
+        assert!(response.is_ok());
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+
+        assert_eq!(String::from_utf8_lossy(body), "\"a\"");
+    }
+
+    #[tokio::test]
+    async fn it_creates_array_ok_response() {
+        let vec = vec![1,2,3];
+        let response = ok!(vec);
+
+        assert!(response.is_ok());
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+
+        assert_eq!(String::from_utf8_lossy(body), "[1,2,3]");
+    }
+
+    #[tokio::test]
     async fn it_creates_formatted_text_ok_response() {
         let text = "test";
         let response = ok!("This is text: {}", text);
@@ -269,18 +380,18 @@ mod tests {
         assert_eq!(String::from_utf8_lossy(body), "\"This is text: test\"");
     }
 
-    //#[tokio::test]
-    //async fn it_creates_interpolated_text_ok_response() {
-    //    let text = "test";
-    //    let response = ok!("This is text: {text}");
-//
-    //    assert!(response.is_ok());
-//
-    //    let mut response = response.unwrap();
-    //    let body = &response.body_mut().collect().await.unwrap().to_bytes();
-//
-    //    assert_eq!(String::from_utf8_lossy(body), "\"This is text: test\"");
-    //}
+    #[tokio::test]
+    async fn it_creates_interpolated_text_ok_response() {
+        let text = "test";
+        let response = ok!("This is text: {text}");
+
+        assert!(response.is_ok());
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+
+        assert_eq!(String::from_utf8_lossy(body), "\"This is text: test\"");
+    }
     
     #[tokio::test]
     async fn it_creates_empty_ok_response() {
@@ -357,7 +468,7 @@ mod tests {
     #[tokio::test]
     async fn it_creates_200_with_json_response() {
         let payload = TestPayload { name: "test".into() };
-        let response = status!(200, &payload);
+        let response = status!(200, payload);
 
         assert!(response.is_ok());
 
@@ -407,7 +518,7 @@ mod tests {
     #[tokio::test]
     async fn it_creates_400_with_json_response() {
         let payload = TestPayload { name: "test".into() };
-        let response = status!(400, &payload);
+        let response = status!(400, payload);
 
         assert!(response.is_ok());
 
@@ -468,7 +579,7 @@ mod tests {
     #[tokio::test]
     async fn it_creates_401_response_with_json_body() {
         let payload = TestPayload { name: "test".into() };
-        let response = status!(401, &payload);
+        let response = status!(401, payload);
 
         assert!(response.is_ok());
 
@@ -517,7 +628,7 @@ mod tests {
     #[tokio::test]
     async fn it_creates_403_response_with_json_body() {
         let payload = TestPayload { name: "test".into() };
-        let response = status!(403, &payload);
+        let response = status!(403, payload);
         
         assert!(response.is_ok());
 
@@ -584,7 +695,7 @@ mod tests {
     #[tokio::test]
     async fn in_creates_json_response_with_custom_headers() {
         let payload = TestPayload { name: "test".into() };
-        let response = ok!(&payload, [
+        let response = ok!(payload, [
             ("x-api-key", "some api key"),
             ("x-req-id", "some req id"),
         ]);

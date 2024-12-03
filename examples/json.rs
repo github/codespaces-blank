@@ -24,8 +24,7 @@ async fn main() -> std::io::Result<()> {
             name,
             age: 35
         };
-
-        ok!(&user) // { name: "John", age: 35 }
+        ok!(user) // { name: "John", age: 35 }
     });
     
     // Read JSON body

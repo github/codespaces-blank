@@ -3,9 +3,14 @@
     Router,
     ok,
     headers,
-    Headers,
     Results,
     ResponseContext
+};
+use volga::headers::{
+    Header, 
+    Headers, 
+    Accept,
+    ContentLength
 };
 
 #[tokio::main]
@@ -13,11 +18,21 @@ async fn main() -> std::io::Result<()> {
     let mut app = App::new();
 
     // Read request headers
-    app.map_get("/hi", |headers: Headers|async move { 
+    app.map_get("/api-key", |headers: Headers| async move { 
         let request_headers = headers.into_inner();
-        let api_key = request_headers.get("x-api-key").unwrap();
-        
-        ok!(api_key.to_str().unwrap())
+        let api_key = request_headers.get("x-api-key")
+            .unwrap()
+            .to_str()
+            .unwrap();
+        ok!(api_key)
+    });
+    
+    app.map_get("/accept", |accept: Header<Accept>| async move { 
+        ok!("{accept}")
+    });
+
+    app.map_get("/content-length", |content_length: Header<ContentLength>| async move {
+        ok!(content_length.to_string())
     });
     
     // Respond with headers

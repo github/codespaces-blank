@@ -1,18 +1,26 @@
-﻿use crate::app::body::{BoxBody, HttpBody};
-use std::collections::HashMap;
-use tokio::fs::File;
-use tokio::io;
+﻿use std::collections::HashMap;
+
+use crate::app::body::{BoxBody, HttpBody};
+
+use tokio::{io, fs::File};
+
 use bytes::Bytes;
+
 use serde::Serialize;
-use hyper::{Response, StatusCode};
-use hyper::header::{HeaderName, HeaderValue};
-use hyper::http::response::Builder;
+
+use hyper::{
+    header::{HeaderName, HeaderValue},
+    http::response::Builder,
+    Response,
+    StatusCode
+};
 use hyper::header::{ 
     CONTENT_DISPOSITION,
     TRANSFER_ENCODING,
     CONTENT_TYPE,
     SERVER
 };
+
 use mime::{
     APPLICATION_OCTET_STREAM,
     APPLICATION_JSON,
@@ -72,11 +80,11 @@ impl Results {
 
     /// Produces an `OK 200` response with the `JSON` body.
     #[inline]
-    pub fn json<T>(content: &T) -> HttpResult
-    where T:
-        ?Sized + Serialize
+    pub fn json<T>(content: T) -> HttpResult
+    where 
+        T: Serialize
     {
-        let content = serde_json::to_vec(content)?;
+        let content = serde_json::to_vec(&content)?;
         Self::status(
             StatusCode::OK,
             APPLICATION_JSON.as_ref(),
@@ -85,11 +93,11 @@ impl Results {
 
     /// Produces a response with `StatusCode` the `JSON` body.
     #[inline]
-    pub fn json_with_status<T>(status: StatusCode, content: &T) -> HttpResult
-    where T:
-        ?Sized + Serialize
+    pub fn json_with_status<T>(status: StatusCode, content: T) -> HttpResult
+    where 
+        T: Serialize
     {
-        let content = serde_json::to_vec(content)?;
+        let content = serde_json::to_vec(&content)?;
         Self::status(
             status,
             APPLICATION_JSON.as_ref(),
@@ -332,7 +340,7 @@ mod tests {
     #[tokio::test]
     async fn it_creates_json_response() {
         let payload = TestPayload { name: "test".into() };
-        let mut response = Results::json(&payload).unwrap();
+        let mut response = Results::json(payload).unwrap();
 
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
         
@@ -344,7 +352,7 @@ mod tests {
     #[tokio::test]
     async fn it_creates_json_response_with_custom_status() {
         let payload = TestPayload { name: "test".into() };
-        let mut response = Results::json_with_status(StatusCode::NOT_FOUND, &payload).unwrap();
+        let mut response = Results::json_with_status(StatusCode::NOT_FOUND, payload).unwrap();
 
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
         
