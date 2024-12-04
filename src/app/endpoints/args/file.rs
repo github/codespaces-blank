@@ -1,24 +1,40 @@
-﻿use std::io::{Error, ErrorKind::InvalidInput};
-use std::path::Path;
+﻿//! Extractors for file stream
 
 use bytes::Bytes;
-
 use futures_util::future::BoxFuture;
 use http_body_util::BodyExt;
-
-use hyper::http::request::Parts;
-use hyper::body::{Body, Incoming};
-
 use tokio::io::{AsyncWriteExt, BufWriter};
+
+use std::{
+    io::{Error, ErrorKind::InvalidInput},
+    path::Path
+};
+
+use hyper::{
+    body::{Body, Incoming},
+    http::request::Parts
+};
 
 use crate::app::endpoints::args::{
     FromPayload,
-    Payload, 
-    PayloadType
+    Payload,
+    Source
 };
 
+/// See [`FileStream<B>`] for more details.
 pub type File = FileStream<Incoming>;
 
+/// Describes a single file stream
+/// 
+/// # Example
+/// ```no_run
+/// use volga::{HttpResult, File, ok};
+///
+/// async fn handle(file: File) -> HttpResult {
+///     file.save("example.txt").await?;        
+///     ok!("File saved!")
+/// }
+/// ```
 pub struct FileStream<B: Body<Data = Bytes> + Unpin> {
     stream: B
 }
@@ -28,6 +44,17 @@ impl<B: Body<Data = Bytes> + Unpin> FileStream<B> {
         Self { stream }
     }
     
+    /// Asynchronously writes a file stream to disk
+    /// # Example
+    /// ```no_run
+    /// # use volga::{HttpResult, ok};
+    /// use volga::File;
+    ///
+    /// # async fn handle(file: File) -> HttpResult {
+    /// file.save("path/to/file.txt").await?;        
+    /// # ok!("File saved!")
+    /// # }
+    /// ```
     #[inline]
     pub async fn save(self, file_path: impl AsRef<Path>) -> Result<(), Error> {
         let file = tokio::fs::File::create(file_path).await?;
@@ -51,11 +78,12 @@ impl<B: Body<Data = Bytes> + Unpin> FileStream<B> {
     }
 }
 
+/// Extracts a file stream from request body
 impl FromPayload for File {
     type Future = BoxFuture<'static, Result<Self, Error>>;
 
     #[inline]
-    fn from_payload(_req: &Parts, payload: Payload) -> Self::Future {
+    fn from_payload(_: &Parts, payload: Payload) -> Self::Future {
         Box::pin(async move {
             match payload {
                 Payload::Body(body) => {
@@ -67,8 +95,8 @@ impl FromPayload for File {
     }
 
     #[inline]
-    fn payload_type() -> PayloadType {
-        PayloadType::Body
+    fn source() -> Source {
+        Source::Body
     }
 }
 

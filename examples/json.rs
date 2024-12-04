@@ -7,6 +7,12 @@ struct User {
     age: i32
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+struct OptionalUser {
+    name: Option<String>,
+    age: Option<i32>
+}
+
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
     let mut app = App::new();
@@ -31,6 +37,13 @@ async fn main() -> std::io::Result<()> {
     // POST /user
     // { name: "John", age: 35 }
     app.map_post("/user", |user: Json<User>| async move {
+        ok!("User payload: {:?}", user)
+    });
+
+    // Read JSON body
+    // POST /user
+    // {}
+    app.map_post("/user-optional", |user: Json<OptionalUser>| async move {
         ok!("User payload: {:?}", user)
     });
 

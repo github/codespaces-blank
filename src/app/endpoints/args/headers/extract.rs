@@ -23,12 +23,13 @@ use crate::app::endpoints::args::headers::FromHeaders;
 macro_rules! define_header {
     ($(($struct_name:ident, $header_name:ident)),* $(,)?) => {
         $(
+            #[doc = concat!("See [`", stringify!($header_name), "`] for more details.")]
             pub struct $struct_name;
 
             impl FromHeaders for $struct_name {
                 #[inline]
-                fn from_headers(headers: &HeaderMap) -> &HeaderValue {
-                    &headers[$header_name]
+                fn from_headers(headers: &HeaderMap) -> Option<&HeaderValue> {
+                    headers.get($header_name)
                 }
             }
         )*

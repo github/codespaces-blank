@@ -1,4 +1,10 @@
-﻿use bytes::Buf;
+﻿//! Extractors for typed JSON data
+
+use bytes::Buf;
+use futures_util::future::BoxFuture;
+use http_body_util::BodyExt;
+use hyper::http::request::Parts;
+use serde::de::DeserializeOwned;
 
 use std::{
     io::{Error, ErrorKind::InvalidInput},
@@ -6,23 +12,33 @@ use std::{
     ops::{Deref, DerefMut}
 };
 
-use futures_util::future::BoxFuture;
-use http_body_util::BodyExt;
-
-use hyper::http::request::Parts;
-
-use serde::de::DeserializeOwned;
-
 use crate::app::endpoints::args::{
     FromPayload, 
-    Payload, 
-    PayloadType
+    Payload,
+    Source
 };
 
+/// Wraps typed JSON data
+///
+/// # Example
+/// ```no_run
+/// use volga::{HttpResult, Json, ok};
+/// use serde::Deserialize;
+///
+/// #[derive(Deserialize)]
+/// struct User {
+///     name: String,
+/// }
+///
+/// async fn handle(user: Json<User>) -> HttpResult {
+///     ok!("Hello {}", user.name)
+/// }
+/// ```
 #[derive(Debug)]
 pub struct Json<T>(pub T);
 
 impl<T> Json<T> {
+    /// Unwraps the inner `T`
     pub fn into_inner(self) -> T {
         self.0
     }
@@ -48,10 +64,12 @@ impl<T: Display> Display for Json<T> {
     }
 }
 
+/// Extracts JSON data from request body into `Json<T>`
+/// where T is deserializable `struct`
 impl<T: DeserializeOwned + Send> FromPayload for Json<T> {
     type Future = BoxFuture<'static, Result<Self, Error>>;
 
-    fn from_payload(_req: &Parts, payload: Payload) -> Self::Future {
+    fn from_payload(_: &Parts, payload: Payload) -> Self::Future {
         Box::pin(async move {
             match payload {
                 Payload::Body(body) => {
@@ -68,7 +86,7 @@ impl<T: DeserializeOwned + Send> FromPayload for Json<T> {
         })
     }
 
-    fn payload_type() -> PayloadType {
-        PayloadType::Body
+    fn source() -> Source {
+        Source::Body
     }
 }

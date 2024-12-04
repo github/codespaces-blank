@@ -1,11 +1,16 @@
-﻿use std::future::Future;
-use std::io::Error;
+﻿//! Extractors for HTTP request parts and body
 
-use hyper::body::Incoming;
-use hyper::http::request::Parts;
+use std::{io::Error, future::Future};
 
-use crate::HttpRequest;
-use crate::app::endpoints::route::PathArguments;
+use hyper::{
+    http::request::Parts,
+    body::Incoming
+};
+
+use crate::{
+    app::endpoints::route::PathArguments,
+    HttpRequest
+};
 
 pub mod path;
 pub mod query;
@@ -14,13 +19,15 @@ pub mod json;
 pub mod file;
 pub mod cancellation_token;
 
+/// Holds the payload for extractors
 pub(crate) enum Payload {
     None,
     Body(Incoming),
     Path((String, String))
 }
 
-pub(crate) enum PayloadType {
+/// Describes a data source for extractors to read from
+pub(crate) enum Source {
     None,
     Path,
     Query,
@@ -28,21 +35,27 @@ pub(crate) enum PayloadType {
     Body
 }
 
+/// Specifies extractors to read data from HTTP request
 pub trait FromRequest: Sized {
     fn from_request(req: HttpRequest) -> impl Future<Output = Result<Self, Error>> + Send;
 }
 
+/// Specifies extractors to read data from HTTP request
 pub trait FromRequestRef: Sized {
     fn from_request(req: &HttpRequest) -> Result<Self, Error>;
 }
 
+/// Specifies extractor to read data from HTTP request
+/// depending on payload's [`Source`]
 pub(crate) trait FromPayload: Send + Sized {
     type Future: Future<Output = Result<Self, Error>> + Send;
     
+    /// Extracts data from give [`Payload`]
     fn from_payload(req: &Parts, payload: Payload) -> Self::Future;
 
-    fn payload_type() -> PayloadType {
-        PayloadType::None
+    /// Returns a [`Source`] where payload should be extracted from
+    fn source() -> Source {
+        Source::None
     }
 }
 
@@ -67,12 +80,12 @@ macro_rules! define_generic_from_request {
                 let mut iter = params.iter();
                 let tuple = (
                     $(
-                    $T::from_payload(&parts, match $T::payload_type() { 
-                        PayloadType::Path => match iter.next() {
+                    $T::from_payload(&parts, match $T::source() { 
+                        Source::Path => match iter.next() {
                             Some(param) => Payload::Path(param.clone()),
                             None => Payload::None
                         },
-                        PayloadType::Body => match body.take() {
+                        Source::Body => match body.take() {
                             Some(body) => Payload::Body(body),
                             None => Payload::None
                         },

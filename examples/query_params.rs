@@ -1,10 +1,15 @@
 ﻿use std::collections::HashMap;
 use serde::Deserialize;
-use volga::{App, ok, Router, Query};
+use volga::{App, ok, Router, Query, status};
 
 #[derive(Deserialize)]
 struct User {
     name: String
+}
+
+#[derive(Deserialize)]
+struct OptionalUser {
+    name: Option<String>
 }
 
 #[tokio::main]
@@ -14,6 +19,14 @@ async fn main() -> std::io::Result<()> {
     // GET /hello?name=John
     app.map_get("/hello", |user: Query<User>| async move {
         ok!("Hello {}!", user.name)
+    });
+
+    // GET /hello-optional
+    app.map_get("/hello-optional", |user: Query<OptionalUser>| async move {
+        match &user.name { 
+            Some(name) => ok!("Hello {}!", name),
+            None => status!(400, "Missing query params")
+        }
     });
 
     // GET /hello-again?name=John
