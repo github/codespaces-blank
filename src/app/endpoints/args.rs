@@ -3,8 +3,10 @@
 use std::{io::Error, future::Future};
 
 use hyper::{
-    http::request::Parts,
-    body::Incoming
+    http::Extensions,
+    body::Incoming, 
+    Uri,
+    HeaderMap
 };
 
 use crate::{
@@ -20,10 +22,13 @@ pub mod file;
 pub mod cancellation_token;
 
 /// Holds the payload for extractors
-pub(crate) enum Payload {
+pub(crate) enum Payload<'a> {
     None,
     Body(Incoming),
-    Path((String, String))
+    Query(&'a Uri),
+    Headers(&'a HeaderMap),
+    Path(&'a (String, String)),
+    Ext(&'a Extensions)
 }
 
 /// Describes a data source for extractors to read from
@@ -32,7 +37,8 @@ pub(crate) enum Source {
     Path,
     Query,
     Headers,
-    Body
+    Body,
+    Ext
 }
 
 /// Specifies extractors to read data from HTTP request
@@ -51,7 +57,7 @@ pub(crate) trait FromPayload: Send + Sized {
     type Future: Future<Output = Result<Self, Error>> + Send;
     
     /// Extracts data from give [`Payload`]
-    fn from_payload(req: &Parts, payload: Payload) -> Self::Future;
+    fn from_payload(payload: Payload) -> Self::Future;
 
     /// Returns a [`Source`] where payload should be extracted from
     fn source() -> Source {
@@ -80,16 +86,19 @@ macro_rules! define_generic_from_request {
                 let mut iter = params.iter();
                 let tuple = (
                     $(
-                    $T::from_payload(&parts, match $T::source() { 
+                    $T::from_payload(match $T::source() {
+                        Source::None => Payload::None,
+                        Source::Query => Payload::Query(&parts.uri),
+                        Source::Headers => Payload::Headers(&parts.headers),
+                        Source::Ext => Payload::Ext(&parts.extensions),
                         Source::Path => match iter.next() {
-                            Some(param) => Payload::Path(param.clone()),
+                            Some(param) => Payload::Path(&param),
                             None => Payload::None
                         },
                         Source::Body => match body.take() {
                             Some(body) => Payload::Body(body),
                             None => Payload::None
-                        },
-                        _ => Payload::None
+                        }
                     }).await?,
                     )*    
                 );

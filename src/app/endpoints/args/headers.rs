@@ -1,18 +1,14 @@
 ﻿//! Extractors for HTTP headers
 
-use futures_util::future::{ok, Ready};
+use futures_util::future::{ok, ready, Ready};
 use std::{
     marker::PhantomData,
-    io::Error,
+    io::{Error, ErrorKind},
     fmt::{Display, Formatter},
     ops::{Deref, DerefMut}
 };
 
-use hyper::{
-    http::request::Parts,
-    http::HeaderValue,
-    HeaderMap
-};
+pub use hyper::{HeaderMap, http::HeaderValue};
 
 use crate::{
     app::endpoints::args::{FromPayload, Source, Payload, FromRequestRef},
@@ -62,7 +58,11 @@ impl Headers {
 
 /// Describes a way to extract a specific HTTP header
 pub trait FromHeaders {
+    /// Reads a [`HeaderValue`] from [`HeaderMap`]
     fn from_headers(headers: &HeaderMap) -> Option<&HeaderValue>;
+    
+    /// Returns a header type as `&str`
+    fn header_type() -> &'static str;
 }
 
 /// Typed header that wraps a [`HeaderValue`]
@@ -78,64 +78,47 @@ pub trait FromHeaders {
 /// ```
 #[derive(Debug)]
 pub struct Header<T: FromHeaders> {
-    value: Option<HeaderValue>,
+    value: HeaderValue,
     _marker: PhantomData<T>
 }
 
 impl<T: FromHeaders> Header<T> {
     /// Creates a new instance of [`Header<T>`] from [`HeaderValue`]
     pub fn new(header_value: &HeaderValue) -> Self {
-        Self { value: Some(header_value.clone()), _marker: PhantomData }
-    }
-
-    /// Creates a new instance of [`Header<T>`] with empty [`HeaderValue`]
-    pub fn empty() -> Self {
-        Self { value: None, _marker: PhantomData }
+        Self { value: header_value.clone(), _marker: PhantomData }
     }
     
     /// Unwraps the inner [`HeaderValue`]
-    pub fn into_inner(self) -> Option<HeaderValue> {
+    pub fn into_inner(self) -> HeaderValue {
         self.value
-    }
-
-    /// Converts [`Header<T>`] to `&str`
-    #[inline]
-    pub fn to_str(&self) -> &str {
-        self.value
-            .as_ref()
-            .and_then(|value| value.to_str().ok())
-            .unwrap_or("")
     }
     
     /// Parses specific [`Header<T>`] from ['HeaderMap']
     #[inline]
-    pub(super) fn from_headers_map(headers: &HeaderMap) -> Self {
+    pub(super) fn from_headers_map(headers: &HeaderMap) -> Result<Self, Error> {
         T::from_headers(headers)
+            .ok_or_else(HeaderError::header_missing::<T>)
             .map(Self::new)
-            .unwrap_or_else(Self::empty)
     }
 }
 
 impl<T: FromHeaders> Deref for Header<T> {
-    type Target = Option<HeaderValue>;
+    type Target = HeaderValue;
 
-    fn deref(&self) -> &Option<HeaderValue> {
+    fn deref(&self) -> &HeaderValue {
         &self.value
     }
 }
 
 impl<T: FromHeaders> DerefMut for Header<T> {
-    fn deref_mut(&mut self) -> &mut Option<HeaderValue> {
+    fn deref_mut(&mut self) -> &mut HeaderValue {
         &mut self.value
     }
 }
 
 impl<T: FromHeaders> Display for Header<T>  {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        match &self.value {
-            Some(val) => val.to_str().map_err(|_| std::fmt::Error)?.fmt(f),
-            None => f.write_str(""),
-        }
+        self.value.to_str().map_err(|_| std::fmt::Error)?.fmt(f)
     }
 }
 
@@ -144,9 +127,12 @@ impl FromPayload for Headers {
     type Future = Ready<Result<Self, Error>>;
 
     #[inline]
-    fn from_payload(req: &Parts, _: Payload) -> Self::Future {
-        let headers = req.headers.clone();
-        ok(Headers { inner: headers })
+    fn from_payload(payload: Payload) -> Self::Future {
+        if let Payload::Headers(headers) = payload {
+            ok(Headers { inner: headers.clone() })
+        } else {
+            unreachable!()
+        }
     }
 
     #[inline]
@@ -159,7 +145,7 @@ impl FromPayload for Headers {
 /// where T implements [`FromHeaders`] `struct`
 impl<T: FromHeaders + Send> FromRequestRef for Header<T> {
     fn from_request(req: &HttpRequest) -> Result<Self, Error> {
-        Ok(Self::from_headers_map(req.headers()))
+        Self::from_headers_map(req.headers())
     }
 }
 
@@ -169,8 +155,12 @@ impl<T: FromHeaders + Send> FromPayload for Header<T> {
     type Future = Ready<Result<Self, Error>>;
 
     #[inline]
-    fn from_payload(req: &Parts, _payload: Payload) -> Self::Future {
-        ok(Self::from_headers_map(&req.headers))
+    fn from_payload(payload: Payload) -> Self::Future {
+        if let Payload::Headers(headers) = payload {
+            ready(Self::from_headers_map(headers))
+        } else {
+            unreachable!()
+        }
     }
 
     #[inline]
@@ -179,8 +169,18 @@ impl<T: FromHeaders + Send> FromPayload for Header<T> {
     }
 }
 
+struct HeaderError;
+
+impl HeaderError {
+    #[inline]
+    fn header_missing<T: FromHeaders>() -> Error {
+        Error::new(ErrorKind::NotFound, format!("Header: `{}` not found", T::header_type()))
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    use std::ops::Deref;
     use hyper::HeaderMap;
     use hyper::http::HeaderValue;
     use crate::headers::{ContentType, Header};
@@ -190,17 +190,18 @@ mod tests {
         let mut headers = HeaderMap::new();
         headers.insert("Content-Type", HeaderValue::from_static("text/plain"));
         
-        let header: Header<ContentType> = Header::from_headers_map(&headers);
+        let header: Header<ContentType> = Header::from_headers_map(&headers).unwrap();
         
-        assert_eq!(header.to_str(), "text/plain");
+        assert_eq!(header.deref(), "text/plain");
     }
 
     #[test]
     fn it_gets_missing_header() {
         let headers = HeaderMap::new();
 
-        let header: Header<ContentType> = Header::from_headers_map(&headers);
+        let header = Header::<ContentType>::from_headers_map(&headers);
 
-        assert!(header.value.is_none());
+        assert!(header.is_err());
+        assert_eq!(header.err().unwrap().to_string(), "Header: `content-type` not found");
     }
 }

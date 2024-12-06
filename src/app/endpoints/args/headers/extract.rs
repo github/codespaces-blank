@@ -31,6 +31,11 @@ macro_rules! define_header {
                 fn from_headers(headers: &HeaderMap) -> Option<&HeaderValue> {
                     headers.get($header_name)
                 }
+                
+                #[inline]
+                fn header_type() -> &'static str {
+                    $header_name.as_str()
+                }
             }
         )*
     };

@@ -1,7 +1,7 @@
 ﻿//! Extractors for route/path segments
 
-use futures_util::future::{ready, err, Ready};
-use hyper::http::{Extensions, request::Parts};
+use futures_util::future::{ready, Ready};
+use hyper::http::Extensions;
 use serde::de::DeserializeOwned;
 
 use std::{
@@ -85,7 +85,7 @@ impl<T: DeserializeOwned> Path<T> {
     pub(super) fn from_extensions(extensions: &Extensions) -> Result<Self, Error> {
         extensions
             .get::<PathArguments>()
-            .ok_or_else(PathError::args_error)
+            .ok_or_else(PathError::args_missing)
             .and_then(|params| Self::from_slice(params))
     }
 }
@@ -96,8 +96,17 @@ impl<T: DeserializeOwned + Send> FromPayload for Path<T> {
     type Future = Ready<Result<Self, Error>>;
 
     #[inline]
-    fn from_payload(req: &Parts, _: Payload) -> Self::Future {
-        ready(Self::from_extensions(&req.extensions))
+    fn from_payload(payload: Payload) -> Self::Future {
+        if let Payload::Ext(extensions) = payload {
+            ready(Self::from_extensions(extensions))
+        } else {
+            unreachable!()
+        }
+    }
+
+    #[inline]
+    fn source() -> Source {
+        Source::Ext
     }
 }
 
@@ -115,10 +124,11 @@ impl<T: FromStr + Send> FromPayload for T {
     type Future = Ready<Result<Self, Error>>;
 
     #[inline]
-    fn from_payload(_: &Parts, payload: Payload) -> Self::Future {
-        match payload {
-            Payload::Path((_, value)) => ready(value.parse::<T>().map_err(|_| PathError::args_error())),
-            _ => err(PathError::not_supported()),
+    fn from_payload(payload: Payload) -> Self::Future {
+        if let Payload::Path((arg, value)) = payload {
+            ready(value.parse::<T>().map_err(|_| PathError::type_mismatch(arg)))
+        } else {
+            unreachable!()
         }
     }
 
@@ -134,17 +144,17 @@ struct PathError;
 impl PathError {
     #[inline]
     fn from_serde_error(err: serde::de::value::Error) -> Error {
-        Error::new(InvalidInput, err.to_string())
+        Error::new(InvalidInput, format!("Path parsing error: {}", err))
     }
 
     #[inline]
-    fn args_error() -> Error {
-        Error::new(InvalidData, "Arguments parse error")
+    fn type_mismatch(arg: &str) -> Error {
+        Error::new(InvalidData, format!("Path parsing error: argument `{arg}` type mismatch"))
     }
 
     #[inline]
-    fn not_supported() -> Error {
-        Error::new(InvalidData, "Arguments parse error")
+    fn args_missing() -> Error {
+        Error::new(InvalidData, "Path parsing error: missing arguments")
     }
 }
 

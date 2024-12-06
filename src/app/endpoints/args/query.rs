@@ -9,10 +9,7 @@ use std::{
     ops::{Deref, DerefMut}
 };
 
-use hyper::{
-    http::request::Parts,
-    Uri
-};
+use hyper::Uri;
 
 use crate::{
     app::endpoints::args::{FromPayload, FromRequestRef, Payload, Source},
@@ -96,8 +93,12 @@ impl<T: DeserializeOwned + Send> FromPayload for Query<T> {
     type Future = Ready<Result<Self, Error>>;
 
     #[inline]
-    fn from_payload(req: &Parts, _: Payload) -> Self::Future {
-        ready(Self::from_uri(&req.uri))
+    fn from_payload(payload: Payload) -> Self::Future {
+        if let Payload::Query(uri) = payload {
+            ready(Self::from_uri(uri))
+        } else {
+            unreachable!()
+        }
     }
 
     #[inline]
@@ -112,7 +113,7 @@ struct QueryError;
 impl QueryError {
     #[inline]
     fn from_serde_error(err: serde::de::value::Error) -> Error {
-        Error::new(InvalidInput, err.to_string())
+        Error::new(InvalidInput, format!("Query parsing error: {}", err))
     }
 }
 

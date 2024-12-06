@@ -1,6 +1,6 @@
 [package]
 name = "volga"
-version = "0.4.0"
+version = "0.4.1"
 edition = "2021"
 rust-version = "1.80.0"
 authors = ["Roman Emreis <roman.emreis@outlook.com>"]
@@ -15,19 +15,21 @@ keywords = ["volga", "server", "http", "web", "framework"]
 
 [dependencies]
 bytes = "1.8.0"
-futures-util = "0.3.31"
+futures-util = { version = "0.3.31", default-features = false, features = ["alloc"] }
 http-body-util = "0.1.2"
 hyper = { version = "1.5.1", features = ["server"], optional = true }
 hyper-util = { version = "0.1.10", features = ["server", "server-auto", "server-graceful", "service", "tokio"], optional = true }
 mime = "0.3.17"
-tokio = { version = "1.41.1", features = ["full"] }
+pin-project-lite = "0.2.15"
+tokio = { version = "1.42.0", features = ["full"] }
 tokio-util = "0.7.12"
+serde = "1.0.215"
 serde_json = "1.0.133"
-serde = { version = "1.0.215", features = ["derive"] }
 serde_urlencoded = "0.7.1"
 
 [dev-dependencies]
 reqwest = { version = "0.12.9", features = ["blocking", "json", "http2"] }
+serde = { version = "1.0.215", features = ["derive"] }
 
 [features]
 # Default HTTP/1 only server

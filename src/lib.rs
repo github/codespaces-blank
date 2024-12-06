@@ -12,7 +12,7 @@
 //! ## Example
 //! ```toml
 //! [dependencies]
-//! volga = "0.4.0"
+//! volga = "0.4.1"
 //! tokio = "1.41.1"
 //! ```
 //! ```no_run
@@ -23,7 +23,7 @@
 //!     // Start the server
 //!     let mut app = App::new();
 //! 
-//!     // Example of asynchronous request handler
+//!     // Example of request handler
 //!     app.map_get("/hello/{name}", |name: String| async move {
 //!          ok!("Hello {name}!")
 //!     });

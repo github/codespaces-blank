@@ -12,7 +12,7 @@ async fn main() -> std::io::Result<()> {
         let cancellation_token: CancellationToken = ctx.extract()?;
         let user_agent: Header<Accept> = ctx.extract()?;
         
-        if !cancellation_token.is_cancelled() && user_agent.to_str() == "*/*" {
+        if !cancellation_token.is_cancelled() && *user_agent == "*/*" {
             next(ctx).await
         } else { 
             status!(406)

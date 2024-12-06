@@ -1,7 +1,7 @@
 ﻿//! Extractors for file stream
 
 use bytes::Bytes;
-use futures_util::future::BoxFuture;
+use futures_util::future::{ok, Ready};
 use http_body_util::BodyExt;
 use tokio::io::{AsyncWriteExt, BufWriter};
 
@@ -10,10 +10,7 @@ use std::{
     path::Path
 };
 
-use hyper::{
-    body::{Body, Incoming},
-    http::request::Parts
-};
+use hyper::body::{Body, Incoming};
 
 use crate::app::endpoints::args::{
     FromPayload,
@@ -71,7 +68,7 @@ impl<B: Body<Data = Bytes> + Unpin> FileStream<B> {
                         break
                     }
                 },
-                Err(_) => return Err(Error::new(InvalidInput, "Unable to read a file"))
+                Err(_) => return Err(FileStreamError::read_error())
             };
         }
         writer.flush().await
@@ -80,23 +77,29 @@ impl<B: Body<Data = Bytes> + Unpin> FileStream<B> {
 
 /// Extracts a file stream from request body
 impl FromPayload for File {
-    type Future = BoxFuture<'static, Result<Self, Error>>;
+    type Future = Ready<Result<Self, Error>>;
 
     #[inline]
-    fn from_payload(_: &Parts, payload: Payload) -> Self::Future {
-        Box::pin(async move {
-            match payload {
-                Payload::Body(body) => {
-                    Ok(FileStream::new(body))
-                },
-                _ => Err(Error::new(InvalidInput, "Body has already been consumed"))
-            }
-        })
+    fn from_payload(payload: Payload) -> Self::Future {
+        if let Payload::Body(body) = payload {
+            ok(FileStream::new(body))
+        } else {
+            unreachable!()
+        }
     }
 
     #[inline]
     fn source() -> Source {
         Source::Body
+    }
+}
+
+struct FileStreamError;
+
+impl FileStreamError {
+    #[inline]
+    fn read_error() -> Error {
+        Error::new(InvalidInput, "Unable to read a file")
     }
 }
 

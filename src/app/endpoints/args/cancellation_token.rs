@@ -2,7 +2,7 @@
 
 use tokio_util::sync::CancellationToken as TokioCancellationToken;
 use futures_util::future::{ready, Ready};
-use hyper::http::{Extensions, request::Parts};
+use hyper::http::Extensions;
 
 use std::{
     io::Error,
@@ -13,6 +13,7 @@ use crate::{
     app::endpoints::args::{FromPayload, FromRequestRef, Payload},
     HttpRequest
 };
+use crate::app::endpoints::args::Source;
 
 /// See [`tokio_util::sync::CancellationToken`] for more details.
 pub type CancellationToken = TokenGuard;
@@ -88,8 +89,17 @@ impl FromPayload for TokenGuard {
     type Future = Ready<Result<Self, Error>>;
 
     #[inline]
-    fn from_payload(req: &Parts, _: Payload) -> Self::Future {
-        ready(Self::from_extensions(&req.extensions))
+    fn from_payload(payload: Payload) -> Self::Future {
+        if let Payload::Ext(extensions) = payload {
+            ready(Self::from_extensions(extensions))
+        } else {
+            unreachable!()
+        }
+    }
+
+    #[inline]
+    fn source() -> Source {
+        Source::Ext
     }
 }
 

@@ -10,29 +10,48 @@ use volga::headers::{
     Header, 
     Headers, 
     Accept,
-    ContentLength
+    FromHeaders,
+    HeaderMap,
+    HeaderValue
 };
+
+// The `x-api-key` header
+struct ApiKey;
+
+// FromHeaders trait implementation for ApiKey header
+impl FromHeaders for ApiKey {
+    // Reading the header from request's HeaderMap 
+    fn from_headers(headers: &HeaderMap) -> Option<&HeaderValue> {
+        headers.get(Self::header_type())
+    }
+
+    // String representation of the header
+    fn header_type() -> &'static str {
+        "x-api-key"
+    }
+}
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
     let mut app = App::new();
 
-    // Read request headers
+    // Read request headers with Headers
     app.map_get("/api-key", |headers: Headers| async move { 
-        let request_headers = headers.into_inner();
-        let api_key = request_headers.get("x-api-key")
+        let api_key = headers.get("x-api-key")
             .unwrap()
             .to_str()
             .unwrap();
         ok!(api_key)
     });
     
+    // Reading header with Header<T>
     app.map_get("/accept", |accept: Header<Accept>| async move { 
         ok!("{accept}")
     });
 
-    app.map_get("/content-length", |content_length: Header<ContentLength>| async move {
-        ok!(content_length.to_string())
+    // Reading custom header
+    app.map_get("/api-key", |api_key: Header<ApiKey>| async move {
+        ok!("Received key: {}", api_key)
     });
     
     // Respond with headers
