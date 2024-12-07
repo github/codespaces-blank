@@ -16,8 +16,10 @@ use crate::{
 };
 
 pub use extract::*;
+pub use macros::custom_headers;
 
 pub mod extract;
+mod macros;
 
 /// Wraps the [`HeaderMap`] extracted from request
 ///

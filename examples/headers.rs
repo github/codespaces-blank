@@ -1,34 +1,14 @@
-﻿use volga::{
-    App,
-    Router,
-    ok,
-    headers,
-    Results,
-    ResponseContext
-};
+﻿use volga::{App, Router, Results, ResponseContext, headers, ok};
 use volga::headers::{
     Header, 
     Headers, 
     Accept,
-    FromHeaders,
-    HeaderMap,
-    HeaderValue
+    custom_headers
 };
 
 // The `x-api-key` header
-struct ApiKey;
-
-// FromHeaders trait implementation for ApiKey header
-impl FromHeaders for ApiKey {
-    // Reading the header from request's HeaderMap 
-    fn from_headers(headers: &HeaderMap) -> Option<&HeaderValue> {
-        headers.get(Self::header_type())
-    }
-
-    // String representation of the header
-    fn header_type() -> &'static str {
-        "x-api-key"
-    }
+custom_headers! {
+    (ApiKey, "x-api-key")
 }
 
 #[tokio::main]
