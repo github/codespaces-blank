@@ -1,9 +1,12 @@
 ﻿use std::io::Error;
 
-use crate::app::endpoints::handlers::RouteHandler;
-use crate::app::endpoints::args::FromRequestRef;
+use crate::app::endpoints::{
+    handlers::RouteHandler,
+    args::FromRequestRef
+};
 
 use crate::{
+    headers::{Header, FromHeaders},
     HttpRequest, 
     HttpResult
 };
@@ -35,6 +38,15 @@ impl HttpContext {
     /// ```
     pub fn extract<T: FromRequestRef>(&self) -> Result<T, Error> {
         T::from_request(&self.request)
+    }
+    
+    /// Inserts the [`Header<T>`] to HTTP request headers
+    #[inline]
+    pub fn insert_header<T: FromHeaders>(&mut self, header: Header<T>) {
+        let (name, value) = header.into_parts();
+        self.request
+            .headers_mut()
+            .insert(name, value);
     }
     
     pub(super) fn new(request: HttpRequest, handler: RouteHandler) -> Self {

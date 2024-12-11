@@ -5,12 +5,19 @@ use futures_util::future::BoxFuture;
 use crate::{HttpResult, HttpRequest};
 use crate::app::endpoints::args::FromRequest;
 
-pub(crate) type RouteHandler = Arc<dyn Handler + Send + Sync>;
+/// Represents a specific registered request handler
+pub(crate) type RouteHandler = Arc<
+    dyn Handler 
+    + Send 
+    + Sync
+>;
 
 pub(crate) trait Handler {
     fn call(&self, req: HttpRequest) -> BoxFuture<HttpResult>;
 }
 
+/// Represents a function request handler that could take different arguments
+/// that implements [`FromRequest`] trait.
 pub(crate) struct Func<F, Args>
 where
     F: GenericHandler<Args, Output = HttpResult>,
@@ -25,8 +32,10 @@ where
     F: GenericHandler<Args, Output = HttpResult>,
     Args: FromRequest
 {
-    pub(crate) fn new(func: F) -> Self {
-        Self { func, _marker: std::marker::PhantomData }
+    /// Creates a new [`Func`] wrapped into [`Arc`]
+    pub(crate) fn new(func: F) -> Arc<Self> {
+        let func = Self { func, _marker: std::marker::PhantomData };
+        Arc::new(func)
     }
 }
 
@@ -44,7 +53,8 @@ where
     }
 }
 
-
+/// Describes a generic request handler that could take 0 or N parameters of types
+/// that are implement [`FromPayload`] trait
 pub trait GenericHandler<Args>: Clone + Send + Sync + 'static {
     type Output;
     type Future: Future<Output = Self::Output> + Send;

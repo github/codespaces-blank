@@ -82,6 +82,7 @@ pin_project! {
 impl<T: DeserializeOwned + Send> Future for ExtractJsonPayloadFut<T> {
     type Output = Result<Json<T>, Error>;
 
+    #[inline]
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
         let this = self.project();
         let result = ready!(this.fut.poll(cx))

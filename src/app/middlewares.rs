@@ -1,7 +1,5 @@
-﻿use std::future::Future;
-use std::sync::Arc;
-
-use futures_util::future::BoxFuture;
+﻿use futures_util::future::BoxFuture;
+use std::{sync::Arc, future::Future};
 
 use crate::{
     App, 
@@ -10,22 +8,37 @@ use crate::{
     Results
 };
 
-pub type Next = Arc<dyn Fn(HttpContext) -> BoxFuture<'static, HttpResult> + Send + Sync>;
-type MiddlewareFn = Arc<dyn Fn(HttpContext, Next) -> BoxFuture<'static, HttpResult> + Send + Sync>;
+/// Points to the next middleware or request handler
+pub type Next = Arc<
+    dyn Fn(HttpContext) -> BoxFuture<'static, HttpResult> 
+    + Send
+    + Sync
+>;
+
+/// Point to a middleware function
+type MiddlewareFn = Arc<
+    dyn Fn(HttpContext, Next) -> BoxFuture<'static, HttpResult> 
+    + Send
+    + Sync
+>;
 
 pub(crate) struct Middlewares {
     pipeline: Vec<MiddlewareFn>
 }
 
 impl Middlewares {
+    /// Initializes a new middleware pipeline
     pub(super) fn new() -> Self {
         Self { pipeline: Vec::new() }
     }
 
+    /// Returns `true` if there are no middlewares,
+    /// otherwise `false`
     pub(crate) fn is_empty(&self) -> bool {
         self.pipeline.is_empty()
     }
 
+    /// Composes middlewares into a "Linked List" and returns head
     pub(crate) fn compose(&self) -> Option<Next> {
         if self.pipeline.is_empty() {
             return None;

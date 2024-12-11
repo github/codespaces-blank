@@ -1,11 +1,7 @@
-﻿use std::collections::HashMap;
-
-use crate::app::body::{BoxBody, HttpBody};
-
+﻿use crate::app::body::{BoxBody, HttpBody};
+use std::collections::HashMap;
 use tokio::{io, fs::File};
-
 use bytes::Bytes;
-
 use serde::Serialize;
 
 use hyper::{
@@ -203,6 +199,14 @@ impl Results {
     }
 
     #[inline]
+    pub fn status_with_headers(status: StatusCode, body: BoxBody, headers: HttpHeaders) -> HttpResult {
+        Self::create_custom_builder(headers)
+            .status(status)
+            .body(body)
+            .map_err(|_| Self::response_error())
+    }
+
+    #[inline]
     fn create_default_builder() -> Builder {
         Response::builder().header(SERVER, "Volga")
     }
@@ -239,15 +243,12 @@ impl Results {
 
     #[inline]
     fn get_error_bytes(error: Option<String>) -> Bytes {
-        if let Some(error) = error {
-            Bytes::from(error)
-        } else {
-            Bytes::new()
-        }
+        error.map_or(Bytes::new(), Bytes::from)
     }
 }
 
 impl<T: Serialize> From<ResponseContext<T>> for HttpResult {
+    #[inline]
     fn from(value: ResponseContext<T>) -> Self {
         let ResponseContext { content, headers, status } = value;
         let content = serde_json::to_vec(&content)?;

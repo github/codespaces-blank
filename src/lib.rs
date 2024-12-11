@@ -12,8 +12,8 @@
 //! ## Example
 //! ```toml
 //! [dependencies]
-//! volga = "0.4.1"
-//! tokio = "1.41.1"
+//! volga = "0.4.2"
+//! tokio = { version = "1", features = ["full"] }
 //! ```
 //! ```no_run
 //! use volga::*;
@@ -57,3 +57,6 @@ pub use crate::app::http_context::HttpContext;
 
 #[cfg(feature = "middleware")]
 pub use crate::app::middlewares::{Next, Middleware};
+
+// Re-exporting HTTP status codes from hyper/http
+pub use hyper::StatusCode;

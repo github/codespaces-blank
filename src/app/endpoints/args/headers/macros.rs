@@ -11,7 +11,7 @@
 /// ```
 #[macro_export]
 macro_rules! custom_headers {
-    ($(($struct_name:ident, $header_name:literal)),* $(,)?) => {
+    ($(($struct_name:ident, $header_name:expr)),* $(,)?) => {
         $(
             pub struct $struct_name;
 

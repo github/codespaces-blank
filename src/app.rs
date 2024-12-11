@@ -126,7 +126,6 @@ impl App {
         Self::subscribe_for_ctrl_c_signal(&shutdown_sender);
         
         let pipeline = Arc::new(self.pipeline.build());
-        
         loop {
             tokio::select! {
                 Ok((stream, _)) = tcp_listener.accept() => {
@@ -141,7 +140,6 @@ impl App {
                 }
             }
         }
-
         Ok(())
     }
 

@@ -2,14 +2,8 @@
 use volga::headers::{
     Header, 
     Headers, 
-    Accept,
-    custom_headers
+    Accept
 };
-
-// The `x-api-key` header
-custom_headers! {
-    (ApiKey, "x-api-key")
-}
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -27,11 +21,6 @@ async fn main() -> std::io::Result<()> {
     // Reading header with Header<T>
     app.map_get("/accept", |accept: Header<Accept>| async move { 
         ok!("{accept}")
-    });
-
-    // Reading custom header
-    app.map_get("/api-key", |api_key: Header<ApiKey>| async move {
-        ok!("Received key: {}", api_key)
     });
     
     // Respond with headers

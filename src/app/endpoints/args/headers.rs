@@ -8,7 +8,11 @@ use std::{
     ops::{Deref, DerefMut}
 };
 
-pub use hyper::{HeaderMap, http::HeaderValue};
+pub use hyper::{
+    HeaderMap, 
+    http::HeaderValue, 
+    header::{InvalidHeaderValue, ToStrError}
+};
 
 use crate::{
     app::endpoints::args::{FromPayload, Source, Payload, FromRequestRef},
@@ -78,7 +82,7 @@ pub trait FromHeaders {
 ///     ok!("Content-Type: {content_type}")
 /// }
 /// ```
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Header<T: FromHeaders> {
     value: HeaderValue,
     _marker: PhantomData<T>
@@ -89,10 +93,81 @@ impl<T: FromHeaders> Header<T> {
     pub fn new(header_value: &HeaderValue) -> Self {
         Self { value: header_value.clone(), _marker: PhantomData }
     }
+
+    /// Creates a new instance of [`Header<T>`] from a static string
+    /// 
+    /// # Examples
+    /// ```no_run
+    /// use volga::headers::{ContentType, Header};
+    /// 
+    /// let content_type_header = Header::<ContentType>::from_static("text/plain");
+    /// assert_eq!(*content_type_header, "text/plain");
+    /// ```
+    #[inline]
+    pub fn from_static(str: &'static str) -> Self {
+        Self { value: HeaderValue::from_static(str), _marker: PhantomData }
+    }
+    
+    /// Creates a new instance of [`Header<T>`] from `&str`
+    ///
+    /// # Examples
+    /// ```no_run
+    /// use volga::headers::{ContentType, Header};
+    ///
+    /// let content_type_header = Header::<ContentType>::from("text/plain").unwrap();
+    /// assert_eq!(*content_type_header, "text/plain");
+    /// ```
+    /// An invalid value
+    /// ```no_run
+    /// use volga::headers::{ContentType, Header};
+    /// 
+    /// let content_type_header = Header::<ContentType>::from("\n");
+    /// assert!(content_type_header.is_err())
+    /// ```
+    #[inline]
+    pub fn from(str: &str) -> Result<Self, Error> {
+        let header_value = HeaderValue::from_str(str)
+            .map_err(HeaderError::from_invalid_header_value)?;
+        Ok(Self { value: header_value, _marker: PhantomData })
+    }
+
+    /// Creates a new instance of [`Header<T>`] from a byte slice
+    /// 
+    /// # Examples
+    /// ```no_run
+    /// use volga::headers::{ContentType, Header};
+    ///
+    /// let content_type_header = Header::<ContentType>::from_bytes(b"text/plain").unwrap();
+    /// assert_eq!(*content_type_header, "text/plain");
+    /// ```
+    /// An invalid value
+    /// ```no_run
+    /// use volga::headers::{ContentType, Header};
+    /// 
+    /// let content_type_header = Header::<ContentType>::from_bytes(b"\n");
+    /// assert!(content_type_header.is_err())
+    /// ```
+    #[inline]
+    pub fn from_bytes(bytes: &[u8]) -> Result<Self, Error> {
+        let header_value = HeaderValue::from_bytes(bytes)
+            .map_err(HeaderError::from_invalid_header_value)?;
+        Ok(Self { value: header_value, _marker: PhantomData })
+    }
     
     /// Unwraps the inner [`HeaderValue`]
     pub fn into_inner(self) -> HeaderValue {
         self.value
+    }
+
+    /// Unwraps to the [`HeaderName`] as `&str` and inner [`HeaderValue`]
+    pub fn into_parts(self) -> (&'static str, HeaderValue) {
+        (T::header_type(), self.value)
+    }
+
+    /// Unwraps to the [`HeaderName`] as string tuple of header name and value
+    pub fn into_string_parts(self) -> Result<(String, String), Error> {
+        let value = self.value.to_str().map_err(HeaderError::from_to_str_error)?;
+        Ok((T::header_type().into(), value.into()))
     }
     
     /// Parses specific [`Header<T>`] from ['HeaderMap']
@@ -178,6 +253,16 @@ impl HeaderError {
     fn header_missing<T: FromHeaders>() -> Error {
         Error::new(ErrorKind::NotFound, format!("Header: `{}` not found", T::header_type()))
     }
+    
+    #[inline]
+    fn from_invalid_header_value(error: InvalidHeaderValue) -> Error {
+        Error::new(ErrorKind::InvalidData, format!("Header: {}", error))
+    }
+
+    #[inline]
+    fn from_to_str_error(error: ToStrError) -> Error {
+        Error::new(ErrorKind::InvalidData, format!("Header: {}", error))
+    }
 }
 
 #[cfg(test)]
@@ -205,5 +290,50 @@ mod tests {
 
         assert!(header.is_err());
         assert_eq!(header.err().unwrap().to_string(), "Header: `content-type` not found");
+    }
+    
+    #[test]
+    fn i_creates_header_from_bytes() {
+        let header_value_bytes = b"text/plain";
+        
+        let header = Header::<ContentType>::from_bytes(header_value_bytes).unwrap();
+        
+        assert_eq!(*header, "text/plain");
+    }
+
+    #[test]
+    fn i_creates_header_from_str() {
+        let header_value = "text/plain";
+
+        let header = Header::<ContentType>::from(header_value).unwrap();
+
+        assert_eq!(*header, "text/plain");
+    }
+
+    #[test]
+    fn i_creates_header_from_static() {
+        let header = Header::<ContentType>::from_static("text/plain");
+
+        assert_eq!(*header, "text/plain");
+    }
+    
+    #[test]
+    fn it_creates_parts() {
+        let header = Header::<ContentType>::from_static("text/plain");
+        
+        let (name, value) = header.into_parts();
+        
+        assert_eq!(name, "content-type");
+        assert_eq!(value, "text/plain");
+    }
+
+    #[test]
+    fn it_creates_string_parts() {
+        let header = Header::<ContentType>::from_static("text/plain");
+
+        let (name, value) = header.into_string_parts().unwrap();
+
+        assert_eq!(name, "content-type");
+        assert_eq!(value, "text/plain");
     }
 }

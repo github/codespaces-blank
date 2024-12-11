@@ -47,6 +47,20 @@ macro_rules! ok {
         $crate::Results::ok()
     };
     
+    // handles ok!([("key", "val")])
+    ([ $( ($key:expr, $value:expr) ),* $(,)? ]) => {{
+        // We're not using a headers! macro here to avoid adding unnecessary use if it's not needed
+        let mut headers = $crate::HttpHeaders::new();
+        $(
+            headers.insert($key.to_string(), $value.to_string());
+        )*
+        $crate::Results::status_with_headers(
+            $crate::StatusCode::OK, 
+            $crate::app::body::HttpBody::empty(),
+            headers
+        )
+    }};
+    
     // handles ok!({ json })
     ({ $($json:tt)* }) => {
         $crate::Results::json(serde_json::json_internal!({ $($json)* }))
@@ -209,21 +223,40 @@ macro_rules! status {
     (404) => {
         $crate::Results::not_found()
     };
+    
     ($status:expr, { $($json:tt)* }) => {
         $crate::Results::json_with_status(
-            hyper::StatusCode::from_u16($status).unwrap_or(hyper::StatusCode::OK), 
-            serde_json::json_internal!({ $($json)* }))
+            $crate::StatusCode::from_u16($status).unwrap_or($crate::StatusCode::OK), 
+            serde_json::json_internal!({ $($json)* })
+        )
     };
+    
     ($status:expr) => {
         $crate::Results::status(
-            hyper::StatusCode::from_u16($status).unwrap_or(hyper::StatusCode::OK), 
-            mime::TEXT_PLAIN.as_ref(), 
-            $crate::app::body::HttpBody::empty())
+            $crate::StatusCode::from_u16($status).unwrap_or($crate::StatusCode::OK), 
+            "text/plain", 
+            $crate::app::body::HttpBody::empty()
+        )
     };
+    
+    ($status:expr, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {{
+        // We're not using a headers! macro here to avoid adding unnecessary use if it's not needed
+        let mut headers = $crate::HttpHeaders::new();
+        $(
+            headers.insert($key.to_string(), $value.to_string());
+        )*
+        $crate::Results::status_with_headers(
+            $crate::StatusCode::from_u16($status).unwrap_or($crate::StatusCode::OK), 
+            $crate::app::body::HttpBody::empty(),
+            headers
+        )
+    }};
+    
     ($status:expr, $e:expr) => {
         $crate::Results::json_with_status(
-            hyper::StatusCode::from_u16($status).unwrap_or(hyper::StatusCode::OK),
-            $e)
+            $crate::StatusCode::from_u16($status).unwrap_or($crate::StatusCode::OK),
+            $e
+        )
     };
 }
 
@@ -250,6 +283,7 @@ mod tests {
 
         assert_eq!(String::from_utf8_lossy(body), "{\"name\":\"test\"}");
         assert_eq!(response.headers().get("Content-Type").unwrap(), "application/json");
+        assert_eq!(response.status(), 200);
     }
 
     #[tokio::test]
@@ -261,6 +295,7 @@ mod tests {
 
         assert_eq!(String::from_utf8_lossy(body), "{\"name\":\"test\"}");
         assert_eq!(response.headers().get("Content-Type").unwrap(), "application/json");
+        assert_eq!(response.status(), 200);
     }
 
     #[tokio::test]
@@ -273,6 +308,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
         
         assert_eq!(String::from_utf8_lossy(body), "{\"name\":\"test\"}");
+        assert_eq!(response.status(), 200);
     }
     
     #[tokio::test]
@@ -286,6 +322,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
         
         assert_eq!(String::from_utf8_lossy(body), "\"test\"");
+        assert_eq!(response.status(), 200);
     }
 
     #[tokio::test]
@@ -298,6 +335,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
 
         assert_eq!(String::from_utf8_lossy(body), "\"test\"");
+        assert_eq!(response.status(), 200);
     }
 
     #[tokio::test]
@@ -310,6 +348,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
 
         assert_eq!(String::from_utf8_lossy(body), "10");
+        assert_eq!(response.status(), 200);
     }
 
     #[tokio::test]
@@ -325,6 +364,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
 
         assert_eq!(String::from_utf8_lossy(body), "100");
+        assert_eq!(response.status(), 200);
     }
 
     #[tokio::test]
@@ -337,6 +377,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
 
         assert_eq!(String::from_utf8_lossy(body), "true");
+        assert_eq!(response.status(), 200);
     }
 
     #[tokio::test]
@@ -352,6 +393,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
 
         assert_eq!(String::from_utf8_lossy(body), "\"a\"");
+        assert_eq!(response.status(), 200);
     }
 
     #[tokio::test]
@@ -365,6 +407,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
 
         assert_eq!(String::from_utf8_lossy(body), "[1,2,3]");
+        assert_eq!(response.status(), 200);
     }
 
     #[tokio::test]
@@ -378,6 +421,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
         
         assert_eq!(String::from_utf8_lossy(body), "\"This is text: test\"");
+        assert_eq!(response.status(), 200);
     }
 
     #[tokio::test]
@@ -391,6 +435,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
 
         assert_eq!(String::from_utf8_lossy(body), "\"This is text: test\"");
+        assert_eq!(response.status(), 200);
     }
     
     #[tokio::test]
@@ -403,6 +448,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
         
         assert_eq!(body.len(), 0);
+        assert_eq!(response.status(), 200);
     }
     
     #[tokio::test]
@@ -419,6 +465,7 @@ mod tests {
         let body = read_file_bytes(&mut response).await;
         
         assert_eq!(String::from_utf8_lossy(body.as_slice()), "Hello, this is some file content!");
+        assert_eq!(response.status(), 200);
     }
 
     #[tokio::test]
@@ -438,6 +485,7 @@ mod tests {
         let body = read_file_bytes(&mut response).await;
         
         assert_eq!(String::from_utf8_lossy(body.as_slice()), "Hello, this is some file content!");
+        assert_eq!(response.status(), 200);
     }
 
     #[tokio::test]
@@ -450,6 +498,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
         
         assert_eq!(body.len(), 0);
+        assert_eq!(response.status(), 200);
     }
 
     #[tokio::test]
@@ -463,6 +512,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
         
         assert_eq!(String::from_utf8_lossy(body), "\"test\"");
+        assert_eq!(response.status(), 200);
     }
 
     #[tokio::test]
@@ -476,6 +526,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
         
         assert_eq!(String::from_utf8_lossy(body), "{\"name\":\"test\"}");
+        assert_eq!(response.status(), 200);
     }
 
     #[tokio::test]
@@ -488,6 +539,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
         
         assert_eq!(String::from_utf8_lossy(body), "{\"name\":\"test\"}");
+        assert_eq!(response.status(), 200);
     }
 
     #[tokio::test]
@@ -500,6 +552,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
         
         assert_eq!(body.len(), 0);
+        assert_eq!(response.status(), 400);
     }
 
     #[tokio::test]
@@ -513,6 +566,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
         
         assert_eq!(String::from_utf8_lossy(body), "\"test\"");
+        assert_eq!(response.status(), 400);
     }
 
     #[tokio::test]
@@ -526,6 +580,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
         
         assert_eq!(String::from_utf8_lossy(body), "{\"name\":\"test\"}");
+        assert_eq!(response.status(), 400);
     }
 
     #[tokio::test]
@@ -538,6 +593,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
         
         assert_eq!(String::from_utf8_lossy(body), "{\"name\":\"test\"}");
+        assert_eq!(response.status(), 400);
     }
     
     #[tokio::test]
@@ -550,6 +606,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
         
         assert_eq!(body.len(), 0);
+        assert_eq!(response.status(), 404);
     }
 
     #[tokio::test]
@@ -562,6 +619,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
         
         assert_eq!(body.len(), 0);
+        assert_eq!(response.status(), 401);
     }
 
     #[tokio::test]
@@ -574,6 +632,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
         
         assert_eq!(String::from_utf8_lossy(body), "\"You are not authorized!\"");
+        assert_eq!(response.status(), 401);
     }
 
     #[tokio::test]
@@ -587,6 +646,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
         
         assert_eq!(String::from_utf8_lossy(body), "{\"name\":\"test\"}");
+        assert_eq!(response.status(), 401);
     }
 
     #[tokio::test]
@@ -599,6 +659,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
         
         assert_eq!(String::from_utf8_lossy(body), "{\"name\":\"test\"}");
+        assert_eq!(response.status(), 401);
     }
 
     #[tokio::test]
@@ -611,6 +672,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
         
         assert_eq!(body.len(), 0);
+        assert_eq!(response.status(), 403);
     }
 
     #[tokio::test]
@@ -623,6 +685,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
         
         assert_eq!(String::from_utf8_lossy(body), "\"It's forbidden!\"");
+        assert_eq!(response.status(), 403);
     }
 
     #[tokio::test]
@@ -636,6 +699,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
         
         assert_eq!(String::from_utf8_lossy(body), "{\"name\":\"test\"}");
+        assert_eq!(response.status(), 403);
     }
 
     #[tokio::test]
@@ -648,6 +712,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
         
         assert_eq!(String::from_utf8_lossy(body), "{\"name\":\"test\"}");
+        assert_eq!(response.status(), 403);
     }
     
     #[tokio::test]
@@ -674,6 +739,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
         
         assert_eq!(String::from_utf8_lossy(body), "\"ok\"");
+        assert_eq!(response.status(), 200);
         assert_eq!(response.headers().get("x-api-key").unwrap(), "some api key");
         assert_eq!(response.headers().get("x-req-id").unwrap(), "some req id");
     }
@@ -690,6 +756,7 @@ mod tests {
 
         assert_eq!(String::from_utf8_lossy(body), "\"ok\"");
         assert_eq!(response.headers().len(), 2);
+        assert_eq!(response.status(), 200);
     }
 
     #[tokio::test]
@@ -706,6 +773,7 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
 
         assert_eq!(String::from_utf8_lossy(body), "{\"name\":\"test\"}");
+        assert_eq!(response.status(), 200);
         assert_eq!(response.headers().get("x-api-key").unwrap(), "some api key");
         assert_eq!(response.headers().get("x-req-id").unwrap(), "some req id");
     }
@@ -723,6 +791,43 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
 
         assert_eq!(String::from_utf8_lossy(body), "{\"name\":\"test\"}");
+        assert_eq!(response.status(), 200);
+        assert_eq!(response.headers().get("x-api-key").unwrap(), "some api key");
+        assert_eq!(response.headers().get("x-req-id").unwrap(), "some req id");
+    }
+
+    #[tokio::test]
+    async fn it_creates_empty_ok_response_with_headers() {
+        let response = ok!([
+            ("x-api-key", "some api key"),
+            ("x-req-id", "some req id"),
+        ]);
+
+        assert!(response.is_ok());
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+
+        assert_eq!(body.len(), 0);
+        assert_eq!(response.status(), 200);
+        assert_eq!(response.headers().get("x-api-key").unwrap(), "some api key");
+        assert_eq!(response.headers().get("x-req-id").unwrap(), "some req id");
+    }
+
+    #[tokio::test]
+    async fn it_creates_empty_status_response_with_headers() {
+        let response = status!(400, [
+            ("x-api-key", "some api key"),
+            ("x-req-id", "some req id"),
+        ]);
+
+        assert!(response.is_ok());
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+
+        assert_eq!(body.len(), 0);
+        assert_eq!(response.status(), 400);
         assert_eq!(response.headers().get("x-api-key").unwrap(), "some api key");
         assert_eq!(response.headers().get("x-req-id").unwrap(), "some req id");
     }

@@ -1,4 +1,5 @@
-﻿use volga::{App, Results, Router};
+﻿use reqwest::Method;
+use volga::{App, Results, Router};
 
 #[tokio::test]
 async fn it_maps_to_get_request() {
@@ -113,4 +114,50 @@ async fn it_maps_to_delete_request() {
 
     assert!(response.status().is_success());
     assert_eq!(response.text().await.unwrap(), "Pass!");
+}
+
+#[tokio::test]
+async fn it_maps_to_head_request() {
+    tokio::spawn(async {
+        let mut app = App::new().bind("127.0.0.1:7903");
+        app.map_head("/test", || async {
+            Results::ok()
+        });
+        app.run().await
+    });
+
+    let response = tokio::spawn(async {
+        let client = if cfg!(all(feature = "http1", not(feature = "http2"))) {
+            reqwest::Client::builder().http1_only().build().unwrap()
+        } else {
+            reqwest::Client::builder().http2_prior_knowledge().build().unwrap()
+        };
+        client.head("http://127.0.0.1:7903/test").send().await
+    }).await.unwrap().unwrap();
+
+    assert!(response.status().is_success());
+    assert_eq!(response.text().await.unwrap(), "");
+}
+
+#[tokio::test]
+async fn it_maps_to_options_request() {
+    tokio::spawn(async {
+        let mut app = App::new().bind("127.0.0.1:7904");
+        app.map_options("/test", || async {
+            Results::ok()
+        });
+        app.run().await
+    });
+
+    let response = tokio::spawn(async {
+        let client = if cfg!(all(feature = "http1", not(feature = "http2"))) {
+            reqwest::Client::builder().http1_only().build().unwrap()
+        } else {
+            reqwest::Client::builder().http2_prior_knowledge().build().unwrap()
+        };
+        client.request(Method::OPTIONS, "http://127.0.0.1:7904/test").send().await
+    }).await.unwrap().unwrap();
+
+    assert!(response.status().is_success());
+    assert_eq!(response.text().await.unwrap(), "");
 }

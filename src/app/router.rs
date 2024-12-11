@@ -1,10 +1,10 @@
-﻿use std::sync::Arc;
+﻿use hyper::Method;
 
-use hyper::Method;
-
-use crate::app::endpoints::args::FromRequest;
-use crate::app::endpoints::handlers::GenericHandler;
 use crate::{App, HttpResult};
+use crate::app::endpoints::{
+    args::FromRequest,
+    handlers::{Func, GenericHandler}
+};
 
 /// Declares a set ot methods that map routes to a specific pattern and HTTP Verb
 /// 
@@ -129,6 +129,48 @@ pub trait Router {
     where
         F: GenericHandler<Args, Output = HttpResult>,
         Args: FromRequest + Send + Sync + 'static;
+
+    /// Adds a request handler that matches HTTP HEAD requests for the specified pattern.
+    /// 
+    /// # Examples
+    /// ```no_run
+    /// use volga::{App, Router, ok};
+    ///
+    ///# #[tokio::main]
+    ///# async fn main() -> std::io::Result<()> {
+    /// let mut app = App::new();
+    /// 
+    /// app.map_head("/resource/{id}", |id: i32| async move {
+    ///    ok!([("Custom-Header", "value")])
+    /// });
+    ///# app.run().await
+    ///# }
+    /// ```
+    fn map_head<F, Args>(&mut self, pattern: &str, handler: F)
+    where
+        F: GenericHandler<Args, Output = HttpResult>,
+        Args: FromRequest + Send + Sync + 'static;
+
+    /// Adds a request handler that matches HTTP OPTIONS requests for the specified pattern.
+    /// 
+    /// # Examples
+    /// ```no_run
+    /// use volga::{App, Router, ok};
+    ///
+    ///# #[tokio::main]
+    ///# async fn main() -> std::io::Result<()> {
+    /// let mut app = App::new();
+    /// 
+    /// app.map_options("/resource/{id}", |id: i32| async move {
+    ///    ok!([("Allow", "GET, HEAD, POST, OPTIONS")])
+    /// });
+    ///# app.run().await
+    ///# }
+    /// ```
+    fn map_options<F, Args>(&mut self, pattern: &str, handler: F)
+    where
+        F: GenericHandler<Args, Output = HttpResult>,
+        Args: FromRequest + Send + Sync + 'static;
 }
 
 impl Router for App {
@@ -137,11 +179,9 @@ impl Router for App {
         F: GenericHandler<Args, Output = HttpResult>,
         Args: FromRequest + Send + Sync + 'static
     {
-        use crate::app::endpoints::handlers::Func;
-
-        let endpoints = self.endpoints_mut();
-        let handler = Arc::new(Func::new(handler));
-        endpoints.map_route(Method::GET, pattern, handler);
+        let handler = Func::new(handler);
+        self.endpoints_mut()
+            .map_route(Method::GET, pattern, handler);
     }
 
     fn map_post<F, Args>(&mut self, pattern: &str, handler: F)
@@ -149,11 +189,9 @@ impl Router for App {
         F: GenericHandler<Args, Output = HttpResult>,
         Args: FromRequest + Send + Sync + 'static,
     {
-        use crate::app::endpoints::handlers::Func;
-
-        let endpoints = self.endpoints_mut();
-        let handler = Arc::new(Func::new(handler));
-        endpoints.map_route(Method::POST, pattern, handler);
+        let handler = Func::new(handler);
+        self.endpoints_mut()
+            .map_route(Method::POST, pattern, handler);
     }
 
     fn map_put<F, Args>(&mut self, pattern: &str, handler: F)
@@ -161,11 +199,9 @@ impl Router for App {
         F: GenericHandler<Args, Output = HttpResult>,
         Args: FromRequest + Send + Sync + 'static,
     {
-        use crate::app::endpoints::handlers::Func;
-
-        let endpoints = self.endpoints_mut();
-        let handler = Arc::new(Func::new(handler));
-        endpoints.map_route(Method::PUT, pattern, handler);
+        let handler = Func::new(handler);
+        self.endpoints_mut()
+            .map_route(Method::PUT, pattern, handler);
     }
 
     fn map_patch<F, Args>(&mut self, pattern: &str, handler: F)
@@ -173,11 +209,9 @@ impl Router for App {
         F: GenericHandler<Args, Output = HttpResult>,
         Args: FromRequest + Send + Sync + 'static,
     {
-        use crate::app::endpoints::handlers::Func;
-
-        let endpoints = self.endpoints_mut();
-        let handler = Arc::new(Func::new(handler));
-        endpoints.map_route(Method::PATCH, pattern, handler);
+        let handler = Func::new(handler);
+        self.endpoints_mut()
+            .map_route(Method::PATCH, pattern, handler);
     }
 
     fn map_delete<F, Args>(&mut self, pattern: &str, handler: F)
@@ -185,10 +219,28 @@ impl Router for App {
         F: GenericHandler<Args, Output = HttpResult>,
         Args: FromRequest + Send + Sync + 'static,
     {
-        use crate::app::endpoints::handlers::Func;
+        let handler = Func::new(handler);
+        self.endpoints_mut()
+            .map_route(Method::DELETE, pattern, handler);
+    }
 
-        let endpoints = self.endpoints_mut();
-        let handler = Arc::new(Func::new(handler));
-        endpoints.map_route(Method::DELETE, pattern, handler);
+    fn map_head<F, Args>(&mut self, pattern: &str, handler: F)
+    where
+        F: GenericHandler<Args, Output = HttpResult>,
+        Args: FromRequest + Send + Sync + 'static,
+    {
+        let handler = Func::new(handler);
+        self.endpoints_mut()
+            .map_route(Method::HEAD, pattern, handler);
+    }
+
+    fn map_options<F, Args>(&mut self, pattern: &str, handler: F)
+    where
+        F: GenericHandler<Args, Output = HttpResult>,
+        Args: FromRequest + Send + Sync + 'static,
+    {
+        let handler = Func::new(handler);
+        self.endpoints_mut()
+            .map_route(Method::OPTIONS, pattern, handler);
     }
 }

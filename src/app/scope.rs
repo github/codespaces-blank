@@ -2,21 +2,18 @@
 use tokio_util::sync::CancellationToken;
 use std::{
     io::{Error, ErrorKind::InvalidInput},
-    future::Future,
-    pin::Pin,
     sync::Arc
 };
+
+use futures_util::future::{BoxFuture};
+
 use hyper::{
     Request,
     body::Incoming,
     service::Service
 };
-use crate::{
-    app::Pipeline, 
-    HttpResponse, 
-    Results, 
-    HttpResult
-};
+
+use crate::{app::Pipeline, HttpResponse, Results, HttpResult};
 
 #[cfg(feature = "middleware")]
 use crate::HttpContext;
@@ -30,10 +27,15 @@ pub(super) struct Scope {
 impl Service<Request<Incoming>> for Scope {
     type Response = HttpResponse;
     type Error = Error;
-    type Future = Pin<Box<dyn Future<Output = Result<Self::Response, Self::Error>> + Send>>;
+    type Future = BoxFuture<'static, Result<Self::Response, Self::Error>>;
 
-    fn call(&self, request: Request<Incoming>) -> Self::Future { 
-        Box::pin(Self::handle_request(request, self.pipeline.clone(), self.cancellation_token.clone()))
+    #[inline]
+    fn call(&self, request: Request<Incoming>) -> Self::Future {
+        Box::pin(Self::handle_request(
+            request, 
+            self.pipeline.clone(), 
+            self.cancellation_token.clone()
+        ))
     }
 }
 
@@ -45,7 +47,12 @@ impl Scope {
         }
     }
     
-    pub(super) async fn handle_request(mut request: Request<Incoming>, pipeline: Arc<Pipeline>, cancellation_token: CancellationToken) -> io::Result<HttpResponse> {
+    pub(super) async fn handle_request(
+        mut request: Request<Incoming>, 
+        pipeline: Arc<Pipeline>, 
+        cancellation_token: CancellationToken
+    ) -> io::Result<HttpResponse>
+    {
         if let Some(endpoint_context) = pipeline.endpoints().get_endpoint(&request).await {
             let (handler, params) = endpoint_context.into_parts();
                         
