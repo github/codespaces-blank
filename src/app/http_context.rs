@@ -11,13 +11,22 @@ use crate::{
     HttpResult
 };
 
-/// Describes current HTTP context
+/// Describes current HTTP context which consists of the current HTTP request data 
+/// and the reference to the method handler fot this request
 pub struct HttpContext {
+    /// Current HTTP request
     pub request: HttpRequest,
+    
+    /// Current handler that mapped to handle the HTTP request
     handler: RouteHandler
 }
 
 impl HttpContext {
+    /// Creates a new [`HttpContext`]
+    pub(super) fn new(request: HttpRequest, handler: RouteHandler) -> Self {
+        Self { request, handler }
+    }
+    
     /// Extracts a payload from request parts
     ///
     /// # Example
@@ -36,23 +45,18 @@ impl HttpContext {
     /// # Ok(())
     /// # }
     /// ```
+    #[inline]
     pub fn extract<T: FromRequestRef>(&self) -> Result<T, Error> {
-        T::from_request(&self.request)
+        self.request.extract()
     }
     
     /// Inserts the [`Header<T>`] to HTTP request headers
     #[inline]
     pub fn insert_header<T: FromHeaders>(&mut self, header: Header<T>) {
-        let (name, value) = header.into_parts();
-        self.request
-            .headers_mut()
-            .insert(name, value);
-    }
-    
-    pub(super) fn new(request: HttpRequest, handler: RouteHandler) -> Self {
-        Self { request, handler }
+        self.request.insert_header(header)
     }
 
+    /// Executes the request handler for current HTTP request
     pub(super) async fn execute(self) -> HttpResult {
         self.handler.call(self.request).await
     }

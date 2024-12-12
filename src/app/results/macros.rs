@@ -117,8 +117,6 @@ macro_rules! ok {
 
 /// Produces `OK 200` response with file body
 /// 
-/// > This macro is working only within async context, make sure that you are using `AsyncEndpointsMapping`
-/// 
 /// # Examples
 /// ## Default usage
 ///```no_run
@@ -151,7 +149,7 @@ macro_rules! ok {
 #[macro_export]
 macro_rules! file {
     ($file_name:expr, $e:expr) => {
-        $crate::Results::file($file_name, $e).await
+        $crate::Results::file($file_name, $e)
     };
     ($file_name:expr, $e:expr, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {{
         // We're not using a headers! macro here to avoid adding unnecessary use if it's not needed
@@ -159,7 +157,47 @@ macro_rules! file {
         $(
             headers.insert($key.to_string(), $value.to_string());
         )*
-        $crate::Results::file_with_custom_headers($file_name, $e, headers).await
+        $crate::Results::file_with_custom_headers($file_name, $e, headers)
+    }};
+}
+
+/// Produces `OK 200` response with stream body
+/// 
+/// # Examples
+/// ## Default usage
+///```no_run
+/// use volga::{HttpRequest, stream};
+///
+/// # async fn dox(request: HttpRequest) -> std::io::Result<()> {
+/// let boxed_body = request.into_boxed_body();
+/// stream!(boxed_body);
+/// # Ok(())
+/// # }
+/// ```
+/// ## Custom headers
+///```no_run
+/// use volga::{HttpRequest, stream};
+///
+/// # async fn dox(request: HttpRequest) -> std::io::Result<()> {
+/// let boxed_body = request.into_boxed_body();
+/// stream!(boxed_body, [
+///    ("Content-Type", "message/http")
+/// ]);
+/// # Ok(())
+/// # }
+/// ```
+#[macro_export]
+macro_rules! stream {
+    ($e:expr) => {
+        $crate::Results::stream($e)
+    };
+    ($e:expr, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {{
+        // We're not using a headers! macro here to avoid adding unnecessary use if it's not needed
+        let mut headers = $crate::HttpHeaders::new();
+        $(
+            headers.insert($key.to_string(), $value.to_string());
+        )*
+        $crate::Results::stream_with_custom_headers($e, headers)
     }};
 }
 
@@ -266,6 +304,7 @@ mod tests {
     use std::path::Path;
     use serde::Serialize;
     use tokio::fs::File;
+    use crate::HttpBody;
     use crate::test_utils::read_file_bytes;
 
     #[derive(Serialize)]
@@ -485,6 +524,44 @@ mod tests {
         let body = read_file_bytes(&mut response).await;
         
         assert_eq!(String::from_utf8_lossy(body.as_slice()), "Hello, this is some file content!");
+        assert_eq!(response.headers()["x-api-key"], "some api key");
+        assert_eq!(response.status(), 200);
+    }
+
+    #[tokio::test]
+    async fn it_creates_stream_response() {
+        let path = Path::new("tests/resources/test_file.txt");
+        let file = File::open(path).await.unwrap();
+        let box_body = HttpBody::wrap_stream(file);
+
+        let response = stream!(box_body);
+
+        assert!(response.is_ok());
+
+        let mut response = response.unwrap();
+        let body = read_file_bytes(&mut response).await;
+
+        assert_eq!(String::from_utf8_lossy(body.as_slice()), "Hello, this is some file content!");
+        assert_eq!(response.status(), 200);
+    }
+
+    #[tokio::test]
+    async fn it_creates_stream_response_with_custom_headers() {
+        let path = Path::new("tests/resources/test_file.txt");
+        let file = File::open(path).await.unwrap();
+        let box_body = HttpBody::wrap_stream(file);
+
+        let response = stream!(box_body, [
+            ("x-api-key", "some api key")
+        ]);
+
+        assert!(response.is_ok());
+
+        let mut response = response.unwrap();
+        let body = read_file_bytes(&mut response).await;
+
+        assert_eq!(String::from_utf8_lossy(body.as_slice()), "Hello, this is some file content!");
+        assert_eq!(response.headers()["x-api-key"], "some api key");
         assert_eq!(response.status(), 200);
     }
 

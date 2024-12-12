@@ -171,6 +171,27 @@ pub trait Router {
     where
         F: GenericHandler<Args, Output = HttpResult>,
         Args: FromRequest + Send + Sync + 'static;
+
+    /// Adds a request handler that matches HTTP TRACE requests for the specified pattern.
+    /// 
+    /// # Examples
+    /// ```no_run
+    /// use volga::{App, Router, ok};
+    ///
+    ///# #[tokio::main]
+    ///# async fn main() -> std::io::Result<()> {
+    /// let mut app = App::new();
+    /// 
+    /// app.map_trace("/", |id: i32| async move {
+    ///    ok!([("content-type", "message/http")])
+    /// });
+    ///# app.run().await
+    ///# }
+    /// ```
+    fn map_trace<F, Args>(&mut self, pattern: &str, handler: F)
+    where
+        F: GenericHandler<Args, Output = HttpResult>,
+        Args: FromRequest + Send + Sync + 'static;
 }
 
 impl Router for App {
@@ -180,8 +201,7 @@ impl Router for App {
         Args: FromRequest + Send + Sync + 'static
     {
         let handler = Func::new(handler);
-        self.endpoints_mut()
-            .map_route(Method::GET, pattern, handler);
+        self.endpoints_mut().map_route(Method::GET, pattern, handler);
     }
 
     fn map_post<F, Args>(&mut self, pattern: &str, handler: F)
@@ -190,8 +210,7 @@ impl Router for App {
         Args: FromRequest + Send + Sync + 'static,
     {
         let handler = Func::new(handler);
-        self.endpoints_mut()
-            .map_route(Method::POST, pattern, handler);
+        self.endpoints_mut().map_route(Method::POST, pattern, handler);
     }
 
     fn map_put<F, Args>(&mut self, pattern: &str, handler: F)
@@ -200,8 +219,7 @@ impl Router for App {
         Args: FromRequest + Send + Sync + 'static,
     {
         let handler = Func::new(handler);
-        self.endpoints_mut()
-            .map_route(Method::PUT, pattern, handler);
+        self.endpoints_mut().map_route(Method::PUT, pattern, handler);
     }
 
     fn map_patch<F, Args>(&mut self, pattern: &str, handler: F)
@@ -210,8 +228,7 @@ impl Router for App {
         Args: FromRequest + Send + Sync + 'static,
     {
         let handler = Func::new(handler);
-        self.endpoints_mut()
-            .map_route(Method::PATCH, pattern, handler);
+        self.endpoints_mut().map_route(Method::PATCH, pattern, handler);
     }
 
     fn map_delete<F, Args>(&mut self, pattern: &str, handler: F)
@@ -220,8 +237,7 @@ impl Router for App {
         Args: FromRequest + Send + Sync + 'static,
     {
         let handler = Func::new(handler);
-        self.endpoints_mut()
-            .map_route(Method::DELETE, pattern, handler);
+        self.endpoints_mut().map_route(Method::DELETE, pattern, handler);
     }
 
     fn map_head<F, Args>(&mut self, pattern: &str, handler: F)
@@ -230,8 +246,7 @@ impl Router for App {
         Args: FromRequest + Send + Sync + 'static,
     {
         let handler = Func::new(handler);
-        self.endpoints_mut()
-            .map_route(Method::HEAD, pattern, handler);
+        self.endpoints_mut().map_route(Method::HEAD, pattern, handler);
     }
 
     fn map_options<F, Args>(&mut self, pattern: &str, handler: F)
@@ -240,7 +255,15 @@ impl Router for App {
         Args: FromRequest + Send + Sync + 'static,
     {
         let handler = Func::new(handler);
-        self.endpoints_mut()
-            .map_route(Method::OPTIONS, pattern, handler);
+        self.endpoints_mut().map_route(Method::OPTIONS, pattern, handler);
+    }
+
+    fn map_trace<F, Args>(&mut self, pattern: &str, handler: F)
+    where
+        F: GenericHandler<Args, Output = HttpResult>,
+        Args: FromRequest + Send + Sync + 'static,
+    {
+        let handler = Func::new(handler);
+        self.endpoints_mut().map_route(Method::TRACE, pattern, handler);
     }
 }

@@ -100,3 +100,11 @@ path = "examples/file_upload.rs"
 [[example]]
 name = "long_running_task"
 path = "examples/long_running_task.rs"
+
+[[example]]
+name = "http_request_handler"
+path = "examples/http_request_handler.rs"
+
+[[example]]
+name = "trace_request"
+path = "examples/trace_request.rs"

@@ -3,10 +3,11 @@
 use std::{io::Error, future::Future};
 
 use hyper::{
-    http::Extensions,
+    http::Extensions, 
     body::Incoming, 
-    Uri,
-    HeaderMap
+    Uri, 
+    HeaderMap, 
+    Request
 };
 
 use crate::{
@@ -20,10 +21,12 @@ pub mod headers;
 pub mod json;
 pub mod file;
 pub mod cancellation_token;
+pub mod request;
 
 /// Holds the payload for extractors
 pub(crate) enum Payload<'a> {
     None,
+    Full(Request<Incoming>),
     Body(Incoming),
     Query(&'a Uri),
     Headers(&'a HeaderMap),
@@ -34,6 +37,7 @@ pub(crate) enum Payload<'a> {
 /// Describes a data source for extractors to read from
 pub(crate) enum Source {
     None,
+    Full,
     Path,
     Query,
     Headers,
@@ -93,6 +97,10 @@ macro_rules! define_generic_from_request {
                         Source::Ext => Payload::Ext(&parts.extensions),
                         Source::Path => match iter.next() {
                             Some(param) => Payload::Path(&param),
+                            None => Payload::None
+                        },
+                        Source::Full => match body.take() { 
+                            Some(body) => Payload::Full(Request::from_parts(parts.clone(), body)),
                             None => Payload::None
                         },
                         Source::Body => match body.take() {

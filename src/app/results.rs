@@ -110,9 +110,27 @@ impl Results {
             HttpBody::full(content))
     }
 
+    /// Produces an `OK 200` response with the stream body.
+    #[inline]
+    pub fn stream(content: BoxBody) -> HttpResult {
+        Self::create_default_builder()
+            .status(StatusCode::OK)
+            .body(content)
+            .map_err(|_| Self::response_error())
+    }
+
+    /// Produces an `OK 200` response with the stream body and custom headers.
+    #[inline]
+    pub fn stream_with_custom_headers(content: BoxBody, headers: HttpHeaders) -> HttpResult {
+        Self::create_custom_builder(headers)
+            .status(StatusCode::OK)
+            .body(content)
+            .map_err(|_| Self::response_error())
+    }
+
     /// Produces an `OK 200` response with the file body.
     #[inline]
-    pub async fn file(file_name: &str, content: File) -> HttpResult {
+    pub fn file(file_name: &str, content: File) -> HttpResult {
         let boxed_body = HttpBody::wrap_stream(content);
         let file_name = format!("attachment; filename=\"{}\"", file_name);
         
@@ -127,7 +145,7 @@ impl Results {
 
     /// Produces an `OK 200` response with the file body and custom headers.
     #[inline]
-    pub async fn file_with_custom_headers(file_name: &str, content: File, mut headers: HttpHeaders) -> HttpResult {
+    pub fn file_with_custom_headers(file_name: &str, content: File, mut headers: HttpHeaders) -> HttpResult {
         headers.entry(CONTENT_TYPE.as_str().into())
             .or_insert_with(|| APPLICATION_OCTET_STREAM.as_ref().into());
         
@@ -374,12 +392,47 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn it_creates_stream_response() {
+        let path = Path::new("tests/resources/test_file.txt");
+        let file = File::open(path).await.unwrap();
+        let body = HttpBody::wrap_stream(file);
+        
+        let mut response = Results::stream(body).unwrap();
+
+        let body = read_file_bytes(&mut response).await;
+
+        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(String::from_utf8_lossy(body.as_slice()), "Hello, this is some file content!");
+    }
+
+    #[tokio::test]
+    async fn it_creates_stream_response_with_custom_headers() {
+        let path = Path::new("tests/resources/test_file.txt");
+        let headers = headers![
+            ("x-api-key", "some api key"),
+            ("Content-Type", "application/octet-stream")
+        ];
+
+        let file = File::open(path).await.unwrap();
+        let body = HttpBody::wrap_stream(file);
+        
+        let mut response = Results::stream_with_custom_headers(body, headers).unwrap();
+
+        let body = read_file_bytes(&mut response).await;
+
+        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(String::from_utf8_lossy(body.as_slice()), "Hello, this is some file content!");
+        assert_eq!(response.headers().get("Content-Type").unwrap(), "application/octet-stream");
+        assert_eq!(response.headers().get("x-api-key").unwrap(), "some api key");
+    }
+
+    #[tokio::test]
     async fn it_creates_file_response() {
         let path = Path::new("tests/resources/test_file.txt");
         let file_name = path.file_name().and_then(|name| name.to_str()).unwrap();
         
         let file = File::open(path).await.unwrap();
-        let mut response = Results::file(file_name, file).await.unwrap();
+        let mut response = Results::file(file_name, file).unwrap();
 
         let body = read_file_bytes(&mut response).await;
         
@@ -398,7 +451,7 @@ mod tests {
         ];
         
         let file = File::open(path).await.unwrap();
-        let mut response = Results::file_with_custom_headers(file_name, file, headers).await.unwrap();
+        let mut response = Results::file_with_custom_headers(file_name, file, headers).unwrap();
 
         let body = read_file_bytes(&mut response).await;
         

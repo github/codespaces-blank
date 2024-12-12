@@ -7,13 +7,9 @@ use std::{
 
 use futures_util::future::{BoxFuture};
 
-use hyper::{
-    Request,
-    body::Incoming,
-    service::Service
-};
+use hyper::{Request, body::Incoming, service::Service, Method};
 
-use crate::{app::Pipeline, HttpResponse, Results, HttpResult};
+use crate::{app::Pipeline, HttpResponse, Results, HttpResult, HttpRequest, HttpBody};
 
 #[cfg(feature = "middleware")]
 use crate::HttpContext;
@@ -32,7 +28,7 @@ impl Service<Request<Incoming>> for Scope {
     #[inline]
     fn call(&self, request: Request<Incoming>) -> Self::Future {
         Box::pin(Self::handle_request(
-            request, 
+            HttpRequest(request), 
             self.pipeline.clone(), 
             self.cancellation_token.clone()
         ))
@@ -48,7 +44,7 @@ impl Scope {
     }
     
     pub(super) async fn handle_request(
-        mut request: Request<Incoming>, 
+        mut request: HttpRequest, 
         pipeline: Arc<Pipeline>, 
         cancellation_token: CancellationToken
     ) -> io::Result<HttpResponse>
@@ -59,6 +55,8 @@ impl Scope {
             let extensions = request.extensions_mut();
             extensions.insert(cancellation_token);
             extensions.insert(params);
+            
+            let request_method = request.method().clone();
             
             let response: HttpResult;
             #[cfg(feature = "middleware")]
@@ -76,7 +74,12 @@ impl Scope {
             }
 
             match response {
-                Ok(response) => Ok(response),
+                Ok(mut response) => {
+                    if request_method == Method::HEAD {
+                        *response.body_mut() = HttpBody::empty();
+                    }
+                    Ok(response)
+                },
                 Err(error) if error.kind() == InvalidInput => Results::bad_request(Some(error.to_string())),
                 Err(error) => Results::internal_server_error(Some(error.to_string()))
             }
