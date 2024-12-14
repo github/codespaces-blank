@@ -21,7 +21,7 @@ psutil
 pytube
 pykeyboard
 unidecode
-ntgcalls==1.1.2
+#ntgcalls==1.1.2
 python-dotenv
 pyyaml
 requests
