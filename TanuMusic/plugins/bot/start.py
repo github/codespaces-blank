@@ -1,5 +1,5 @@
 import time
-import random 
+import random
 from pyrogram import filters
 from pyrogram.enums import ChatType
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
@@ -23,6 +23,7 @@ from TanuMusic.utils.inline import help_pannel, private_panel, start_panel
 from config import BANNED_USERS
 from strings import get_string
 
+# List of images
 IMAGE = [
 "https://graph.org/file/f76fd86d1936d45a63c64.jpg",
 "https://graph.org/file/69ba894371860cd22d92e.jpg",
@@ -64,12 +65,11 @@ IMAGE = [
 "https://graph.org/file/8f8516c86677a8c91bfb1.jpg",
 "https://graph.org/file/6603c3740378d3f7187da.jpg",
 "https://graph.org/file/66cb6ec40eea5c4670118.jpg",
-"https://graph.org/file/2e3cf4327b169b981055e.jpg",   
-
+"https://graph.org/file/2e3cf4327b169b981055e.jpg",
 ]
 
 
-
+# Start command in private chat
 @app.on_message(filters.command(["start"]) & filters.private & ~BANNED_USERS)
 @LanguageStart
 async def start_pm(client, message: Message, _):
@@ -88,7 +88,7 @@ async def start_pm(client, message: Message, _):
             if await is_on_off(2):
                 return await app.send_message(
                     chat_id=config.LOGGER_ID,
-                    text=f"❖ {message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ ᴛᴏ ᴄʜᴇᴄᴋ <b>sᴜᴅᴏʟɪsᴛ</b>.\n\n<b>● ᴜsᴇʀ ɪᴅ ➥</b> <code>{message.from_user.id}</code>\n<b>● ᴜsᴇʀɴᴀᴍᴇ ➥</b> @{message.from_user.username}",
+                    text=f"❖ {message.from_user.mention} started the bot to check <b>SudoList</b>.\n\n<b>User ID:</b> <code>{message.from_user.id}</code>\n<b>Username:</b> @{message.from_user.username}",
                 )
             return
         if name[0:3] == "inf":
@@ -126,35 +126,49 @@ async def start_pm(client, message: Message, _):
             if await is_on_off(2):
                 return await app.send_message(
                     chat_id=config.LOGGER_ID,
-                    text=f"❖ {message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ ᴛᴏ ᴄʜᴇᴄᴋ <b>ᴛʀᴀᴄᴋ ɪɴғᴏʀᴍᴀᴛɪᴏɴ</b>.\n\n<b>● ᴜsᴇʀ ɪᴅ ➥</b> <code>{message.from_user.id}</code>\n<b>● ᴜsᴇʀɴᴀᴍᴇ ➥</b> @{message.from_user.username}",
+                    text=f"❖ {message.from_user.mention} started the bot to check <b>Track Information</b>.\n\n<b>User ID:</b> <code>{message.from_user.id}</code>\n<b>Username:</b> @{message.from_user.username}",
                 )
     else:
         out = private_panel(_)
-        await message.reply_photo(
-            random.choice(IMAGE),
-            caption=_["start_2"].format(message.from_user.mention, app.mention),
-            reply_markup=InlineKeyboardMarkup(out),
-        )
+        try:
+            await message.reply_photo(
+                random.choice(IMAGE),
+                caption=_["start_2"].format(message.from_user.mention, app.mention),
+                reply_markup=InlineKeyboardMarkup(out),
+            )
+        except pyrogram.errors.exceptions.forbidden_403.ChatSendPhotosForbidden:
+            # Fallback to text message if photo cannot be sent
+            await message.reply_text(
+                _["start_2"].format(message.from_user.mention, app.mention),
+                reply_markup=InlineKeyboardMarkup(out),
+            )
         if await is_on_off(2):
             return await app.send_message(
                 chat_id=config.LOGGER_ID,
-                text=f"❖ {message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ.\n\n<b>● ᴜsᴇʀ ɪᴅ ➥</b> <code>{message.from_user.id}</code>\n<b>● ᴜsᴇʀɴᴀᴍᴇ ➥</b> @{message.from_user.username}",
+                text=f"❖ {message.from_user.mention} started the bot.\n\n<b>User ID:</b> <code>{message.from_user.id}</code>\n<b>Username:</b> @{message.from_user.username}",
             )
 
-
+# Start command in group chats
 @app.on_message(filters.command(["start"]) & filters.group & ~BANNED_USERS)
 @LanguageStart
 async def start_gp(client, message: Message, _):
     out = start_panel(_)
     uptime = int(time.time() - _boot_)
-    await message.reply_photo(
-        random.choice(IMAGE),
-        caption=_["start_1"].format(app.mention, get_readable_time(uptime)),
-        reply_markup=InlineKeyboardMarkup(out),
-    )
+    try:
+        await message.reply_photo(
+            random.choice(IMAGE),
+            caption=_["start_1"].format(app.mention, get_readable_time(uptime)),
+            reply_markup=InlineKeyboardMarkup(out),
+        )
+    except pyrogram.errors.exceptions.forbidden_403.ChatSendPhotosForbidden:
+        # Fallback to text message if photo cannot be sent
+        await message.reply_text(
+            _["start_1"].format(app.mention, get_readable_time(uptime)),
+            reply_markup=InlineKeyboardMarkup(out),
+        )
     return await add_served_chat(message.chat.id)
 
-
+# Welcome new chat members
 @app.on_message(filters.new_chat_members, group=-1)
 async def welcome(client, message: Message):
     for member in message.new_chat_members:
@@ -182,16 +196,28 @@ async def welcome(client, message: Message):
                     return await app.leave_chat(message.chat.id)
 
                 out = start_panel(_)
-                await message.reply_photo(
-                    random.choice(IMAGE),
-                    caption=_["start_3"].format(
-                        message.from_user.first_name,
-                        app.mention,
-                        message.chat.title,
-                        app.mention,
-                    ),
-                    reply_markup=InlineKeyboardMarkup(out),
-                )
+                try:
+                    await message.reply_photo(
+                        random.choice(IMAGE),
+                        caption=_["start_3"].format(
+                            message.from_user.first_name,
+                            app.mention,
+                            message.chat.title,
+                            app.mention,
+                        ),
+                        reply_markup=InlineKeyboardMarkup(out),
+                    )
+                except pyrogram.errors.exceptions.forbidden_403.ChatSendPhotosForbidden:
+                    # Fallback to text message if photo cannot be sent
+                    await message.reply_text(
+                        _["start_3"].format(
+                            message.from_user.first_name,
+                            app.mention,
+                            message.chat.title,
+                            app.mention,
+                        ),
+                        reply_markup=InlineKeyboardMarkup(out),
+                    )
                 await add_served_chat(message.chat.id)
                 await message.stop_propagation()
         except Exception as ex:
