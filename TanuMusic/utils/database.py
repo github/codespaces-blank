@@ -40,6 +40,19 @@ playmode = {}
 playtype = {}
 skipmode = {}
 
+async def get_active_video_chats() -> list:
+    return activevideo
+
+async def get_active_chats() -> list:
+    return active
+
+async def remove_active_chat(chat_id: int):
+    if chat_id in active:
+        active.remove(chat_id)
+
+async def remove_active_video_chat(chat_id: int):
+    if chat_id in activevideo:
+        activevideo.remove(chat_id)
 
 async def get_assistant_number(chat_id: int) -> str:
     assistant = assistantdict.get(chat_id)
