@@ -5,7 +5,7 @@ use crate::{
     App, 
     HttpContext, 
     HttpResult, 
-    Results
+    status
 };
 
 /// Points to the next middleware or request handler
@@ -50,7 +50,7 @@ impl Middlewares {
             let handler = request_handler.clone();
             // Call the last middleware, ignoring its `next` argument with an empty placeholder
             Box::pin(async move {
-                handler(ctx, Arc::new(|_| Box::pin(async { Results::not_found() }))).await
+                handler(ctx, Arc::new(|_| Box::pin(async { status!(404) }))).await
             })
         });
 

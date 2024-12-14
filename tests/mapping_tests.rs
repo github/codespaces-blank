@@ -1,5 +1,5 @@
 ﻿use reqwest::Method;
-use volga::{App, Results, Router};
+use volga::{App, HttpRequest, Results, Router};
 
 #[tokio::test]
 async fn it_maps_to_get_request() {
@@ -156,6 +156,30 @@ async fn it_maps_to_options_request() {
             reqwest::Client::builder().http2_prior_knowledge().build().unwrap()
         };
         client.request(Method::OPTIONS, "http://127.0.0.1:7904/test").send().await
+    }).await.unwrap().unwrap();
+
+    assert!(response.status().is_success());
+    assert_eq!(response.text().await.unwrap(), "");
+}
+
+#[tokio::test]
+async fn it_maps_to_trace_request() {
+    tokio::spawn(async {
+        let mut app = App::new().bind("127.0.0.1:7905");
+        app.map_trace("/test", |req: HttpRequest| async {
+            let boxed_body = req.into_boxed_body();
+            Results::stream(boxed_body)
+        });
+        app.run().await
+    });
+    
+    let response = tokio::spawn(async {
+        let client = if cfg!(all(feature = "http1", not(feature = "http2"))) {
+            reqwest::Client::builder().http1_only().build().unwrap()
+        } else {
+            reqwest::Client::builder().http2_prior_knowledge().build().unwrap()
+        };
+        client.request(Method::TRACE, "http://127.0.0.1:7905/test").send().await
     }).await.unwrap().unwrap();
 
     assert!(response.status().is_success());

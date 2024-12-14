@@ -41,8 +41,15 @@ pub mod app;
 pub mod test_utils;
 
 pub use crate::app::{App, router::Router, body::{BoxBody, HttpBody}};
-pub use crate::app::results::{HttpResponse, HttpResult, HttpHeaders, Results, ResponseContext};
 pub use crate::app::request::HttpRequest;
+pub use crate::app::results::{
+    HttpResponse, 
+    HttpResult, 
+    HttpHeaders, 
+    Results, 
+    ResponseContext,
+    builder::{SERVER_NAME, RESPONSE_ERROR}
+};
 pub use crate::app::endpoints::args::{
     path::Path,
     json::Json,
@@ -58,5 +65,14 @@ pub use crate::app::http_context::HttpContext;
 #[cfg(feature = "middleware")]
 pub use crate::app::middlewares::{Next, Middleware};
 
-// Re-exporting HTTP status codes from hyper/http
-pub use hyper::StatusCode;
+// Re-exporting HTTP status codes, Response and some headers from hyper/http
+pub use hyper::{
+    StatusCode, 
+    Response, 
+    header::{    
+        CONTENT_DISPOSITION,
+        TRANSFER_ENCODING,
+        CONTENT_TYPE,
+        SERVER
+    }
+};

@@ -44,74 +44,101 @@
 macro_rules! ok {
     // handles ok!()
     () => {
-        $crate::Results::ok()
+        $crate::response!(
+            $crate::StatusCode::OK, 
+            $crate::HttpBody::empty(),
+            [
+                ($crate::CONTENT_TYPE, "text/plain")
+            ]
+        )
     };
     
     // handles ok!([("key", "val")])
-    ([ $( ($key:expr, $value:expr) ),* $(,)? ]) => {{
-        // We're not using a headers! macro here to avoid adding unnecessary use if it's not needed
-        let mut headers = $crate::HttpHeaders::new();
-        $(
-            headers.insert($key.to_string(), $value.to_string());
-        )*
-        $crate::Results::status_with_headers(
+    ([ $( ($key:expr, $value:expr) ),* $(,)? ]) => {
+        $crate::response!(
             $crate::StatusCode::OK, 
             $crate::app::body::HttpBody::empty(),
-            headers
+            [ $( ($key, $value) ),* ]
         )
-    }};
+    };
     
     // handles ok!({ json })
     ({ $($json:tt)* }) => {
-        $crate::Results::json(serde_json::json_internal!({ $($json)* }))
+        $crate::response!(
+            $crate::StatusCode::OK,
+            $crate::HttpBody::json(serde_json::json_internal!({ $($json)* })),
+            [
+                ($crate::CONTENT_TYPE, "application/json"),
+            ]
+        )
     };
     
     // handles ok!({ json }, [("key", "val")])
-    ({ $($json:tt)* }, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {{
-        // We're not using a headers! macro here to avoid adding unnecessary use if it's not needed
-        let mut headers = $crate::HttpHeaders::new();
-        $(
-            headers.insert($key.to_string(), $value.to_string());
-        )*
-        $crate::Results::from($crate::ResponseContext {
-            status: 200,
-            content: serde_json::json_internal!({ $($json)* }),
-            headers
-        })
-    }};
+    ({ $($json:tt)* }, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {
+        $crate::response!(
+            $crate::StatusCode::OK,
+            $crate::HttpBody::json(serde_json::json_internal!({ $($json)* })),
+            [
+                ($crate::CONTENT_TYPE, "application/json"),
+                $( ($key, $value) ),*
+            ]
+        )
+    };
     
     // handles ok!(json)
     ($var:ident) => {
-        $crate::Results::json($var)
+        $crate::response!(
+            $crate::StatusCode::OK,
+            $crate::HttpBody::json($var),
+            [
+                ($crate::CONTENT_TYPE, "application/json"),
+            ]
+        )
     };
     
     // handles ok!(json, [("key", "val")])
-    ($e:expr, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {{
-        // We're not using a headers! macro here to avoid adding unnecessary use if it's not needed
-        let mut headers = $crate::HttpHeaders::new();
-        $(
-            headers.insert($key.to_string(), $value.to_string());
-        )*
-        $crate::Results::from($crate::ResponseContext {
-            status: 200,
-            content: $e,
-            headers
-        })
-    }};
+    ($e:expr, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {
+        $crate::response!(
+            $crate::StatusCode::OK,
+            $crate::HttpBody::json($e),
+            [
+                ($crate::CONTENT_TYPE, "application/json"),
+                $( ($key, $value) ),*
+            ]
+        )
+    };
     
     // handles ok!("Hello {name}")
     ($fmt:tt) => {
-        $crate::Results::json(format!($fmt))
+        $crate::response!(
+            $crate::StatusCode::OK,
+            $crate::HttpBody::json(format!($fmt)),
+            [
+                ($crate::CONTENT_TYPE, "application/json"),
+            ]
+        )
     };
     
     // handles ok!(thing.to_string()) or ok!(5 + 5)
     ($e:expr) => {
-        $crate::Results::json($e)
+        $crate::response!(
+            $crate::StatusCode::OK,
+            $crate::HttpBody::json($e),
+            [
+                ($crate::CONTENT_TYPE, "application/json"),
+            ]
+        )
     };
     
     // handles ok!("Hello {}", name)
     ($($fmt:tt)*) => {
-        $crate::Results::json(format!($($fmt)*))
+        $crate::response!(
+            $crate::StatusCode::OK,
+            $crate::HttpBody::json(format!($($fmt)*)),
+            [
+                ($crate::CONTENT_TYPE, "application/json"),
+            ]
+        )
     };
 }
 
@@ -149,16 +176,29 @@ macro_rules! ok {
 #[macro_export]
 macro_rules! file {
     ($file_name:expr, $e:expr) => {
-        $crate::Results::file($file_name, $e)
+        $crate::response!(
+            $crate::StatusCode::OK, 
+            $crate::HttpBody::wrap_stream($e),
+            [
+                ($crate::CONTENT_TYPE, "application/octet-stream"),
+                ($crate::TRANSFER_ENCODING, "chunked"),
+                ($crate::CONTENT_DISPOSITION, format!("attachment; filename=\"{}\"", $file_name))
+            ]
+        )
     };
-    ($file_name:expr, $e:expr, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {{
-        // We're not using a headers! macro here to avoid adding unnecessary use if it's not needed
-        let mut headers = $crate::HttpHeaders::new();
-        $(
-            headers.insert($key.to_string(), $value.to_string());
-        )*
-        $crate::Results::file_with_custom_headers($file_name, $e, headers)
-    }};
+    
+    ($file_name:expr, $e:expr, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {
+        $crate::response!(
+            $crate::StatusCode::OK, 
+            $crate::HttpBody::wrap_stream($e),
+            [
+                ($crate::CONTENT_TYPE, "application/octet-stream"),
+                ($crate::TRANSFER_ENCODING, "chunked"),
+                ($crate::CONTENT_DISPOSITION, format!("attachment; filename=\"{}\"", $file_name)),
+                $( ($key, $value) ),*
+            ]
+        )
+    };
 }
 
 /// Produces `OK 200` response with stream body
@@ -189,16 +229,68 @@ macro_rules! file {
 #[macro_export]
 macro_rules! stream {
     ($e:expr) => {
-        $crate::Results::stream($e)
+        $crate::response!($crate::StatusCode::OK, $e)
     };
-    ($e:expr, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {{
-        // We're not using a headers! macro here to avoid adding unnecessary use if it's not needed
-        let mut headers = $crate::HttpHeaders::new();
-        $(
-            headers.insert($key.to_string(), $value.to_string());
-        )*
-        $crate::Results::stream_with_custom_headers($e, headers)
-    }};
+    ($e:expr, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {
+        $crate::response!(
+            $crate::StatusCode::OK, 
+            $e,
+            [ $( ($key, $value) ),* ]
+        )
+    };
+}
+
+/// Produces HTTP 404 NOT FOUND response
+/// 
+/// # Examples
+/// ## Without body
+/// ```no_run
+/// use volga::not_found;
+///
+/// not_found!();
+/// ```
+/// ## plain/text body
+/// ```no_run
+/// use volga::not_found;
+///
+/// not_found!("User not found!");
+/// ```
+#[macro_export]
+macro_rules! not_found {
+    () => {
+        $crate::status!(404)
+    };
+    ($e:expr) => {
+        $crate::status!(404, $e)
+    }
+}
+
+/// Produces HTTP 400 BAD REQUEST response
+///
+/// # Examples
+/// ## Without body
+/// ```no_run
+/// use volga::bad_request;
+///
+/// bad_request!();
+/// ```
+/// ## plain/text body
+/// ```no_run
+/// use volga::bad_request;
+///
+/// bad_request!("User not found!");
+/// ```
+#[macro_export]
+macro_rules! bad_request {
+    () => {
+        $crate::status!(400)
+    };
+    ({ $($json:tt)* }) => {
+        $crate::status!(400, { $($json)* })
+    };
+    ($e:expr) => {
+        $crate::status!(400, $e)
+    };
 }
 
 /// Creates HTTP Request/Response headers
@@ -252,48 +344,41 @@ macro_rules! headers {
 /// ```
 #[macro_export]
 macro_rules! status {
-    (200) => {
-        $crate::Results::ok()
-    };
-    (400) => {
-        $crate::Results::bad_request(None)
-    };
-    (404) => {
-        $crate::Results::not_found()
-    };
-    
     ($status:expr, { $($json:tt)* }) => {
-        $crate::Results::json_with_status(
-            $crate::StatusCode::from_u16($status).unwrap_or($crate::StatusCode::OK), 
-            serde_json::json_internal!({ $($json)* })
+        $crate::response!(
+            $crate::StatusCode::from_u16($status).unwrap_or($crate::StatusCode::OK),
+            $crate::HttpBody::json(serde_json::json_internal!({ $($json)* })),
+            [
+                ($crate::CONTENT_TYPE, "application/json"),
+            ]
         )
     };
     
     ($status:expr) => {
-        $crate::Results::status(
+        $crate::response!(
             $crate::StatusCode::from_u16($status).unwrap_or($crate::StatusCode::OK), 
-            "text/plain", 
-            $crate::app::body::HttpBody::empty()
+            $crate::HttpBody::empty(),
+            [
+                ($crate::CONTENT_TYPE, "text/plain")
+            ]
         )
     };
     
-    ($status:expr, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {{
-        // We're not using a headers! macro here to avoid adding unnecessary use if it's not needed
-        let mut headers = $crate::HttpHeaders::new();
-        $(
-            headers.insert($key.to_string(), $value.to_string());
-        )*
-        $crate::Results::status_with_headers(
+    ($status:expr, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {
+        $crate::response!(
             $crate::StatusCode::from_u16($status).unwrap_or($crate::StatusCode::OK), 
-            $crate::app::body::HttpBody::empty(),
-            headers
+            $crate::HttpBody::empty(),
+            [ $( ($key, $value) ),* ]
         )
-    }};
+    };
     
     ($status:expr, $e:expr) => {
-        $crate::Results::json_with_status(
+        $crate::response!(
             $crate::StatusCode::from_u16($status).unwrap_or($crate::StatusCode::OK),
-            $e
+            $crate::HttpBody::json($e),
+            [
+                ($crate::CONTENT_TYPE, "application/json"),
+            ]
         )
     };
 }
@@ -621,7 +706,7 @@ mod tests {
 
     #[tokio::test]
     async fn it_creates_400_response() {
-        let response = status!(400);
+        let response = bad_request!();
 
         assert!(response.is_ok());
 
@@ -635,7 +720,7 @@ mod tests {
     #[tokio::test]
     async fn it_creates_400_with_text_response() {
         let text = "test";
-        let response = status!(400, text);
+        let response = bad_request!(text);
 
         assert!(response.is_ok());
 
@@ -649,7 +734,7 @@ mod tests {
     #[tokio::test]
     async fn it_creates_400_with_json_response() {
         let payload = TestPayload { name: "test".into() };
-        let response = status!(400, payload);
+        let response = bad_request!(payload);
 
         assert!(response.is_ok());
 
@@ -662,7 +747,7 @@ mod tests {
 
     #[tokio::test]
     async fn it_creates_anonymous_type_400_response_with_json_body() {
-        let response = status!(400, { "name": "test" });
+        let response = bad_request!({ "name": "test" });
 
         assert!(response.is_ok());
 
@@ -675,7 +760,7 @@ mod tests {
     
     #[tokio::test]
     async fn it_creates_404_response() {
-        let response = status!(404);
+        let response = not_found!();
 
         assert!(response.is_ok());
 
@@ -683,6 +768,19 @@ mod tests {
         let body = &response.body_mut().collect().await.unwrap().to_bytes();
         
         assert_eq!(body.len(), 0);
+        assert_eq!(response.status(), 404);
+    }
+
+    #[tokio::test]
+    async fn it_creates_404_response_with_text() {
+        let response = not_found!("User not found");
+
+        assert!(response.is_ok());
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+
+        assert_eq!(String::from_utf8_lossy(body), "\"User not found\"");
         assert_eq!(response.status(), 404);
     }
 

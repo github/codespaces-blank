@@ -1,19 +1,32 @@
 ﻿use tokio::io;
 use tokio_util::sync::CancellationToken;
+use futures_util::future::BoxFuture;
+
 use std::{
     io::{Error, ErrorKind::InvalidInput},
     sync::Arc
 };
 
-use futures_util::future::{BoxFuture};
+use hyper::{
+    Request, 
+    body::Incoming, 
+    service::Service, 
+    Method
+};
 
-use hyper::{Request, body::Incoming, service::Service, Method};
-
-use crate::{app::Pipeline, HttpResponse, Results, HttpResult, HttpRequest, HttpBody};
+use crate::{
+    app::Pipeline, 
+    HttpResponse, 
+    HttpResult, 
+    HttpRequest, 
+    HttpBody,
+    status
+};
 
 #[cfg(feature = "middleware")]
 use crate::HttpContext;
 
+/// Represents the execution scope of the current connection
 #[derive(Clone)]
 pub(super) struct Scope {
     pub(super) pipeline: Arc<Pipeline>,
@@ -80,11 +93,11 @@ impl Scope {
                     }
                     Ok(response)
                 },
-                Err(error) if error.kind() == InvalidInput => Results::bad_request(Some(error.to_string())),
-                Err(error) => Results::internal_server_error(Some(error.to_string()))
+                Err(error) if error.kind() == InvalidInput => status!(400, error.to_string()),
+                Err(error) => status!(500, error.to_string())
             }
         } else {
-            Results::not_found()
+            status!(404)
         }
     }
 }

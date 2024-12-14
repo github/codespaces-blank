@@ -13,7 +13,9 @@ async fn main() -> std::io::Result<()> {
 
     // GET /hello
     app.map_get("/hello", || async {
-        ok!("Hello World!")
+        ok!("Hello World!", [
+            ("x-custom-head", "some-value")
+        ])
     });
 
     app.run().await
