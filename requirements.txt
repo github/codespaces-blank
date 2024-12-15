@@ -1,4 +1,3 @@
-bing_image_downloader
 deep-translator
 openai
 aiofiles
