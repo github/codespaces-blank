@@ -3,8 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 from pyrogram import Client, filters
 from pyrogram.types import InputMediaPhoto, Message
-from TanuMusic import app 
-# Your Telegram bot 
+from TanuMusic import app
 
 # Function to fetch images from Google Images
 def fetch_google_images(query, num_images=7):
@@ -14,9 +13,11 @@ def fetch_google_images(query, num_images=7):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
     }
-    response = requests.get(url, headers=headers)
 
-    if response.status_code == 200:
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()  # Will raise an HTTPError for bad responses (4xx or 5xx)
+        
         soup = BeautifulSoup(response.text, 'html.parser')
         image_urls = []
 
@@ -29,11 +30,12 @@ def fetch_google_images(query, num_images=7):
                 break
 
         return image_urls
-    else:
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching images: {e}")
         return []
 
 # Function to download images
-def download_images(image_urls, folder='images'):
+def download_images(image_urls, folder='downloads'):
     if not os.path.exists(folder):
         os.makedirs(folder)
 
@@ -69,6 +71,9 @@ async def google_img_search(client: Client, message: Message):
     # Download images
     downloaded_images = download_images(image_urls, folder="downloads")
 
+    if not downloaded_images:
+        return await message.reply("❍ ɪɴsᴜғғɪᴄɪᴇɴᴛ ɪᴍᴀɢᴇs ᴛᴏ sᴇɴᴅ.")
+
     try:
         # Send images as a media group
         await app.send_media_group(
@@ -87,3 +92,6 @@ async def google_img_search(client: Client, message: Message):
         # Handle errors while sending images
         await msg.delete()
         return await message.reply(f"❍ ᴇʀʀᴏʀ ɪɴ sᴇɴᴅɪɴɢ ɪᴍᴀɢᴇs: {e}")
+
+if __name__ == "__main__":
+    app.run()
