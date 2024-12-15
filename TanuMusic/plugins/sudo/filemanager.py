@@ -1,6 +1,7 @@
 import io
 import os
 import time
+import shutil
 from inspect import signature
 from os.path import exists, isdir
 
@@ -151,11 +152,21 @@ async def lst(_, message):
 @capture_err
 async def rm_file(_, message):
     if len(message.command) < 2:
-        return await eor(message, text="Please provide a file name to delete.")
+        return await eor(message, text="Please provide a file name or directory to delete.")
     file = message.text.split(" ", 1)[1]
 
     if exists(file):
-        os.remove(file)
-        await eor(message, text=f"{file} has been deleted.")
+        if isdir(file):
+            try:
+                shutil.rmtree(file)  # Removes a directory and its contents
+                await eor(message, text=f"Directory `{file}` has been deleted.")
+            except Exception as e:
+                await eor(message, text=f"Failed to delete directory `{file}`: {str(e)}")
+        else:
+            try:
+                os.remove(file)  # Removes a file
+                await eor(message, text=f"File `{file}` has been deleted.")
+            except Exception as e:
+                await eor(message, text=f"Failed to delete file `{file}`: {str(e)}")
     else:
         await eor(message, text=f"{file} doesn't exist!")
