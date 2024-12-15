@@ -1,10 +1,53 @@
 import os
-import shutil
-from re import findall
-from bing_image_downloader import downloader
+import requests
+from bs4 import BeautifulSoup
 from pyrogram import Client, filters
 from pyrogram.types import InputMediaPhoto, Message
-from TanuMusic import app
+from TanuMusic import app 
+# Your Telegram bot 
+
+# Function to fetch images from Google Images
+def fetch_google_images(query, num_images=7):
+    query = '+'.join(query.split())
+    url = f"https://www.google.com/search?hl=en&tbm=isch&q={query}"
+
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
+    }
+    response = requests.get(url, headers=headers)
+
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, 'html.parser')
+        image_urls = []
+
+        for img_tag in soup.find_all('img', {'src': True}):
+            img_url = img_tag['src']
+            if img_url.startswith('http'):
+                image_urls.append(img_url)
+
+            if len(image_urls) >= num_images:
+                break
+
+        return image_urls
+    else:
+        return []
+
+# Function to download images
+def download_images(image_urls, folder='images'):
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+
+    paths = []
+    for i, url in enumerate(image_urls):
+        try:
+            img_data = requests.get(url).content
+            img_path = os.path.join(folder, f'image_{i+1}.jpg')
+            with open(img_path, 'wb') as img_file:
+                img_file.write(img_data)
+            paths.append(img_path)
+        except Exception as e:
+            print(f"Error downloading image {i+1}: {e}")
+    return paths
 
 @app.on_message(filters.command("img", "image"))
 async def google_img_search(client: Client, message: Message):
@@ -15,50 +58,32 @@ async def google_img_search(client: Client, message: Message):
     except IndexError:
         return await message.reply("❍ ᴘʀᴏᴠɪᴅᴇ ᴀɴ ɪᴍᴀɢᴇ ǫᴜɪɴ ᴛᴏ sᴇᴀʀᴄʜ!")
 
-    lim = findall(r"lim=\d+", query)
-    try:
-        lim = int(lim[0].replace("lim=", ""))
-        query = query.replace(f"lim={lim}", "")
-    except IndexError:
-        lim = 6  # Default limit to 6 images
+    lim = 7  # Default limit to 7 images
+    image_urls = fetch_google_images(query, num_images=lim)
 
-    download_dir = "downloads"
-
-    try:
-        # Download images
-        downloader.download(query, limit=lim, output_dir=download_dir, adult_filter_off=True, force_replace=False, timeout=60)
-        images_dir = os.path.join(download_dir, query)
-        
-        # Ensure there are images to send
-        if not os.listdir(images_dir):
-            raise Exception("No images were downloaded.")
-        
-        # Get only the number of images as specified by lim
-        lst = [os.path.join(images_dir, img) for img in os.listdir(images_dir)][:lim]
-        
-    except Exception as e:
-        return await message.reply(f"❍ ᴇʀʀᴏʀ ɪɴ ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ɪᴍᴀɢᴇs: {e}")
+    if not image_urls:
+        return await message.reply("❍ ɴᴏ ɪᴍᴀɢᴇs ғᴏᴜɴᴅ!")
 
     msg = await message.reply("❍ ғɪɴᴅɪɴɢ ɪᴍᴀɢᴇs.....")
 
-    count = 0
-    for img in lst:
-        count += 1
-        await msg.edit(f"❍ ғɪɴᴅ {count} ɪᴍᴀɢᴇs.....")
+    # Download images
+    downloaded_images = download_images(image_urls, folder="downloads")
 
     try:
         # Send images as a media group
         await app.send_media_group(
             chat_id=chat_id,
-            media=[InputMediaPhoto(media=img) for img in lst],
+            media=[InputMediaPhoto(media=img) for img in downloaded_images],
             reply_to_message_id=message.id
         )
 
         # Cleanup the downloaded images after sending
-        shutil.rmtree(images_dir)
+        for img in downloaded_images:
+            os.remove(img)
+
         await msg.delete()
 
     except Exception as e:
-        # Handle any errors while sending images
+        # Handle errors while sending images
         await msg.delete()
         return await message.reply(f"❍ ᴇʀʀᴏʀ ɪɴ sᴇɴᴅɪɴɢ ɪᴍᴀɢᴇs: {e}")
