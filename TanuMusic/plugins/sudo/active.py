@@ -54,7 +54,7 @@ async def activevc(_, message: Message):
         else:
             text += f"<b>{j + 1}.</b> {unidecode(title).upper()} [<code>{x}</code>]\n"
         
-        button_text = f"ᴊᴏɪɴ {ordinal(j + 1)} ɢʀᴏᴜᴘ "
+        button_text = f"{ordinal(j + 1)} ɢʀᴏᴜᴘ "
         buttons.append([InlineKeyboardButton(button_text, url=invite_link)])
         j += 1
 
@@ -94,7 +94,7 @@ async def activevi_(_, message: Message):
         else:
             text += f"<b>{j + 1}.</b> {unidecode(title).upper()} [<code>{x}</code>]\n"
         
-        button_text = f" ᴊᴏɪɴ {ordinal(j + 1)} ɢʀᴏᴜᴘ "
+        button_text = f"{ordinal(j + 1)} ɢʀᴏᴜᴘ "
         buttons.append([InlineKeyboardButton(button_text, url=invite_link)])
         j += 1
 
