@@ -93,5 +93,3 @@ async def google_img_search(client: Client, message: Message):
         await msg.delete()
         return await message.reply(f"❍ ᴇʀʀᴏʀ ɪɴ sᴇɴᴅɪɴɢ ɪᴍᴀɢᴇs: {e}")
 
-if __name__ == "__main__":
-    app.run()
