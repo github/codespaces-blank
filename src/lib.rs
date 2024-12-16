@@ -12,7 +12,7 @@
 //! ## Example
 //! ```toml
 //! [dependencies]
-//! volga = "0.4.2"
+//! volga = "0.4.3"
 //! tokio = { version = "1", features = ["full"] }
 //! ```
 //! ```no_run
@@ -73,6 +73,7 @@ pub use hyper::{
         CONTENT_DISPOSITION,
         TRANSFER_ENCODING,
         CONTENT_TYPE,
+        CONTENT_LENGTH,
         SERVER
     }
 };

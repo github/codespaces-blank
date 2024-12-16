@@ -1,6 +1,6 @@
 [package]
 name = "volga"
-version = "0.4.2"
+version = "0.4.3"
 edition = "2021"
 rust-version = "1.80.0"
 authors = ["Roman Emreis <roman.emreis@outlook.com>"]
@@ -19,6 +19,7 @@ futures-util = { version = "0.3.31", default-features = false, features = ["allo
 http-body-util = "0.1.2"
 hyper = { version = "1.5.1", features = ["server"], optional = true }
 hyper-util = { version = "0.1.10", features = ["server", "server-auto", "server-graceful", "service", "tokio"], optional = true }
+itoa = "1.0.14"
 mime = "0.3.17"
 pin-project-lite = "0.2.15"
 tokio = { version = "1.42.0", features = ["full"] }

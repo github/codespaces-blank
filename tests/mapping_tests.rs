@@ -185,3 +185,58 @@ async fn it_maps_to_trace_request() {
     assert!(response.status().is_success());
     assert_eq!(response.text().await.unwrap(), "");
 }
+
+#[tokio::test]
+async fn it_maps_to_head_along_with_get_request() {
+    tokio::spawn(async {
+        let mut app = App::new().bind("127.0.0.1:7906");
+        app.map_get("/test", || async {
+            Results::text("Pass!")
+        });
+        app.run().await
+    });
+
+    let response = tokio::spawn(async {
+        let client = if cfg!(all(feature = "http1", not(feature = "http2"))) {
+            reqwest::Client::builder().http1_only().build().unwrap()
+        } else {
+            reqwest::Client::builder().http2_prior_knowledge().build().unwrap()
+        };
+        client.head("http://127.0.0.1:7906/test").send().await
+    }).await.unwrap().unwrap();
+
+    assert!(response.status().is_success());
+    assert_eq!(response.headers().get("Content-Length").unwrap(), "5");
+    assert_eq!(response.text().await.unwrap(), "");
+}
+
+#[tokio::test]
+async fn it_overrides_default_head_map() {
+    tokio::spawn(async {
+        let mut app = App::new().bind("127.0.0.1:7907");
+        app.map_head("/test", || async {
+            volga::ok!([
+                ("x-header", "Hello from HEAD")
+            ])
+        });
+        app.map_get("/test", || async {
+            volga::ok!("Pass!", [
+                ("x-header", "Hello from GET")
+            ])
+        });
+        app.run().await
+    });
+
+    let response = tokio::spawn(async {
+        let client = if cfg!(all(feature = "http1", not(feature = "http2"))) {
+            reqwest::Client::builder().http1_only().build().unwrap()
+        } else {
+            reqwest::Client::builder().http2_prior_knowledge().build().unwrap()
+        };
+        client.head("http://127.0.0.1:7907/test").send().await
+    }).await.unwrap().unwrap();
+
+    assert!(response.status().is_success());
+    assert_eq!(response.headers().get("x-header").unwrap(), "Hello from HEAD");
+    assert_eq!(response.text().await.unwrap(), "");
+}

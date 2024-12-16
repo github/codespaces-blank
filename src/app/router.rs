@@ -201,7 +201,13 @@ impl Router for App {
         Args: FromRequest + Send + Sync + 'static
     {
         let handler = Func::new(handler);
-        self.endpoints_mut().map_route(Method::GET, pattern, handler);
+        let endpoints = self.endpoints_mut();
+        endpoints.map_route(Method::GET, pattern, handler.clone());
+        
+        let head = Method::HEAD;
+        if !endpoints.contains(&head, pattern) { 
+            endpoints.map_route(head, pattern, handler.clone());
+        } 
     }
 
     fn map_post<F, Args>(&mut self, pattern: &str, handler: F)

@@ -1,12 +1,17 @@
 ﻿use std::collections::HashMap;
+use hyper::Method;
 use crate::app::endpoints::handlers::RouteHandler;
+
+const END_OF_ROUTE: &str = "";
+const OPEN_BRACKET: char = '{';
+const CLOSE_BRACKET: char = '}';
 
 pub(crate) type PathArguments = Vec<(String, String)>;
 
 pub(super) enum Route {
     Static(HashMap<String, Route>),
     Dynamic(HashMap<String, Route>),
-    Handler(RouteHandler)
+    Handler(HashMap<Method, RouteHandler>)
 }
 
 pub(super) struct RouteParams<'route> {
@@ -15,9 +20,13 @@ pub(super) struct RouteParams<'route> {
 }
 
 impl Route {
-    pub(super) fn insert(&mut self, path_segments: &[String], handler: RouteHandler) {
+    pub(super) fn insert(
+        &mut self, 
+        path_segments: &[String], 
+        method: Method, 
+        handler: RouteHandler
+    ) {
         let mut current = self;
-
         for (index, segment) in path_segments.iter().enumerate() {
             let is_last = index == path_segments.len() - 1;
             let is_dynamic = Self::is_dynamic_segment(segment);
@@ -38,7 +47,20 @@ impl Route {
                         match entry {
                             Route::Dynamic(ref mut map) |
                             Route::Static(ref mut map) => {
-                                map.insert("".to_string(), Route::Handler(handler.clone()));
+                                if let Some(endpoint) = map.get_mut(END_OF_ROUTE) { 
+                                    match endpoint { 
+                                        Route::Handler(ref mut methods) => 
+                                            methods.insert(method.clone(), handler.clone()),
+                                        _ => unreachable!()
+                                    };
+                                } else { 
+                                    map.insert(
+                                        END_OF_ROUTE.into(), 
+                                        Route::Handler(HashMap::from([
+                                            (method.clone(), handler.clone())
+                                        ]))
+                                    );
+                                }
                             },
                             _ => ()
                         }
@@ -54,7 +76,6 @@ impl Route {
     pub(super) fn find(&self, path_segments: &[String]) -> Option<RouteParams> {
         let mut current = Some(self);
         let mut params = Vec::new();
-
         for (index, segment) in path_segments.iter().enumerate() {
             let is_last = index == path_segments.len() - 1;
 
@@ -68,7 +89,7 @@ impl Route {
                         map.iter()
                             .filter(|(key, _)| Self::is_dynamic_segment(key))
                             .map(|(key, route)| {
-                                if let Some(param_name) = key.strip_prefix('{').and_then(|k| k.strip_suffix('}')) {
+                                if let Some(param_name) = key.strip_prefix(OPEN_BRACKET).and_then(|k| k.strip_suffix(CLOSE_BRACKET)) {
                                     params.push((param_name.to_string(), segment.clone()));
                                 }
                                 route
@@ -82,7 +103,7 @@ impl Route {
                             match route {
                                 Route::Dynamic(inner_map) | Route::Static(inner_map) => {
                                     // Attempt to get handler directly if no further routing is possible
-                                    inner_map.get("").or(Some(route))
+                                    inner_map.get(END_OF_ROUTE).or(Some(route))
                                 },
                                 handler @ Route::Handler(_) => Some(handler), // Direct handler return
                             }
@@ -102,13 +123,15 @@ impl Route {
 
     #[inline]
     fn is_dynamic_segment(segment: &str) -> bool {
-        segment.starts_with("{") && segment.ends_with("}")
+        segment.starts_with(OPEN_BRACKET) && 
+        segment.ends_with(CLOSE_BRACKET)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
+    use hyper::Method;
     
     use crate::ok;
     use crate::app::endpoints::handlers::Func;
@@ -122,7 +145,7 @@ mod tests {
         let path = ["test".into()];
         
         let mut route = Route::Static(HashMap::new());
-        route.insert(&path, handler);
+        route.insert(&path, Method::GET, handler);
         
         let route_params = route.find(&path);
         
@@ -137,7 +160,7 @@ mod tests {
         let path = ["test".into(), "{value}".into()];
 
         let mut route = Route::Static(HashMap::new());
-        route.insert(&path, handler);
+        route.insert(&path, Method::GET, handler);
 
         let path = ["test".into(), "some".into()];
         
