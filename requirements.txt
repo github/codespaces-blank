@@ -34,7 +34,6 @@ pyshorteners
 gunicorn==22.0.0
 youtube-search
 youtube-search-python
-pornhub-api==0.3.0
 async_pymongo
 gpytranslate
 search_engine_parser
@@ -50,7 +49,7 @@ pydub
 apscheduler
 gtts
 py-tgcalls==0.9.7
-lexica-api==1.5.7
+
 
 git+https://github.com/yt-dlp/yt-dlp
 git+https://github.com/alexmercerind/youtube-search-python@main
