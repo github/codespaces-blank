@@ -11,7 +11,7 @@ async def privacy(client, message: Message):
     keyboard = InlineKeyboardMarkup(
         [[InlineKeyboardButton("ᴠɪᴇᴡ ᴘʀɪᴠᴀᴄʏ ᴘᴏʟɪᴄʏ", url=config.PRIVACY_LINK)]]
     )
-    TEXT = f"""
+    TEXT = f""">
 🔒 **Privacy Policy for {client.me.mention} !**
 
 Your privacy is important to us. To learn more about how we collect, use, and protect your data, please review our Privacy Policy here: [Privacy Policy]({config.PRIVACY_LINK}).
