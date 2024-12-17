@@ -9,19 +9,14 @@ ffmpeg-python
 gitpython
 hachoir
 heroku3
-#httpx[http2]
-httpx==0.27.2
 lyricsgenius
 motor
 wget
 pycountry
-pillow==11.0.0
-pymongo==4.9.1
 psutil
 pytube
 pykeyboard
 unidecode
-#ntgcalls==1.1.2
 python-dotenv
 pyyaml
 requests
@@ -31,7 +26,6 @@ tgcrypto
 urllib3
 flask
 pyshorteners
-gunicorn==22.0.0
 youtube-search
 youtube-search-python
 async_pymongo
@@ -48,10 +42,15 @@ pytz
 pydub
 apscheduler
 gtts
+
+httpx==0.27.2
+gunicorn==22.0.0
+pillow==11.0.0
+pymongo==4.9.1
 py-tgcalls==0.9.7
+lexica-api==1.5.7
 
 
 git+https://github.com/yt-dlp/yt-dlp
 git+https://github.com/alexmercerind/youtube-search-python@main
 git+https://github.com/joetats/youtube_search@master
-
