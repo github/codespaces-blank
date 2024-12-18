@@ -47,10 +47,10 @@ bson
 httpx==0.27.2
 gunicorn==22.0.0
 pillow==11.0.0
-pymongo==4.9.1
+#pymongo==4.9.1
 py-tgcalls==0.9.7
 lexica-api==1.5.7
-
+pymongo==3.12.0
 
 git+https://github.com/yt-dlp/yt-dlp
 git+https://github.com/alexmercerind/youtube-search-python@main
