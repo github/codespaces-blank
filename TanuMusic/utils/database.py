@@ -1,4 +1,5 @@
 import random
+from typing import Dict, List, Union
 
 from TanuMusic import userbot
 from TanuMusic.core.mongo import mongodb
