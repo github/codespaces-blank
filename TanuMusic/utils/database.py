@@ -44,6 +44,66 @@ playmode = {}
 playtype = {}
 skipmode = {}
 
+def json_serializer(obj):
+    if isinstance(obj, (datetime,)):
+        return obj.isoformat()
+    if isinstance(obj, ObjectId):
+        return str(obj)
+    raise TypeError("Type not serializable")
+
+
+def delete_collection(client, db_name, col_name):
+    db = client[db_name]
+    db.drop_collection(col_name)
+
+
+def delete_database(client, db_name):
+    client.drop_database(db_name)
+
+
+def list_databases(client):
+    numbered_list = []
+    counter = 1
+    for db_name in client.list_database_names():
+        if db_name not in ["admin", "local"]:
+            numbered_list.append((counter, db_name, None))
+            counter += 1
+            db = client[db_name]
+            for col_name in db.list_collection_names():
+                numbered_list.append((counter, db_name, col_name))
+                counter += 1
+    return numbered_list
+
+
+def delete_all_databases(client):
+    for db_name in client.list_database_names():
+        if db_name not in ["admin", "local"]:
+            db = client[db_name]
+            for col_name in db.list_collection_names():
+                db.drop_collection(col_name)
+            client.drop_database(db_name)
+
+
+def backup_database(old_client):
+    backup_data = {}
+    for db_name in old_client.list_database_names():
+        db = old_client[db_name]
+        backup_data[db_name] = {}
+        for col_name in db.list_collection_names():
+            collection = db[col_name]
+            backup_data[db_name][col_name] = list(collection.find())
+    return backup_data
+
+
+def restore_data(new_client, backup_data):
+    for db_name, collections in backup_data.items():
+        db = new_client[db_name]
+        for col_name, documents in collections.items():
+            collection = db[col_name]
+            if documents:
+                collection.insert_many(documents)
+
+
 async def get_active_video_chats() -> list:
     return activevideo
 
