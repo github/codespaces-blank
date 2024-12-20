@@ -1,5 +1,6 @@
 import time
 import random
+import pyrogram
 from pyrogram import filters
 from pyrogram.enums import ChatType
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
