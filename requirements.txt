@@ -51,6 +51,7 @@ py-tgcalls==0.9.7
 lexica-api==1.5.7
 #pymongo==3.12.0
 
+git+https://github.com/Mayuri-Chan/pyrofork
 git+https://github.com/yt-dlp/yt-dlp
 git+https://github.com/alexmercerind/youtube-search-python@main
 git+https://github.com/joetats/youtube_search@master
