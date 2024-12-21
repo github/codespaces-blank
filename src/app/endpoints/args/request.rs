@@ -16,7 +16,7 @@ impl FromPayload for HttpRequest {
     #[inline]
     fn from_payload(payload: Payload) -> Self::Future {
         if let Payload::Full(req) = payload {
-            ok(HttpRequest(req))
+            ok(req)
         } else {
             unreachable!()
         }

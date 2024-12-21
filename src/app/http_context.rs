@@ -11,6 +11,9 @@ use crate::{
     HttpResult
 };
 
+#[cfg(feature = "di")]
+use crate::app::di::Inject;
+
 /// Describes current HTTP context which consists of the current HTTP request data 
 /// and the reference to the method handler fot this request
 pub struct HttpContext {
@@ -48,6 +51,12 @@ impl HttpContext {
     #[inline]
     pub fn extract<T: FromRequestRef>(&self) -> Result<T, Error> {
         self.request.extract()
+    }
+
+    /// Resolves a service from Dependency Container
+    #[cfg(feature = "di")]
+    pub fn resolve<T: Inject + 'static>(&mut self) -> Result<T, Error> {
+        self.request.container.resolve::<T>()
     }
     
     /// Inserts the [`Header<T>`] to HTTP request headers

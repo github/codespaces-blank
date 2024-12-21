@@ -16,8 +16,8 @@ use hyper::{
     HeaderMap
 };
 
-use crate::{app::Pipeline, HttpResponse, HttpResult, HttpRequest, HttpBody, status};
-
+use crate::{HttpResponse, HttpRequest, HttpBody, status};
+use crate::app::AppInstance;
 use crate::app::endpoints::RouteOption;
 #[cfg(feature = "middleware")]
 use crate::HttpContext;
@@ -25,7 +25,7 @@ use crate::HttpContext;
 /// Represents the execution scope of the current connection
 #[derive(Clone)]
 pub(super) struct Scope {
-    pub(super) pipeline: Arc<Pipeline>,
+    pub(super) shared: Arc<AppInstance>,
     pub(super) cancellation_token: CancellationToken
 }
 
@@ -37,27 +37,27 @@ impl Service<Request<Incoming>> for Scope {
     #[inline]
     fn call(&self, request: Request<Incoming>) -> Self::Future {
         Box::pin(Self::handle_request(
-            HttpRequest(request), 
-            self.pipeline.clone(), 
+            request, 
+            self.shared.clone(),
             self.cancellation_token.clone()
         ))
     }
 }
 
 impl Scope {
-    pub(super) fn new(pipeline: Arc<Pipeline>) -> Self {
-        Self { 
+    pub(super) fn new(shared: Arc<AppInstance>) -> Self {
+        Self {
             cancellation_token: CancellationToken::new(),
-            pipeline
+            shared
         }
     }
     
     pub(super) async fn handle_request(
-        mut request: HttpRequest, 
-        pipeline: Arc<Pipeline>, 
+        request: Request<Incoming>, 
+        shared: Arc<AppInstance>,
         cancellation_token: CancellationToken
-    ) -> io::Result<HttpResponse>
-    {
+    ) -> io::Result<HttpResponse> {
+        let pipeline = &shared.pipeline;
         match pipeline.endpoints().get_endpoint(request.method(), request.uri()) {
             RouteOption::RouteNotFound => status!(404),
             RouteOption::MethodNotFound(allowed) => status!(405, [
@@ -66,26 +66,26 @@ impl Scope {
             RouteOption::Ok(endpoint_context) => {
                 let (handler, params) = endpoint_context.into_parts();
 
+                #[cfg(feature = "di")]
+                let mut request = HttpRequest::new(request, shared.container.clone());
+                #[cfg(not(feature = "di"))]
+                let mut request = HttpRequest::new(request);
+                
                 let extensions = request.extensions_mut();
                 extensions.insert(cancellation_token);
                 extensions.insert(params);
-
+                
                 let request_method = request.method().clone();
 
-                let response: HttpResult;
                 #[cfg(feature = "middleware")]
-                {
-                    response = if pipeline.has_middleware_pipeline() {
-                        let ctx = HttpContext::new(request, handler);
-                        pipeline.execute(ctx).await
-                    } else {
-                        handler.call(request).await
-                    };
-                }
+                let response = if pipeline.has_middleware_pipeline() {
+                    let ctx = HttpContext::new(request, handler);
+                    pipeline.execute(ctx).await
+                } else {
+                    handler.call(request).await
+                };
                 #[cfg(not(feature = "middleware"))]
-                {
-                    response = handler.call(request).await;
-                }
+                let response = handler.call(request).await;
 
                 match response {
                     Ok(mut response) => {

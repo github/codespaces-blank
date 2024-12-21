@@ -65,6 +65,12 @@ pub use crate::app::http_context::HttpContext;
 #[cfg(feature = "middleware")]
 pub use crate::app::middlewares::{Next, Middleware};
 
+#[cfg(feature = "di")]
+pub use crate::app::endpoints::args::dc::Dc;
+
+#[cfg(feature = "di")]
+pub use crate::app::di::Inject;
+
 // Re-exporting HTTP status codes, Response and some headers from hyper/http
 pub use hyper::{
     StatusCode, 

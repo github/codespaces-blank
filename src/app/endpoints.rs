@@ -52,26 +52,28 @@ impl Endpoints {
     #[inline]
     pub(crate) fn get_endpoint(&self, method: &Method, uri: &Uri) -> RouteOption {
         let path_segments = Self::split_path(uri.path());
-        self.routes.find(&path_segments)
-            .map_or_else(
-                || RouteOption::RouteNotFound, 
-                |route_params| {
-                    match route_params.route {
-                        Route::Handler(handlers) => {
-                            handlers.get(method)
-                                .map_or_else(
-                                    || {
-                                        let allowed: Vec<&str> = handlers
-                                            .keys()
-                                            .map(|k| k.as_str())
-                                            .collect();
-                                        RouteOption::MethodNotFound(allowed.join(ALLOW_METHOD_SEPARATOR))
-                                    }, 
-                                    |handler| RouteOption::Ok(EndpointContext::new(handler.clone(), route_params.params)))
-                        },
-                        _ => RouteOption::RouteNotFound
-                    }  
-                })
+        let route_params = match self.routes.find(&path_segments) {
+            Some(params) => params,
+            None => return RouteOption::RouteNotFound,
+        };
+
+        if let Route::Handler(handlers) = &route_params.route {
+            return handlers.get(method).map_or_else(
+                || {
+                    let allowed_methods = handlers
+                        .keys()
+                        .map(|key| key.as_str())
+                        .collect::<Vec<_>>()
+                        .join(ALLOW_METHOD_SEPARATOR);
+                    RouteOption::MethodNotFound(allowed_methods)
+                },
+                |handler| RouteOption::Ok(
+                    EndpointContext::new(handler.clone(), route_params.params)
+                ),
+            );
+        }
+
+        RouteOption::RouteNotFound
     }
 
     /// Maps the request handler to the current HTTP Verb and route pattern

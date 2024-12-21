@@ -31,12 +31,13 @@ serde_urlencoded = "0.7.1"
 [dev-dependencies]
 reqwest = { version = "0.12.9", features = ["blocking", "json", "http2"] }
 serde = { version = "1.0.215", features = ["derive"] }
+uuid = { version = "1.11.0", features = ["v4"] }
 
 [features]
 # Default HTTP/1 only server
-default = ["http1", "middleware"]
+default = ["http1", "middleware", "di"]
 # HTTP/1 and HTTP/2 server
-full = ["http1", "http2", "middleware"]
+full = ["http1", "http2", "middleware", "di"]
 
 # Mimimal HTTP/1
 mini = ["http1"]
@@ -47,6 +48,7 @@ http1 = ["dep:hyper", "hyper?/http1", "dep:hyper-util", "hyper-util?/http1"]
 http2 = ["dep:hyper", "hyper?/http2", "dep:hyper-util", "hyper-util?/http2"]
 
 middleware = []
+di = []
 
 [[test]]
 name = "middleware_mapping_tests"
@@ -109,3 +111,8 @@ path = "examples/http_request_handler.rs"
 [[example]]
 name = "trace_request"
 path = "examples/trace_request.rs"
+
+[[example]]
+name = "dependency_injection"
+path = "examples/dependency_injection.rs"
+required-features = ["middleware", "di"]

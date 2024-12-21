@@ -260,9 +260,12 @@ macro_rules! not_found {
     () => {
         $crate::status!(404)
     };
+    ([ $( ($key:expr, $value:expr) ),* $(,)? ]) => {
+        $crate::status!(404, [ $( ($key, $value) ),* ])
+    };
     ($e:expr) => {
         $crate::status!(404, $e)
-    }
+    };
 }
 
 /// Produces HTTP 400 BAD REQUEST response
@@ -782,6 +785,24 @@ mod tests {
 
         assert_eq!(String::from_utf8_lossy(body), "\"User not found\"");
         assert_eq!(response.status(), 404);
+    }
+
+    #[tokio::test]
+    async fn it_creates_404_response_with_headers() {
+        let response = not_found!([
+            ("x-api-key", "some api key"),
+            ("x-req-id", "some req id"),
+        ]);
+
+        assert!(response.is_ok());
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+
+        assert_eq!(body.len(), 0);
+        assert_eq!(response.status(), 404);
+        assert_eq!(response.headers().get("x-api-key").unwrap(), "some api key");
+        assert_eq!(response.headers().get("x-req-id").unwrap(), "some req id");
     }
 
     #[tokio::test]

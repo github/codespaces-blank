@@ -7,13 +7,12 @@ use hyper::{
     body::Incoming, 
     Uri, 
     HeaderMap, 
-    Request
 };
 
-use crate::{
-    app::endpoints::route::PathArguments,
-    HttpRequest
-};
+use crate::{app::endpoints::route::PathArguments, HttpRequest};
+
+#[cfg(feature = "di")]
+use crate::app::di::Container;
 
 pub mod path;
 pub mod query;
@@ -22,16 +21,20 @@ pub mod json;
 pub mod file;
 pub mod cancellation_token;
 pub mod request;
+#[cfg(feature = "di")]
+pub mod dc;
 
 /// Holds the payload for extractors
 pub(crate) enum Payload<'a> {
     None,
-    Full(Request<Incoming>),
+    Full(HttpRequest),
     Body(Incoming),
     Query(&'a Uri),
     Headers(&'a HeaderMap),
     Path(&'a (String, String)),
-    Ext(&'a Extensions)
+    Ext(&'a Extensions),
+    #[cfg(feature = "di")]
+    Dc(&'a mut Container)
 }
 
 /// Describes a data source for extractors to read from
@@ -42,7 +45,9 @@ pub(crate) enum Source {
     Query,
     Headers,
     Body,
-    Ext
+    Ext,
+    #[cfg(feature = "di")]
+    Dc
 }
 
 /// Specifies extractors to read data from HTTP request
@@ -81,7 +86,11 @@ macro_rules! define_generic_from_request {
         impl<$($T: FromPayload),+> FromRequest for ($($T,)+) {
             #[inline]
             async fn from_request(req: HttpRequest) -> Result<Self, Error> {
+                #[cfg(feature = "di")]
+                let (parts, body, mut container) = req.into_parts();
+                #[cfg(not(feature = "di"))]
                 let (parts, body) = req.into_parts();
+                
                 let params = parts.extensions.get::<PathArguments>()
                     .map(|params| &params[..])
                     .unwrap_or(&[]);
@@ -95,18 +104,26 @@ macro_rules! define_generic_from_request {
                         Source::Query => Payload::Query(&parts.uri),
                         Source::Headers => Payload::Headers(&parts.headers),
                         Source::Ext => Payload::Ext(&parts.extensions),
+                        #[cfg(feature = "di")]
+                        Source::Dc => Payload::Dc(&mut container),
                         Source::Path => match iter.next() {
                             Some(param) => Payload::Path(&param),
-                            None => Payload::None
-                        },
-                        Source::Full => match body.take() { 
-                            Some(body) => Payload::Full(Request::from_parts(parts.clone(), body)),
                             None => Payload::None
                         },
                         Source::Body => match body.take() {
                             Some(body) => Payload::Body(body),
                             None => Payload::None
-                        }
+                        },
+                        Source::Full => match body.take() {
+                            Some(body) => {
+                                #[cfg(feature = "di")]
+                                let req = Payload::Full(HttpRequest::from_parts(parts.clone(), body, container.clone()));
+                                #[cfg(not(feature = "di"))]
+                                let req = Payload::Full(HttpRequest::from_parts(parts.clone(), body));
+                                req
+                            },
+                            None => Payload::None
+                        },
                     }).await?,
                     )*    
                 );

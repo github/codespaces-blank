@@ -13,47 +13,87 @@ use std::{
 use std::io::ErrorKind;
 use crate::{app::endpoints::args::FromRequestRef, headers::{FromHeaders, Header}, BoxBody};
 
+#[cfg(feature = "di")]
+use crate::app::di::Container;
+
 /// Wraps the incoming [`Request`] to enrich its functionality
-pub struct HttpRequest(pub Request<Incoming>);
+//pub struct HttpRequest(pub Request<Incoming>);
+pub struct HttpRequest {
+    pub inner: Request<Incoming>,
+    #[cfg(feature = "di")]
+    pub(crate) container: Container
+}
 
 impl Deref for HttpRequest {
     type Target = Request<Incoming>;
 
     fn deref(&self) -> &Self::Target {
-        &self.0
+        &self.inner
     }
 }
 
 impl DerefMut for HttpRequest {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
+        &mut self.inner
     }
 }
 
 impl HttpRequest {
+    #[cfg(not(feature = "di"))]
+    pub fn new(request: Request<Incoming>) -> Self {
+        Self { inner: request }
+    }
+
+    #[cfg(feature = "di")]
+    pub fn new(request: Request<Incoming>, container: Container) -> Self {
+        Self { inner: request, container }
+    }
+    
     /// Unwraps the inner request
     #[inline]
     pub fn into_inner(self) -> Request<Incoming> {
-        self.0
+        self.inner
     }
 
     /// Consumes the request and returns just the body
     #[inline]
     pub fn into_body(self) -> Incoming {
-        self.0.into_body()
+        self.inner.into_body()
     }
 
     /// Consumes the request and returns the body as boxed trait object
     #[inline]
     pub fn into_boxed_body(self) -> BoxBody {
-        self.0.into_body()
+        self.inner.into_body()
             .map_err(|e| Error::new(ErrorKind::InvalidInput, e))
             .boxed()
     }
 
     /// Consumes the request and returns request head and body
+    #[cfg(not(feature = "di"))]
     pub fn into_parts(self) -> (Parts, Incoming) {
-        self.0.into_parts()
+        self.inner.into_parts()
+    }
+
+    /// Consumes the request and returns request head, body and scoped DI container
+    #[cfg(feature = "di")]
+    pub fn into_parts(self) -> (Parts, Incoming, Container) {
+        let (parts, body) = self.inner.into_parts();
+        (parts, body, self.container)
+    }
+
+    /// Creates a new `HttpRequest` with the given head and body
+    #[cfg(not(feature = "di"))]
+    pub fn from_parts(parts: Parts, body: Incoming) -> Self {
+        let request = Request::from_parts(parts, body);
+        Self::new(request)
+    }
+    
+    /// Creates a new `HttpRequest` with the given head, body and scoped DI container
+    #[cfg(feature = "di")]
+    pub fn from_parts(parts: Parts, body: Incoming, container: Container) -> Self {
+        let request = Request::from_parts(parts, body);
+        Self::new(request, container)
     }
     
     /// Extracts a payload from request parts

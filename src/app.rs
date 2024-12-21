@@ -19,6 +19,8 @@ use crate::app::{
 
 #[cfg(feature = "middleware")]
 use crate::app::middlewares::{Middlewares, Middleware};
+#[cfg(feature = "di")]
+use crate::app::di::{Inject, Container, ContainerBuilder};
 
 #[cfg(feature = "middleware")]
 pub mod middlewares;
@@ -29,6 +31,8 @@ pub mod body;
 pub mod request;
 pub mod results;
 pub mod router;
+#[cfg(feature = "di")]
+pub mod di;
 pub(crate) mod pipeline;
 mod scope;
 mod server;
@@ -49,6 +53,8 @@ const DEFAULT_PORT: u16 = 7878;
 ///}
 /// ```
 pub struct App {
+    #[cfg(feature = "di")]
+    container: ContainerBuilder,
     pipeline: PipelineBuilder,
     connection: Connection
 }
@@ -74,6 +80,24 @@ impl Connection {
     }
 }
 
+/// Contains a shared resources of running Web Server
+pub(crate) struct AppInstance {
+    #[cfg(feature = "di")]
+    container: Container,
+    pipeline: Pipeline
+}
+
+impl AppInstance {
+    fn new(app: App) -> Arc<Self> {
+        let this = Self {
+            #[cfg(feature = "di")]
+            container: app.container.build(),
+            pipeline: app.pipeline.build()
+        };
+        Arc::new(this)
+    }
+}
+
 impl Default for App {
     fn default() -> Self {
         Self::new()
@@ -91,6 +115,8 @@ impl App {
     /// ```
     pub fn new() -> Self {
         Self {
+            #[cfg(feature = "di")]
+            container: ContainerBuilder::new(),
             pipeline:PipelineBuilder::new(),
             connection: Default::default()
         }
@@ -109,6 +135,21 @@ impl App {
         self
     }
 
+    #[cfg(feature = "di")]
+    pub fn register_singleton<T: Inject + 'static>(&mut self, instance: T) {
+        self.container.register_singleton(instance);
+    }
+
+    #[cfg(feature = "di")]
+    pub fn register_scoped<T: Inject + 'static>(&mut self) {
+        self.container.register_scoped::<T>();
+    }
+
+    #[cfg(feature = "di")]
+    pub fn register_transient<T: Inject + 'static>(&mut self) {
+        self.container.register_transient::<T>();
+    }
+
     /// Runs the `App`
     pub async fn run(mut self) -> io::Result<()> {
         #[cfg(feature = "middleware")]
@@ -125,14 +166,14 @@ impl App {
         
         Self::subscribe_for_ctrl_c_signal(&shutdown_sender);
         
-        let pipeline = Arc::new(self.pipeline.build());
+        let app_instance = AppInstance::new(self);
         loop {
             tokio::select! {
                 Ok((stream, _)) = tcp_listener.accept() => {
-                    let pipeline = pipeline.clone();
+                    let app_instance = app_instance.clone();
                     let io = TokioIo::new(stream);
                     
-                    tokio::spawn(Self::handle_connection(io, pipeline));
+                    tokio::spawn(Self::handle_connection(io, app_instance));
                 }
                 _ = shutdown_signal.recv() => {
                     println!("Shutting down server...");
@@ -176,11 +217,11 @@ impl App {
             });
         }
     }
-    
-    async fn handle_connection(io: TokioIo<TcpStream>, pipeline: Arc<Pipeline>) {
+
+    async fn handle_connection(io: TokioIo<TcpStream>, app_instance: Arc<AppInstance>) {
         let server = Server::new(io);
-        let scope = Scope::new(pipeline);
-        
+        let scope = Scope::new(app_instance);
+
         server.serve(scope).await;
     }
 }
