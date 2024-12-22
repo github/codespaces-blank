@@ -11,16 +11,16 @@ API_ID = getenv("API_ID", None)
 API_HASH = getenv("API_HASH", None)
 
 #❖ Add Owner Username without @ 
-OWNER_USERNAME = getenv("OWNER_USERNAME", "itzAsuraa")
+OWNER_USERNAME = getenv("OWNER_USERNAME", "EasyWinter")
 
 #❖  Get Your bot username
-BOT_USERNAME = getenv("BOT_USERNAME", "TanuMusicxBot")
+BOT_USERNAME = getenv("BOT_USERNAME", "SprotifyMusicBot")
 
 #❖  Don't Add style font 
-BOT_NAME = getenv("BOT_NAME", "TANU MUSIC")
+BOT_NAME = getenv("BOT_NAME", "Sprotify Music")
 
 #❖ get Your Assistant User name
-ASSUSERNAME = getenv("ASSUSERNAME", "TANU_ASS")
+ASSUSERNAME = getenv("ASSUSERNAME", "Nanosauruss")
 
 #❖ Get your token from @BotFather on Telegram.
 BOT_TOKEN = getenv("BOT_TOKEN")
@@ -31,10 +31,10 @@ MONGO_DB_URI = getenv("MONGO_DB_URI", None)
 DURATION_LIMIT_MIN = int(getenv("DURATION_LIMIT", 600000))
 
 #❖  Chat id of a group for logging bot's activities
-LOGGER_ID = int(getenv("LOGGER_ID", "-1002100219353"))
+LOGGER_ID = int(getenv("LOGGER_ID", "-1001589206452"))
 
 #❖ Get this value from @MissRose_bot on Telegram by /id
-OWNER_ID = getenv("OWNER_ID", "7453278496")
+OWNER_ID = getenv("OWNER_ID", "1854441420")
 
 #❖  Your heroku app name
 HEROKU_APP_NAME = getenv("HEROKU_APP_NAME", None)
@@ -44,10 +44,10 @@ HEROKU_API_KEY = getenv("HEROKU_API_KEY", None)
 
 UPSTREAM_REPO = getenv(
     "UPSTREAM_REPO",
-    "https://github.com/CodeSearchDev/TanuMusic",
+    "https://github.com/Mister-Man7/SprotifyXMusic",
 )
 
-UPSTREAM_BRANCH = getenv("UPSTREAM_BRANCH", "master")
+UPSTREAM_BRANCH = getenv("UPSTREAM_BRANCH", "v2")
 
 GIT_TOKEN = getenv(
     "GIT_TOKEN", None
@@ -55,11 +55,11 @@ GIT_TOKEN = getenv(
 
 #❖ Make your bots privacy from telegra.ph and put your url here
 PRIVACY_LINK = getenv(
-    "PRIVACY_LINK", "https://graph.org/Privacy-Policy-for-Tanu-Music-11-26"
+    "PRIVACY_LINK", "https://telegra.ph/Privacy-Policy-for-SprotifyXMusic-11-29"
 )
 
-SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/C0DE_SEARCH")
-SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/AsuraaSupports")
+SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/SprotifyNews")
+SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/datarantinggi")
 
 #❖ Set this to True if you want the assistant to automatically leave chats after an interval
 AUTO_LEAVING_ASSISTANT = bool(getenv("AUTO_LEAVING_ASSISTANT", False))
@@ -97,21 +97,21 @@ confirmer = {}
 
 
 START_IMG_URL = getenv(
-    "START_IMG_URL", "https://envs.sh/SSL.jpg"
+    "START_IMG_URL", "https://graph.org/file/afe0bf9e6b4fede3afc0e.jpg"
 )
 PING_IMG_URL = getenv(
-    "PING_IMG_URL", "https://envs.sh/qEB.jpg"
+    "PING_IMG_URL", "https://graph.org/file/8f6de108a54be6506b693.jpg"
 )
-PLAYLIST_IMG_URL = "https://envs.sh/nOh.jpg"
-STATS_IMG_URL = "https://envs.sh/SSk.jpg"
-TELEGRAM_AUDIO_URL = "https://telegra.ph/file/d2081243af7c1d7578b7b.jpg"
-TELEGRAM_VIDEO_URL = "https://telegra.ph/file/d2081243af7c1d7578b7b.jpg"
-STREAM_IMG_URL = "https://telegra.ph/file/982b01ba53c3d69b0d0ce.jpg"
-SOUNCLOUD_IMG_URL = "https://telegra.ph/file/982b01ba53c3d69b0d0ce.jpg"
-YOUTUBE_IMG_URL = "https://telegra.ph/file/d2081243af7c1d7578b7b.jpg"
-SPOTIFY_ARTIST_IMG_URL = "https://telegra.ph/file/61024698bfc926e95d57a.jpg"
-SPOTIFY_ALBUM_IMG_URL = "https://telegra.ph/file/61024698bfc926e95d57a.jpg"
-SPOTIFY_PLAYLIST_IMG_URL = "https://telegra.ph/file/61024698bfc926e95d57a.jpg"
+PLAYLIST_IMG_URL = "https://graph.org/file/94074fd8f348807833802.jpg"
+STATS_IMG_URL = "https://graph.org/file/c9266ed41c1a9b8121185.jpg"
+TELEGRAM_AUDIO_URL = "https://graph.org/file/f626eb194b025672eea28.jpg"
+TELEGRAM_VIDEO_URL = "https://graph.org/file/f6e977e0046a5b8d17904.jpg"
+STREAM_IMG_URL = "https://graph.org/file/7247dcb0ae280ba3b8492.jpg"
+SOUNCLOUD_IMG_URL = "https://graph.org/file/199a1bd803d3e8c8d0e43.jpg"
+YOUTUBE_IMG_URL = "https://graph.org/file/d902a638d7bcb6653d36f.jpg"
+SPOTIFY_ARTIST_IMG_URL = "https://graph.org/file/dc9eb455f86f845f400f8.jpg"
+SPOTIFY_ALBUM_IMG_URL = "https://graph.org/file/aacfa8762c016077b7ee9.jpg"
+SPOTIFY_PLAYLIST_IMG_URL = "https://graph.org/file/480dbdc265670e833d763.jpg"
 
 
 

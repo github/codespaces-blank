@@ -1,121 +1,122 @@
 HELP_1 = """
-<pre><b>❖ ᴀᴅᴍɪɴ ᴄᴏᴍᴍᴀɴᴅs ➥</pre></b>
-● /pause ➥ ᴩᴀᴜsᴇ ᴛʜᴇ ᴄᴜʀʀᴇɴᴛ ᴩʟᴀʏɪɴɢ sᴛʀᴇᴀᴍ.
-● /resume ➥ ʀᴇsᴜᴍᴇ ᴛʜᴇ ᴩᴀᴜsᴇᴅ sᴛʀᴇᴀᴍ.
-● /skip ➥ sᴋɪᴩ ᴛʜᴇ ᴄᴜʀʀᴇɴᴛ ᴩʟᴀʏɪɴɢ sᴛʀᴇᴀᴍ ᴀɴᴅ sᴛᴀʀᴛ sᴛʀᴇᴀᴍɪɴɢ ᴛʜᴇ ɴᴇxᴛ ᴛʀᴀᴄᴋ ɪɴ ǫᴜᴇᴜᴇ.
-● /end ᴏʀ /stop ➥ ᴄʟᴇᴀʀs ᴛʜᴇ ǫᴜᴇᴜᴇ ᴀɴᴅ ᴇɴᴅ ᴛʜᴇ ᴄᴜʀʀᴇɴᴛ ᴩʟᴀʏɪɴɢ sᴛʀᴇᴀᴍ.
-● /player ➥ ɢᴇᴛ ᴀ ɪɴᴛᴇʀᴀᴄᴛɪᴠᴇ ᴩʟᴀʏᴇʀ ᴩᴀɴᴇʟ.
-● /queue ➥ sʜᴏᴡs ᴛʜᴇ ǫᴜᴇᴜᴇᴅ ᴛʀᴀᴄᴋs ʟɪsᴛ.
-● /speed or /playback ➥ ғᴏʀ ᴀᴅᴊᴜsᴛɪɴɢ ᴛʜᴇ ᴀᴜᴅɪᴏ ᴘʟᴀʏʙᴀᴄᴋ sᴘᴇᴇᴅ ɪɴ ɢʀᴏᴜᴘ.
-● /cspeed or /cplayback ➥ ғᴏʀ ᴀᴅᴊᴜsᴛɪɴɢ ᴛʜᴇ ᴀᴜᴅɪᴏ ᴘʟᴀʏʙᴀᴄᴋ sᴘᴇᴇᴅ ɪɴ ᴄʜᴀɴɴᴇʟ.
+>> Admin Commands
+┌ pause - Pause the current **playing** stream.
+├ resume - Resume the **paused** stream.
+├ skip - Skip the current playing stream and start streaming the next track in queue.
+├ end or stop - Clears the queue and ends the current playing stream.
+├ player - Get an interactive player panel.
+├ queue - Shows the queued tracks list.
+├ speed or /playback - Adjust the audio playback speed in the group.
+└ cspeed or /cplayback - Adjust the audio playback speed in the channel.
 
-<pre><b>❖ ʟᴏᴏᴘ sᴛʀᴇᴀᴍ ➥</pre></b>
-● /loop [enable/disable] ➥ ᴇɴᴀʙʟᴇs/ᴅɪsᴀʙʟᴇs ʟᴏᴏᴘ ғᴏʀ ᴛʜᴇ ᴏɴɢᴏɪɴɢ sᴛʀᴇᴀᴍ
-● /loop [1, 2, 3, ...] ➥ ᴇɴᴀʙʟᴇs ᴛʜᴇ ʟᴏᴏᴘ ғᴏʀ ᴛʜᴇ ɢɪᴠᴇɴ ᴠᴀʟᴜᴇ.
+>> Loop Stream
+┌ /loop [enable/disable] - Enables/disables loop for the ongoing stream. 
+└ /loop [1, 2, 3, ...] - Enables the loop for the given value.
 
-<b><pre>❖ sʜᴜғғʟᴇ ᴏ̨ᴜᴇᴜᴇ ➥</pre></b>
-● /shuffle ➥ sʜᴜғғʟᴇ's ᴛʜᴇ ᴏ̨ᴜᴇᴜᴇ.
-● /queue ➥ sʜᴏᴡs ᴛʜᴇ sʜᴜғғʟᴇᴅ ᴏ̨ᴜᴇᴜᴇ.
+>> Shuffle Queue
+┌ /shuffle - Shuffle the queue.  
+└ /queue - Shows the shuffled queue.
 
-<b><pre>❖ sᴇᴇᴋ sᴛʀᴇᴀᴍ ➥</pre></b>
-● /seek [ᴅᴜʀᴀᴛɪᴏɴ ɪɴ sᴇᴄᴏɴᴅs] ➥ sᴇᴇᴋ ᴛʜᴇ sᴛʀᴇᴀᴍ ᴛᴏ ᴛʜᴇ ɢɪᴠᴇɴ ᴅᴜʀᴀᴛɪᴏɴ.
-● /seekback [ᴅᴜʀᴀᴛɪᴏɴ ɪɴ sᴇᴄᴏɴᴅs] ➥ ʙᴀᴄᴋᴡᴀʀᴅ sᴇᴇᴋ ᴛʜᴇ sᴛʀᴇᴀᴍ ᴛᴏ ᴛʜᴇ ᴛʜᴇ ɢɪᴠᴇɴ ᴅᴜʀᴀᴛɪᴏɴ.
+>> Seek Stream
+┌ /seek [duration in seconds] - Seek the stream to the given duration.  
+└ /seekback [duration in seconds] - Backward seek the stream to the given duration.
 
-❖ ᴘᴏᴡᴇʀᴇᴅ ʙʏ ➥ ˹ ᴛᴀɴᴜ ꭙ ᴍᴜsɪᴄ™ ♡゙
+>> Powered by Sprotify Music
 """
 
 HELP_2 = """
-<b><pre>❖ ᴀᴜᴛʜ ᴜsᴇʀs ➥</pre></b>
-● /auth [ᴜsᴇʀɴᴀᴍᴇ/ᴜsᴇʀ_ɪᴅ] ➥ ᴀᴅᴅ ᴀ ᴜsᴇʀ ᴛᴏ ᴀᴜᴛʜ ʟɪsᴛ ᴏғ ᴛʜᴇ ʙᴏᴛ.
-● /unauth [ᴜsᴇʀɴᴀᴍᴇ/ᴜsᴇʀ_ɪᴅ] ➥ ʀᴇᴍᴏᴠᴇ ᴀ ᴀᴜᴛʜ ᴜsᴇʀs ғʀᴏᴍ ᴛʜᴇ ᴀᴜᴛʜ ᴜsᴇʀs ʟɪsᴛ.
-● /authusers ➥ sʜᴏᴡs ᴛʜᴇ ʟɪsᴛ ᴏғ ᴀᴜᴛʜ ᴜsᴇʀs ᴏғ ᴛʜᴇ ɢʀᴏᴜᴩ.
+>> Auth Users
+┌ /auth [username/user_id] - Add a user to the bot's auth list.  
+├ /unauth [username/user_id] - Remove a user from the bot's auth list.  
+└ /authusers - Show the list of authorized users.
 
-❖ ᴘᴏᴡᴇʀᴇᴅ ʙʏ ➥ ˹ ᴛᴀɴᴜ ꭙ ᴍᴜsɪᴄ™ ♡゙
+>> Powered by Sprotify Music
 """
 
 HELP_3 = """
-<b><pre>❖ ʙʀᴏᴀᴅᴄᴀsᴛ ғᴇᴀᴛᴜʀᴇ ➥</pre></b>
+>> Broadcast Feature
+┌ /broadcast [message or reply to a message] - Broadcast a message to the served chats of the bot.  
+├ -pin - Pins your broadcasted messages in served chats.  
+├ -pinloud - Pins your broadcasted message in served chats and sends notifications to members.  
+├ -user - Broadcasts the message to the users who have started your bot.  
+├ -assistant - Broadcast your message from the assistant account of the bot.  
+└ -nobot - Forces the bot not to broadcast the message.
 
-● /broadcast [ᴍᴇssᴀɢᴇ ᴏʀ ʀᴇᴩʟʏ ᴛᴏ ᴀ ᴍᴇssᴀɢᴇ] ➥ ʙʀᴏᴀᴅᴄᴀsᴛ ᴀ ᴍᴇssᴀɢᴇ ᴛᴏ sᴇʀᴠᴇᴅ ᴄʜᴀᴛs ᴏғ ᴛʜᴇ ʙᴏᴛ.
+Example: /broadcast -user -assistant -pin Testing Broadcast
 
-● <b>-pin</b> ➥ ᴩɪɴs ʏᴏᴜʀ ʙʀᴏᴀᴅᴄᴀsᴛᴇᴅ ᴍᴇssᴀɢᴇs ɪɴ sᴇʀᴠᴇᴅ ᴄʜᴀᴛs.
-● <b>-pinloud</b> ➥ ᴩɪɴs ʏᴏᴜʀ ʙʀᴏᴀᴅᴄᴀsᴛᴇᴅ ᴍᴇssᴀɢᴇ ɪɴ sᴇʀᴠᴇᴅ ᴄʜᴀᴛs ᴀɴᴅ sᴇɴᴅ ɴᴏᴛɪғɪᴄᴀᴛɪᴏɴ ᴛᴏ ᴛʜᴇ ᴍᴇᴍʙᴇʀs.
-● <b>-user</b> ➥ ʙʀᴏᴀᴅᴄᴀsᴛs ᴛʜᴇ ᴍᴇssᴀɢᴇ ᴛᴏ ᴛʜᴇ ᴜsᴇʀs ᴡʜᴏ ʜᴀᴠᴇ sᴛᴀʀᴛᴇᴅ ʏᴏᴜʀ ʙᴏᴛ.
-● <b>-assistant</b> ➥ ʙʀᴏᴀᴅᴄᴀsᴛ ʏᴏᴜʀ ᴍᴇssᴀɢᴇ ғʀᴏᴍ ᴛʜᴇ ᴀssɪᴛᴀɴᴛ ᴀᴄᴄᴏᴜɴᴛ ᴏғ ᴛʜᴇ ʙᴏᴛ.
-● <b>-nobot</b> ➥ ғᴏʀᴄᴇs ᴛʜᴇ ʙᴏᴛ ᴛᴏ ɴᴏᴛ ʙʀᴏᴀᴅᴄᴀsᴛ ᴛʜᴇ ᴍᴇssᴀɢᴇ..
-
-● <b>ᴇxᴀᴍᴩʟᴇ ➥</b> <code>/broadcast -user -assistant -pin ᴛᴇsᴛɪɴɢ ʙʀᴏᴀᴅᴄᴀsᴛ</code>
-
-❖ ᴘᴏᴡᴇʀᴇᴅ ʙʏ ➥ ˹ ᴛᴀɴᴜ ꭙ ᴍᴜsɪᴄ™ ♡゙
+>> Powered by Sprotify Music
 """
 
 HELP_4 = """
-<b><pre>❖ ᴄʜᴀᴛ ʙʟᴀᴄᴋʟɪsᴛ ғᴇᴀᴛᴜʀᴇ ➥</pre></b> 
-● /blacklistchat [ᴄʜᴀᴛ ɪᴅ] ➥ ʙʟᴀᴄᴋʟɪsᴛ ᴀ ᴄʜᴀᴛ ғʀᴏᴍ ᴜsɪɴɢ ᴛʜᴇ ʙᴏᴛ.
-● /whitelistchat [ᴄʜᴀᴛ ɪᴅ] ➥ ᴡʜɪᴛᴇʟɪsᴛ ᴛʜᴇ ʙʟᴀᴄᴋʟɪsᴛᴇᴅ ᴄʜᴀᴛ.
-● /blacklistedchat ➥ sʜᴏᴡs ᴛʜᴇ ʟɪsᴛ ᴏғ ʙʟᴀᴄᴋʟɪsᴛᴇᴅ ᴄʜᴀᴛs.
+>> Chat Blacklist Feature
+┌ /blacklistchat [chat_id] - Blacklist a chat from using the bot.  
+├ /whitelistchat [chat_id] - Whitelist a blacklisted chat.  
+└ /blacklistedchat - Shows the list of blacklisted chats.
 
-<b><pre>❖ ʙʟᴏᴄᴋ ᴜsᴇʀs ➥</pre></b>
-● /block [ᴜsᴇʀɴᴀᴍᴇ ᴏʀ ʀᴇᴩʟʏ ᴛᴏ ᴀ ᴜsᴇʀ] ● ʙʟᴏᴄᴋ ᴛʜᴇ ᴜsᴇʀ ғʀᴏᴍ ᴏᴜʀ ʙᴏᴛ.
-● /unblock [ᴜsᴇʀɴᴀᴍᴇ ᴏʀ ʀᴇᴩʟʏ ᴛᴏ ᴀ ᴜsᴇʀ] ● ᴜɴʙʟᴏᴄᴋs ᴛʜᴇ ʙʟᴏᴄᴋᴇᴅ ᴜsᴇʀ.
-● /blockedusers ➥ sʜᴏᴡs ᴛʜᴇ ʟɪsᴛ ᴏғ ʙʟᴏᴄᴋᴇᴅ ᴜsᴇʀs.
+>> Block Users
+┌ /block [username or reply to a user] - Block the user from the bot.  
+├ /unblock [username or reply to a user] - Unblock the user.  
+└ /blockedusers - Shows the list of blocked users.
 
-<b><pre>❖ ɢʟᴏʙᴀʟ ʙᴀɴ ғᴇᴀᴛᴜʀᴇ ➥</pre></b>
-● /gban [ᴜsᴇʀɴᴀᴍᴇ ᴏʀ ʀᴇᴩʟʏ ᴛᴏ ᴀ ᴜsᴇʀ] ➥ ɢʟᴏʙᴀʟʟʏ ʙᴀɴs ᴛʜᴇ ᴄʜᴜᴛɪʏᴀ ғʀᴏᴍ ᴀʟʟ ᴛʜᴇ sᴇʀᴠᴇᴅ ᴄʜᴀᴛs ᴀɴᴅ ʙʟᴀᴄᴋʟɪsᴛ ʜɪᴍ ғʀᴏᴍ ᴜsɪɴɢ ᴛʜᴇ ʙᴏᴛ.
-● /ungban [ᴜsᴇʀɴᴀᴍᴇ ᴏʀ ʀᴇᴩʟʏ ᴛᴏ ᴀ ᴜsᴇʀ] ➥ ɢʟᴏʙᴀʟʟʏ ᴜɴʙᴀɴs ᴛʜᴇ ɢʟᴏʙᴀʟʟʏ ʙᴀɴɴᴇᴅ ᴜsᴇʀ.
-● /gbannedusers ➥ sʜᴏᴡs ᴛʜᴇ ʟɪsᴛ ᴏғ ɢʟᴏʙᴀʟʟʏ ʙᴀɴɴᴇᴅ ᴜsᴇʀs.
+>> Global Ban Feature
+┌ /gban [username or reply to a user] - Globally ban a user from all served chats.  
+├ /ungban [username or reply to a user] - Globally unban a user.  
+└ /gbannedusers - Shows the list of globally banned users.
 
-<b><pre>❖ ᴍᴀɪɴᴛᴇɴᴀɴᴄᴇ ᴍᴏᴅᴇ ➥</pre></b>
-● /logs ➥ ɢᴇᴛ ʟᴏɢs ᴏғ ᴛʜᴇ ʙᴏᴛ.
-● /logger [ᴇɴᴀʙʟᴇ/ᴅɪsᴀʙʟᴇ] ➥ ʙᴏᴛ ᴡɪʟʟ sᴛᴀʀᴛ ʟᴏɢɢɪɴɢ ᴛʜᴇ ᴀᴄᴛɪᴠɪᴛɪᴇs ʜᴀᴩᴩᴇɴ ᴏɴ ʙᴏᴛ.
-● /maintenance [ᴇɴᴀʙʟᴇ/ᴅɪsᴀʙʟᴇ] ➥ ᴇɴᴀʙʟᴇ ᴏʀ ᴅɪsᴀʙʟᴇ ᴛʜᴇ ᴍᴀɪɴᴛᴇɴᴀɴᴄᴇ ᴍᴏᴅᴇ ᴏғ ʏᴏᴜʀ ʙᴏᴛ.
+>> Maintenance Mode
+┌ /logs - Get logs of the bot.  
+├ /logger [enable/disable] - Enable or disable logging of the bot activities.  
+└ /maintenance [enable/disable] - Enable or disable maintenance mode of the bot
 
-❖ ᴘᴏᴡᴇʀᴇᴅ ʙʏ ➥ ˹ ᴛᴀɴᴜ ꭙ ᴍᴜsɪᴄ™ ♡゙
+>> Powered by Sprotify Music
 """
 
 HELP_5 = """
-<b><pre>❖ ᴩʟᴀʏ ᴄᴏᴍᴍᴀɴᴅs ➥</pre></b>
-● <b>v ➥</b> sᴛᴀɴᴅs ғᴏʀ ᴠɪᴅᴇᴏ ᴩʟᴀʏ.
-● <b>force ➥</b> sᴛᴀɴᴅs ғᴏʀ ғᴏʀᴄᴇ ᴩʟᴀʏ.
-● /play ᴏʀ /vplay ➥ sᴛᴀʀᴛs sᴛʀᴇᴀᴍɪɴɢ ᴛʜᴇ ʀᴇǫᴜᴇsᴛᴇᴅ ᴛʀᴀᴄᴋ ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.
-● /playforce ᴏʀ /vplayforce ➥ sᴛᴏᴩs ᴛʜᴇ ᴏɴɢᴏɪɴɢ sᴛʀᴇᴀᴍ ᴀɴᴅ sᴛᴀʀᴛs sᴛʀᴇᴀᴍɪɴɢ ᴛʜᴇ ʀᴇǫᴜᴇsᴛᴇᴅ ᴛʀᴀᴄᴋ.
+>> Play Commands
+┌ v - Stands for video play.  
+├ force - Stands for force play.  
+├ /play or /vplay - Starts streaming the requested track on video chat.  
+└ /playforce or /vplayforce - Stops the ongoing stream and starts streaming the requested track.
 
-<b><pre>❖ ᴄʜᴀɴɴᴇʟ ᴩʟᴀʏ ᴄᴏᴍᴍᴀɴᴅs ➥</pre></b>
-● /cplay ➥ sᴛᴀʀᴛs sᴛʀᴇᴀᴍɪɴɢ ᴛʜᴇ ʀᴇǫᴜᴇsᴛᴇᴅ ᴀᴜᴅɪᴏ ᴛʀᴀᴄᴋ ᴏɴ ᴄʜᴀɴɴᴇʟ's ᴠɪᴅᴇᴏᴄʜᴀᴛ.
-● /cvplay ➥ sᴛᴀʀᴛs sᴛʀᴇᴀᴍɪɴɢ ᴛʜᴇ ʀᴇǫᴜᴇsᴛᴇᴅ ᴠɪᴅᴇᴏ ᴛʀᴀᴄᴋ ᴏɴ ᴄʜᴀɴɴᴇʟ's ᴠɪᴅᴇᴏᴄʜᴀᴛ.
-● /cplayforce or /cvplayforce ➥ sᴛᴏᴩs ᴛʜᴇ ᴏɴɢᴏɪɴɢ sᴛʀᴇᴀᴍ ᴀɴᴅ sᴛᴀʀᴛs sᴛʀᴇᴀᴍɪɴɢ ᴛʜᴇ ʀᴇǫᴜᴇsᴛᴇᴅ ᴛʀᴀᴄᴋ.
-● /channelplay [ᴄʜᴀᴛ ᴜsᴇʀɴᴀᴍᴇ ᴏʀ ɪᴅ] ᴏʀ [ᴅɪsᴀʙʟᴇ] ➥ ᴄᴏɴɴᴇᴄᴛ ᴄʜᴀɴɴᴇʟ ᴛᴏ ᴀ ɢʀᴏᴜᴩ ᴀɴᴅ sᴛᴀʀᴛs sᴛʀᴇᴀᴍɪɴɢ ᴛʀᴀᴄᴋs ʙʏ ᴛʜᴇ ʜᴇʟᴩ ᴏғ ᴄᴏᴍᴍᴀɴᴅs sᴇɴᴛ ɪɴ ɢʀᴏᴜᴩ.
+>> Channel Play Commands
+┌ /cplay - Starts streaming the requested track in the linked channel.  
+├ /cplayforce or /cvplayforce - Stops the ongoing stream and starts streaming the requested track.  
+└ /channelplay [chat username or ID] or [disable] - Connect a channel to a group and start streaming tracks by commands sent in the group.
 
-❖ ᴘᴏᴡᴇʀᴇᴅ ʙʏ ➥ ˹ ᴛᴀɴᴜ ꭙ ᴍᴜsɪᴄ™ ♡゙
+Powered by Sprotify Music
 """
 
 HELP_6 = """
-<b><pre>❖ sᴏɴɢ ᴅᴏᴡɴʟᴏᴀᴅ ➥</pre></b>
+>> Song Download
 
-● /song [sᴏɴɢ ɴᴀᴍᴇ] ➥ ᴅᴏᴡɴʟᴏᴀᴅ ᴀɴʏ ᴛʀᴀᴄᴋ ғʀᴏᴍ sᴘᴏᴛɪғʏ ɪɴ ᴍᴘ4 ғᴏʀᴍᴀᴛs.
+┌ /song [song name] - Download any track from Spotify in MP4 format /song [song name] - Download any track from Spotify in MP4 format
+└ Note: This Plugin's still bug, dev too lazy to fix it.
 
-❖ ᴘᴏᴡᴇʀᴇᴅ ʙʏ ➥ ˹ ᴛᴀɴᴜ ꭙ ᴍᴜsɪᴄ™ ♡゙
+Powered by Sprotify Music
 """
 
 HELP_7 = """
-<b><pre>❖ ᴄʀᴇᴀᴛᴇ ǫᴜᴏᴛʟʏ ➥</pre></b>
+>> Create Quotly
 
-⬤ /q ➥ ᴄʀᴇᴀᴛᴇ ᴀ ǫᴜᴏᴛᴇ ғʀᴏᴍ ᴛʜᴇ ᴍᴇssᴀɢᴇ.
+┌ /q - Create a quote from the message.
+└ add r to quote reply message
 
-❖ ᴘᴏᴡᴇʀᴇᴅ ʙʏ ➥ ˹ ᴛᴀɴᴜ ꭙ ᴍᴜsɪᴄ™ ♡゙
+Powered by Sprotify Music
 """
+
 HELP_8 = """
-<b><pre>❖ sᴛɪᴄᴋᴇʀ ғᴇᴀᴛᴜʀᴇs ➥</pre></b>
+>> Sticker Features
 
-⬤ /stickerid ➥ ʀᴇᴘʟʏ ᴛᴏ ᴀ sᴛɪᴄᴋᴇʀ ᴛᴏ ᴍᴇ ᴛᴏ ᴛᴇʟʟ ʏᴏᴜ ɪᴛs ғɪʟᴇ ɪᴅ.
-⬤ /kang ➥ ʀᴇᴘʟʏ ᴛᴏ ᴀ sᴛɪᴄᴋᴇʀ ᴛᴏ ᴀᴅᴅ ɪᴛ ᴛᴏ ʏᴏᴜʀ ᴘᴀᴄᴋ.
+┌ /stickerid - Reply to a sticker to get its file ID.
+└ /kang - Reply to a sticker to add it to your pack.
 
-❖ ᴘᴏᴡᴇʀᴇᴅ ʙʏ ➥ ˹ ᴛᴀɴᴜ ꭙ ᴍᴜsɪᴄ™ ♡゙
+Powered by Sprotify Music
 """
+
 HELP_9 = """
-<b><pre>❖ ɪᴍᴀɢᴇ ғᴇᴀᴛᴜʀᴇs ➥</pre></b>
+>> Image Features
 
-⬤ /image ➥ ᴘʟᴇᴀsᴇ ᴘʀᴏᴠɪᴅᴇ ᴀ ǫᴜᴇʀʏ ᴛᴏ sᴄʀᴀᴘᴇ ɪᴍᴀɢᴇ ғᴏʀᴍ ɢᴏᴏɢʟᴇ.
+⬤ /image - Provide a query to scrape an image from Google.
 
-❖ ᴘᴏᴡᴇʀᴇᴅ ʙʏ ➥ ˹ ᴛᴀɴᴜ ꭙ ᴍᴜsɪᴄ™ ♡゙
+Powered by Sprotify Music
 """

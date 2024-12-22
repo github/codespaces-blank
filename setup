@@ -51,7 +51,7 @@ packages(){
 			pprint "SUCCESS.\n\n" "cgreen"
 		else
 			pprint "FAIL.\n\n" "cred"
-			pprint "You need to install ffmpeg manually in order to deploy TanuMusic, exiting...\n" "cblue"
+			pprint "You need to install ffmpeg manually in order to deploy SprotifyMusic, exiting...\n" "cblue"
 			exit 1
 		fi
 	fi
@@ -82,7 +82,7 @@ installation(){
 }
 
 clear
-pprint "Welcome to TanuMusic Setup Installer\n\n"
+pprint "Welcome to SprotifyMusic Setup Installer\n\n"
 pprint "If you see any error during Installation Process, Please refer to these files for logs: "
 pprint "\nFor node js errors , Checkout nodelog.txt"
 pprint "\nFor pypi packages errors , Checkout pypilog.txt"
@@ -122,5 +122,5 @@ STRING_SESSION = $string_session
 OWNER_ID = $ownid""" > .env
 clear
 
-pprint "\n\n\nThanks for using TanuMusic installer, your vars have been saved successfully ! \nIf you wanna add more variables add them in your env by : vi .env"
+pprint "\n\n\nThanks for using SprotifyMusic installer, your vars have been saved successfully ! \nIf you wanna add more variables add them in your env by : vi .env"
 pprint "\n\nNow you can start the bot by : bash start\n\n"
