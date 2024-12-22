@@ -1,4 +1,4 @@
-﻿use volga::{App, Router, ok};
+﻿use volga::{App, ok};
 use volga::headers::{Header, Headers, ContentType};
 
 #[tokio::test]

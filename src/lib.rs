@@ -40,7 +40,7 @@ pub mod app;
 #[cfg(test)]
 pub mod test_utils;
 
-pub use crate::app::{App, router::Router, body::{BoxBody, HttpBody}};
+pub use crate::app::{App, body::{BoxBody, HttpBody}};
 pub use crate::app::request::HttpRequest;
 pub use crate::app::results::{
     HttpResponse, 
@@ -60,16 +60,16 @@ pub use crate::app::endpoints::args::{
 };
 
 #[cfg(feature = "middleware")]
-pub use crate::app::http_context::HttpContext;
-
-#[cfg(feature = "middleware")]
-pub use crate::app::middlewares::{Next, Middleware};
-
-#[cfg(feature = "di")]
-pub use crate::app::endpoints::args::dc::Dc;
+pub use crate::app::{
+    middlewares::Next,
+    http_context::HttpContext
+};
 
 #[cfg(feature = "di")]
-pub use crate::app::di::Inject;
+pub use crate::app::{
+    endpoints::args::dc::Dc,
+    di::Inject
+};
 
 // Re-exporting HTTP status codes, Response and some headers from hyper/http
 pub use hyper::{

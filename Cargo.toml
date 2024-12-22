@@ -35,7 +35,7 @@ uuid = { version = "1.11.0", features = ["v4"] }
 
 [features]
 # Default HTTP/1 only server
-default = ["http1", "middleware", "di"]
+default = ["http1"]
 # HTTP/1 and HTTP/2 server
 full = ["http1", "http2", "middleware", "di"]
 

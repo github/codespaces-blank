@@ -1,7 +1,7 @@
-﻿use volga::{App, Router, ok, Middleware};
-use volga::headers::{
-    Header,
-    custom_headers
+﻿use volga::{
+    headers::{Header, custom_headers},
+    App, 
+    ok
 };
 
 const CORRELATION_ID_HEADER: &str = "x-correlation-id";

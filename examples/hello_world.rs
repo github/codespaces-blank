@@ -1,8 +1,4 @@
-﻿use volga::{
-    App,
-    Router,
-    ok,
-};
+﻿use volga::{App, ok};
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {

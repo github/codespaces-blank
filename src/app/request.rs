@@ -17,7 +17,6 @@ use crate::{app::endpoints::args::FromRequestRef, headers::{FromHeaders, Header}
 use crate::app::di::Container;
 
 /// Wraps the incoming [`Request`] to enrich its functionality
-//pub struct HttpRequest(pub Request<Incoming>);
 pub struct HttpRequest {
     pub inner: Request<Incoming>,
     #[cfg(feature = "di")]
@@ -100,7 +99,7 @@ impl HttpRequest {
     ///
     /// # Example
     /// ```no_run
-    /// use volga::{HttpContext, HttpRequest, Query};
+    /// use volga::{HttpRequest, Query};
     /// use serde::Deserialize;
     ///
     /// #[derive(Deserialize)]

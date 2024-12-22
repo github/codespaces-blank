@@ -1,7 +1,5 @@
 ﻿use volga::{
-    App, Router, Middleware,
-    HttpContext, Next,
-    HttpResult,
+    App, HttpContext, Next, HttpResult,
     headers::{Header, custom_headers},
     Inject, Dc, ok, not_found
 };

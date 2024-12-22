@@ -1,4 +1,4 @@
-﻿use volga::{App, Router, Results, ResponseContext, headers, ok};
+﻿use volga::{App, Results, ResponseContext, headers, ok};
 use volga::headers::{
     Header, 
     Headers, 

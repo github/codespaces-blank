@@ -1,4 +1,4 @@
-﻿use volga::{App, Router, HttpRequest, ok};
+﻿use volga::{App, HttpRequest, ok};
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {

@@ -2,6 +2,7 @@
 use std::any::{Any, TypeId};
 use std::io::{Error, ErrorKind};
 use std::sync::Arc;
+use crate::App;
 
 /// Marks a type that can be used with DI
 pub trait Inject: Default + Clone + Send + Sync {}
@@ -128,6 +129,21 @@ impl DiError {
 
     fn resolve_error(type_name: &str) -> Error {
         Error::new(ErrorKind::Other, format!("Services Error: unable to resolve the service: {}", type_name))
+    }
+}
+
+/// DI specific impl for [`App`]
+impl App {
+    pub fn register_singleton<T: Inject + 'static>(&mut self, instance: T) {
+        self.container.register_singleton(instance);
+    }
+
+    pub fn register_scoped<T: Inject + 'static>(&mut self) {
+        self.container.register_scoped::<T>();
+    }
+
+    pub fn register_transient<T: Inject + 'static>(&mut self) {
+        self.container.register_transient::<T>();
     }
 }
 

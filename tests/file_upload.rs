@@ -1,4 +1,4 @@
-﻿use volga::{App, Router, File, HttpBody, ok};
+﻿use volga::{App, File, HttpBody, ok};
 
 #[tokio::test]
 async fn it_saves_uploaded_file() {

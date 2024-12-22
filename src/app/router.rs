@@ -6,29 +6,13 @@ use crate::app::endpoints::{
     handlers::{Func, GenericHandler}
 };
 
-/// Declares a set ot methods that map routes to a specific pattern and HTTP Verb
-/// 
-/// # Examples
-/// ```no_run
-/// use volga::{App, Router, ok};
-///
-/// #[tokio::main]
-/// async fn main() -> std::io::Result<()> {
-///     let mut app = App::new();
-/// 
-///     app.map_get("/hello", || async {
-///         ok!("Hello World!")
-///     });
-/// 
-///     app.run().await
-/// }
-/// ```
-pub trait Router {
+/// Routes mapping 
+impl App {
     /// Adds a request handler that matches HTTP GET requests for the specified pattern.
     /// 
     /// # Examples
     /// ```no_run
-    /// use volga::{App, Router, ok};
+    /// use volga::{App, ok};
     ///
     ///# #[tokio::main]
     ///# async fn main() -> std::io::Result<()> {
@@ -40,16 +24,26 @@ pub trait Router {
     ///# app.run().await
     ///# }
     /// ```
-    fn map_get<F, Args>(&mut self, pattern: &str, handler: F)
+    pub fn map_get<F, Args>(&mut self, pattern: &str, handler: F)
     where
         F: GenericHandler<Args, Output = HttpResult>,
-        Args: FromRequest + Send + Sync + 'static;
+        Args: FromRequest + Send + Sync + 'static
+    {
+        let handler = Func::new(handler);
+        let endpoints = self.pipeline.endpoints_mut();
+        endpoints.map_route(Method::GET, pattern, handler.clone());
+        
+        let head = Method::HEAD;
+        if !endpoints.contains(&head, pattern) { 
+            endpoints.map_route(head, pattern, handler.clone());
+        } 
+    }
 
     /// Adds a request handler that matches HTTP POST requests for the specified pattern.
     /// 
     /// # Examples
     /// ```no_run
-    /// use volga::{App, Router, File, ok};
+    /// use volga::{App, File, ok};
     ///
     ///# #[tokio::main]
     ///# async fn main() -> std::io::Result<()> {
@@ -62,16 +56,22 @@ pub trait Router {
     ///# app.run().await
     ///# }
     /// ```
-    fn map_post<F, Args>(&mut self, pattern: &str, handler: F)
+    pub fn map_post<F, Args>(&mut self, pattern: &str, handler: F)
     where
         F: GenericHandler<Args, Output = HttpResult>,
-        Args: FromRequest + Send + Sync + 'static;
+        Args: FromRequest + Send + Sync + 'static,
+    {
+        let handler = Func::new(handler);
+        self.pipeline
+            .endpoints_mut()
+            .map_route(Method::POST, pattern, handler);
+    }
 
     /// Adds a request handler that matches HTTP PUT requests for the specified pattern.
     /// 
     /// # Examples
     /// ```no_run
-    /// use volga::{App, Router, ok};
+    /// use volga::{App, ok};
     ///
     ///# #[tokio::main]
     ///# async fn main() -> std::io::Result<()> {
@@ -83,16 +83,22 @@ pub trait Router {
     ///# app.run().await
     ///# }
     /// ```
-    fn map_put<F, Args>(&mut self, pattern: &str, handler: F)
+    pub fn map_put<F, Args>(&mut self, pattern: &str, handler: F)
     where
         F: GenericHandler<Args, Output = HttpResult>,
-        Args: FromRequest + Send + Sync + 'static;
+        Args: FromRequest + Send + Sync + 'static,
+    {
+        let handler = Func::new(handler);
+        self.pipeline
+            .endpoints_mut()
+            .map_route(Method::PUT, pattern, handler);
+    }
 
     /// Adds a request handler that matches HTTP PATCH requests for the specified pattern.
     /// 
     /// # Examples
     /// ```no_run
-    /// use volga::{App, Router, ok};
+    /// use volga::{App, ok};
     ///
     ///# #[tokio::main]
     ///# async fn main() -> std::io::Result<()> {
@@ -104,16 +110,22 @@ pub trait Router {
     ///# app.run().await
     ///# }
     /// ```
-    fn map_patch<F, Args>(&mut self, pattern: &str, handler: F)
+    pub fn map_patch<F, Args>(&mut self, pattern: &str, handler: F)
     where
         F: GenericHandler<Args, Output = HttpResult>,
-        Args: FromRequest + Send + Sync + 'static;
+        Args: FromRequest + Send + Sync + 'static,
+    {
+        let handler = Func::new(handler);
+        self.pipeline
+            .endpoints_mut()
+            .map_route(Method::PATCH, pattern, handler);
+    }
 
     /// Adds a request handler that matches HTTP DELETE requests for the specified pattern.
     /// 
     /// # Examples
     /// ```no_run
-    /// use volga::{App, Router, ok};
+    /// use volga::{App, ok};
     ///
     ///# #[tokio::main]
     ///# async fn main() -> std::io::Result<()> {
@@ -125,16 +137,22 @@ pub trait Router {
     ///# app.run().await
     ///# }
     /// ```
-    fn map_delete<F, Args>(&mut self, pattern: &str, handler: F)
+    pub fn map_delete<F, Args>(&mut self, pattern: &str, handler: F)
     where
         F: GenericHandler<Args, Output = HttpResult>,
-        Args: FromRequest + Send + Sync + 'static;
+        Args: FromRequest + Send + Sync + 'static,
+    {
+        let handler = Func::new(handler);
+        self.pipeline
+            .endpoints_mut()
+            .map_route(Method::DELETE, pattern, handler);
+    }
 
     /// Adds a request handler that matches HTTP HEAD requests for the specified pattern.
     /// 
     /// # Examples
     /// ```no_run
-    /// use volga::{App, Router, ok};
+    /// use volga::{App, ok};
     ///
     ///# #[tokio::main]
     ///# async fn main() -> std::io::Result<()> {
@@ -146,16 +164,22 @@ pub trait Router {
     ///# app.run().await
     ///# }
     /// ```
-    fn map_head<F, Args>(&mut self, pattern: &str, handler: F)
+    pub fn map_head<F, Args>(&mut self, pattern: &str, handler: F)
     where
         F: GenericHandler<Args, Output = HttpResult>,
-        Args: FromRequest + Send + Sync + 'static;
+        Args: FromRequest + Send + Sync + 'static,
+    {
+        let handler = Func::new(handler);
+        self.pipeline
+            .endpoints_mut()
+            .map_route(Method::HEAD, pattern, handler);
+    }
 
     /// Adds a request handler that matches HTTP OPTIONS requests for the specified pattern.
     /// 
     /// # Examples
     /// ```no_run
-    /// use volga::{App, Router, ok};
+    /// use volga::{App, ok};
     ///
     ///# #[tokio::main]
     ///# async fn main() -> std::io::Result<()> {
@@ -167,16 +191,22 @@ pub trait Router {
     ///# app.run().await
     ///# }
     /// ```
-    fn map_options<F, Args>(&mut self, pattern: &str, handler: F)
+    pub fn map_options<F, Args>(&mut self, pattern: &str, handler: F)
     where
         F: GenericHandler<Args, Output = HttpResult>,
-        Args: FromRequest + Send + Sync + 'static;
+        Args: FromRequest + Send + Sync + 'static,
+    {
+        let handler = Func::new(handler);
+        self.pipeline
+            .endpoints_mut()
+            .map_route(Method::OPTIONS, pattern, handler);
+    }
 
     /// Adds a request handler that matches HTTP TRACE requests for the specified pattern.
     /// 
     /// # Examples
     /// ```no_run
-    /// use volga::{App, Router, ok};
+    /// use volga::{App, ok};
     ///
     ///# #[tokio::main]
     ///# async fn main() -> std::io::Result<()> {
@@ -188,88 +218,14 @@ pub trait Router {
     ///# app.run().await
     ///# }
     /// ```
-    fn map_trace<F, Args>(&mut self, pattern: &str, handler: F)
-    where
-        F: GenericHandler<Args, Output = HttpResult>,
-        Args: FromRequest + Send + Sync + 'static;
-}
-
-impl Router for App {
-    fn map_get<F, Args>(&mut self, pattern: &str, handler: F)
-    where
-        F: GenericHandler<Args, Output = HttpResult>,
-        Args: FromRequest + Send + Sync + 'static
-    {
-        let handler = Func::new(handler);
-        let endpoints = self.endpoints_mut();
-        endpoints.map_route(Method::GET, pattern, handler.clone());
-        
-        let head = Method::HEAD;
-        if !endpoints.contains(&head, pattern) { 
-            endpoints.map_route(head, pattern, handler.clone());
-        } 
-    }
-
-    fn map_post<F, Args>(&mut self, pattern: &str, handler: F)
+    pub fn map_trace<F, Args>(&mut self, pattern: &str, handler: F)
     where
         F: GenericHandler<Args, Output = HttpResult>,
         Args: FromRequest + Send + Sync + 'static,
     {
         let handler = Func::new(handler);
-        self.endpoints_mut().map_route(Method::POST, pattern, handler);
-    }
-
-    fn map_put<F, Args>(&mut self, pattern: &str, handler: F)
-    where
-        F: GenericHandler<Args, Output = HttpResult>,
-        Args: FromRequest + Send + Sync + 'static,
-    {
-        let handler = Func::new(handler);
-        self.endpoints_mut().map_route(Method::PUT, pattern, handler);
-    }
-
-    fn map_patch<F, Args>(&mut self, pattern: &str, handler: F)
-    where
-        F: GenericHandler<Args, Output = HttpResult>,
-        Args: FromRequest + Send + Sync + 'static,
-    {
-        let handler = Func::new(handler);
-        self.endpoints_mut().map_route(Method::PATCH, pattern, handler);
-    }
-
-    fn map_delete<F, Args>(&mut self, pattern: &str, handler: F)
-    where
-        F: GenericHandler<Args, Output = HttpResult>,
-        Args: FromRequest + Send + Sync + 'static,
-    {
-        let handler = Func::new(handler);
-        self.endpoints_mut().map_route(Method::DELETE, pattern, handler);
-    }
-
-    fn map_head<F, Args>(&mut self, pattern: &str, handler: F)
-    where
-        F: GenericHandler<Args, Output = HttpResult>,
-        Args: FromRequest + Send + Sync + 'static,
-    {
-        let handler = Func::new(handler);
-        self.endpoints_mut().map_route(Method::HEAD, pattern, handler);
-    }
-
-    fn map_options<F, Args>(&mut self, pattern: &str, handler: F)
-    where
-        F: GenericHandler<Args, Output = HttpResult>,
-        Args: FromRequest + Send + Sync + 'static,
-    {
-        let handler = Func::new(handler);
-        self.endpoints_mut().map_route(Method::OPTIONS, pattern, handler);
-    }
-
-    fn map_trace<F, Args>(&mut self, pattern: &str, handler: F)
-    where
-        F: GenericHandler<Args, Output = HttpResult>,
-        Args: FromRequest + Send + Sync + 'static,
-    {
-        let handler = Func::new(handler);
-        self.endpoints_mut().map_route(Method::TRACE, pattern, handler);
+        self.pipeline
+            .endpoints_mut()
+            .map_route(Method::TRACE, pattern, handler);
     }
 }

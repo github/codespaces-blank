@@ -1,5 +1,8 @@
-﻿use std::net::SocketAddr;
-use std::sync::Arc;
+﻿use std::{
+    net::SocketAddr,
+    future::Future,
+    sync::Arc
+};
 
 use hyper_util::rt::TokioIo;
 
@@ -12,27 +15,24 @@ use tokio::{
 
 use crate::app::{
     pipeline::{Pipeline, PipelineBuilder},
-    endpoints::Endpoints,
     scope::Scope,
     server::Server
 };
 
-#[cfg(feature = "middleware")]
-use crate::app::middlewares::{Middlewares, Middleware};
 #[cfg(feature = "di")]
-use crate::app::di::{Inject, Container, ContainerBuilder};
+use crate::app::di::{Container, ContainerBuilder};
 
 #[cfg(feature = "middleware")]
 pub mod middlewares;
 #[cfg(feature = "middleware")]
 pub mod http_context;
+#[cfg(feature = "di")]
+pub mod di;
 pub mod endpoints;
 pub mod body;
 pub mod request;
 pub mod results;
 pub mod router;
-#[cfg(feature = "di")]
-pub mod di;
 pub(crate) mod pipeline;
 mod scope;
 mod server;
@@ -65,7 +65,11 @@ struct Connection {
 
 impl Default for Connection {
     fn default() -> Self {
-        let socket = SocketAddr::from(([127, 0, 0, 1], DEFAULT_PORT));
+        #[cfg(target_os = "windows")]
+        let ip = [127, 0, 0, 1];
+        #[cfg(not(target_os = "windows"))]
+        let ip = [0, 0, 0, 0];
+        let socket = SocketAddr::from((ip, DEFAULT_PORT));
         Self { socket }
     }
 }
@@ -104,6 +108,7 @@ impl Default for App {
     }
 }
 
+/// General impl
 impl App {
     /// Initializes a new instance of the `App` which will be bound to the 127.0.0.1:7878 socket by default.
     /// 
@@ -135,37 +140,29 @@ impl App {
         self
     }
 
-    #[cfg(feature = "di")]
-    pub fn register_singleton<T: Inject + 'static>(&mut self, instance: T) {
-        self.container.register_singleton(instance);
-    }
-
-    #[cfg(feature = "di")]
-    pub fn register_scoped<T: Inject + 'static>(&mut self) {
-        self.container.register_scoped::<T>();
-    }
-
-    #[cfg(feature = "di")]
-    pub fn register_transient<T: Inject + 'static>(&mut self) {
-        self.container.register_transient::<T>();
+    /// Runs the `App`
+    #[cfg(feature = "middleware")]
+    pub fn run(mut self) -> impl Future<Output = io::Result<()>> {
+        self.use_endpoints();
+        self.run_internal()
     }
 
     /// Runs the `App`
-    pub async fn run(mut self) -> io::Result<()> {
-        #[cfg(feature = "middleware")]
-        {
-            // Register default middleware
-            self.use_endpoints();
-        }
-
+    #[cfg(not(feature = "middleware"))]
+    pub fn run(self) -> impl Future<Output = io::Result<()>> {
+        self.run_internal()
+    }
+    
+    #[inline]
+    async fn run_internal(self) -> io::Result<()> {
         let socket = self.connection.socket;
         let tcp_listener = TcpListener::bind(socket).await?;
         println!("Start listening: {socket}");
-        
+
         let (shutdown_sender, mut shutdown_signal) = broadcast::channel::<()>(1);
-        
+
         Self::subscribe_for_ctrl_c_signal(&shutdown_sender);
-        
+
         let app_instance = AppInstance::new(self);
         loop {
             tokio::select! {
@@ -184,15 +181,6 @@ impl App {
         Ok(())
     }
 
-    #[cfg(feature = "middleware")]
-    pub(crate) fn middlewares_mut(&mut self) -> &mut Middlewares {
-        self.pipeline.middlewares_mut()
-    }
-
-    pub(crate) fn endpoints_mut(&mut self) -> &mut Endpoints {
-        self.pipeline.endpoints_mut()
-    }
-
     #[inline]
     fn subscribe_for_ctrl_c_signal(shutdown_sender: &broadcast::Sender<()>) {
         let ctrl_c_shutdown_sender = shutdown_sender.clone();
@@ -207,15 +195,6 @@ impl App {
                 Err(err) => eprintln!("Failed to send shutdown signal: {}", err)
             }
         });
-    }
-
-    #[cfg(feature = "middleware")]
-    fn use_endpoints(&mut self) {
-        if self.pipeline.has_middleware_pipeline() {
-            self.use_middleware(|ctx, _| async move {
-                ctx.execute().await
-            });
-        }
     }
 
     async fn handle_connection(io: TokioIo<TcpStream>, app_instance: Arc<AppInstance>) {
@@ -236,7 +215,10 @@ mod tests {
     fn it_creates_connection_with_default_socket() {
         let connection = Connection::default();
 
+        #[cfg(target_os = "windows")]
         assert_eq!(connection.socket, SocketAddr::from(([127, 0, 0, 1], 7878)));
+        #[cfg(not(target_os = "windows"))]
+        assert_eq!(connection.socket, SocketAddr::from(([0, 0, 0, 0], 7878)));
     }
 
     #[test]
@@ -250,7 +232,10 @@ mod tests {
     fn it_creates_app_with_default_socket() {
         let app = App::new();
         
+        #[cfg(target_os = "windows")]
         assert_eq!(app.connection.socket, SocketAddr::from(([127, 0, 0, 1], 7878)));
+        #[cfg(not(target_os = "windows"))]
+        assert_eq!(app.connection.socket, SocketAddr::from(([0, 0, 0, 0], 7878)));
     }
 
     #[test]

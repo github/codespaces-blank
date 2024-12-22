@@ -1,10 +1,16 @@
 ﻿//! Extractors for Dependency Injection
 
-use std::io::Error;
-use std::ops::{Deref, DerefMut};
+use std::{
+    ops::{Deref, DerefMut},
+    io::Error
+};
+
 use futures_util::future::{ready, Ready};
-use crate::app::endpoints::args::{FromPayload, Payload, Source};
-use crate::app::di::Inject;
+
+use crate::app::{
+    endpoints::args::{FromPayload, Payload, Source},
+    di::Inject
+};
 
 /// `Dc` stands for Dependency Container, This struct wraps the injectable type of `T` 
 /// `T` must be registered in Dependency Injection Container

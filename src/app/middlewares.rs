@@ -70,38 +70,13 @@ impl Middlewares {
     }
 }
 
-/// Declares a set of methods that help to add a middleware handler to the application request pipeline
-/// 
-/// # Examples
-/// ```no_run
-///use volga::{App, Middleware, Results};
-///
-///#[tokio::main]
-///async fn main() -> std::io::Result<()> {
-///    let mut app = App::new();
-///
-///    // Middleware 2
-///    app.use_middleware(|ctx, next| async move {
-///        // do something...
-///        let response = next(ctx).await;
-///        // do something...
-///        response
-///    });
-/// 
-///    // Middleware 2
-///    app.use_middleware(|ctx, next| async move {
-///        next(ctx).await
-///    });
-///
-///    app.run().await
-///}
-/// ```
-pub trait Middleware {
+/// Middleware specific impl
+impl App {
     /// Adds a middleware handler to the application request pipeline
     /// 
     /// # Examples
     /// ```no_run
-    /// use volga::{App, Middleware, Results};
+    /// use volga::{App, Results};
     ///
     ///# #[tokio::main]
     ///# async fn main() -> std::io::Result<()> {
@@ -113,14 +88,7 @@ pub trait Middleware {
     ///# app.run().await
     ///# }
     /// ```
-    fn use_middleware<F, Fut>(&mut self, middleware: F)
-    where
-        F: Fn(HttpContext, Next) -> Fut + Send + Sync + 'static,
-        Fut: Future<Output = HttpResult> + Send;
-}
-
-impl Middleware for App {
-    fn use_middleware<F, Fut>(&mut self, middleware: F)
+    pub fn use_middleware<F, Fut>(&mut self, middleware: F)
     where
         F: Fn(HttpContext, Next) -> Fut + Send + Sync + 'static,
         Fut: Future<Output = HttpResult> + Send,
@@ -134,8 +102,17 @@ impl Middleware for App {
             }) as BoxFuture<HttpResult>
         });
 
-        let middlewares = self.middlewares_mut();
+        let middlewares = self.pipeline.middlewares_mut();
         middlewares.pipeline.push(mw);
+    }
+
+    /// Registers default middleware
+    pub(super) fn use_endpoints(&mut self) {
+        if self.pipeline.has_middleware_pipeline() {
+            self.use_middleware(|ctx, _| async move {
+                ctx.execute().await
+            });
+        }
     }
 }
 

@@ -1,5 +1,5 @@
 ﻿use reqwest::Method;
-use volga::{App, HttpRequest, Results, Router};
+use volga::{App, HttpRequest, Results};
 
 #[tokio::test]
 async fn it_maps_to_get_request() {

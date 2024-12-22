@@ -1,10 +1,5 @@
 ﻿use tokio::time::{interval, Duration};
-use volga::{
-    App,
-    Router,
-    ok,
-    CancellationToken
-};
+use volga::{App, CancellationToken, ok};
 
 async fn long_running_task() {
     let mut interval = interval(Duration::from_millis(1000));

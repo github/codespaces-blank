@@ -1,4 +1,4 @@
-﻿use volga::{App, file, Router};
+﻿use volga::{App, file};
 use tokio::fs::File;
 
 #[tokio::test]

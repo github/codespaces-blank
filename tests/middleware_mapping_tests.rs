@@ -1,4 +1,4 @@
-﻿use volga::{App, Router, Middleware, Results};
+﻿use volga::{App, Results};
 
 #[tokio::test]
 async fn it_adds_middleware_request() {
