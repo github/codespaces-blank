@@ -11,7 +11,15 @@ use std::{
 pub use hyper::{
     HeaderMap, 
     http::HeaderValue, 
-    header::{InvalidHeaderValue, ToStrError}
+    header::{
+        InvalidHeaderValue, 
+        ToStrError,
+        CONTENT_DISPOSITION,
+        TRANSFER_ENCODING,
+        CONTENT_TYPE,
+        CONTENT_LENGTH,
+        SERVER
+    }
 };
 
 use crate::{

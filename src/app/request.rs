@@ -74,18 +74,18 @@ impl HttpRequest {
         self.inner.into_parts()
     }
 
-    /// Consumes the request and returns request head, body and scoped DI container
-    #[cfg(feature = "di")]
-    pub fn into_parts(self) -> (Parts, Incoming, Container) {
-        let (parts, body) = self.inner.into_parts();
-        (parts, body, self.container)
-    }
-
     /// Creates a new `HttpRequest` with the given head and body
     #[cfg(not(feature = "di"))]
     pub fn from_parts(parts: Parts, body: Incoming) -> Self {
         let request = Request::from_parts(parts, body);
         Self::new(request)
+    }
+
+    /// Consumes the request and returns request head, body and scoped DI container
+    #[cfg(feature = "di")]
+    pub fn into_parts(self) -> (Parts, Incoming, Container) {
+        let (parts, body) = self.inner.into_parts();
+        (parts, body, self.container)
     }
     
     /// Creates a new `HttpRequest` with the given head, body and scoped DI container

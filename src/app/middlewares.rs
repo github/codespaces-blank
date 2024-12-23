@@ -2,8 +2,8 @@
 use std::{sync::Arc, future::Future};
 
 use crate::{
+    middleware::HttpContext, 
     App, 
-    HttpContext, 
     HttpResult, 
     status
 };

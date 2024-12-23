@@ -48,7 +48,7 @@ macro_rules! ok {
             $crate::StatusCode::OK, 
             $crate::HttpBody::empty(),
             [
-                ($crate::CONTENT_TYPE, "text/plain")
+                ($crate::headers::CONTENT_TYPE, "text/plain")
             ]
         )
     };
@@ -68,7 +68,7 @@ macro_rules! ok {
             $crate::StatusCode::OK,
             $crate::HttpBody::json(serde_json::json_internal!({ $($json)* })),
             [
-                ($crate::CONTENT_TYPE, "application/json"),
+                ($crate::headers::CONTENT_TYPE, "application/json"),
             ]
         )
     };
@@ -79,7 +79,7 @@ macro_rules! ok {
             $crate::StatusCode::OK,
             $crate::HttpBody::json(serde_json::json_internal!({ $($json)* })),
             [
-                ($crate::CONTENT_TYPE, "application/json"),
+                ($crate::headers::CONTENT_TYPE, "application/json"),
                 $( ($key, $value) ),*
             ]
         )
@@ -91,7 +91,7 @@ macro_rules! ok {
             $crate::StatusCode::OK,
             $crate::HttpBody::json($var),
             [
-                ($crate::CONTENT_TYPE, "application/json"),
+                ($crate::headers::CONTENT_TYPE, "application/json"),
             ]
         )
     };
@@ -102,7 +102,7 @@ macro_rules! ok {
             $crate::StatusCode::OK,
             $crate::HttpBody::json($e),
             [
-                ($crate::CONTENT_TYPE, "application/json"),
+                ($crate::headers::CONTENT_TYPE, "application/json"),
                 $( ($key, $value) ),*
             ]
         )
@@ -114,7 +114,7 @@ macro_rules! ok {
             $crate::StatusCode::OK,
             $crate::HttpBody::json(format!($fmt)),
             [
-                ($crate::CONTENT_TYPE, "application/json"),
+                ($crate::headers::CONTENT_TYPE, "application/json"),
             ]
         )
     };
@@ -125,7 +125,7 @@ macro_rules! ok {
             $crate::StatusCode::OK,
             $crate::HttpBody::json($e),
             [
-                ($crate::CONTENT_TYPE, "application/json"),
+                ($crate::headers::CONTENT_TYPE, "application/json"),
             ]
         )
     };
@@ -136,7 +136,7 @@ macro_rules! ok {
             $crate::StatusCode::OK,
             $crate::HttpBody::json(format!($($fmt)*)),
             [
-                ($crate::CONTENT_TYPE, "application/json"),
+                ($crate::headers::CONTENT_TYPE, "application/json"),
             ]
         )
     };
@@ -180,9 +180,9 @@ macro_rules! file {
             $crate::StatusCode::OK, 
             $crate::HttpBody::wrap_stream($e),
             [
-                ($crate::CONTENT_TYPE, "application/octet-stream"),
-                ($crate::TRANSFER_ENCODING, "chunked"),
-                ($crate::CONTENT_DISPOSITION, format!("attachment; filename=\"{}\"", $file_name))
+                ($crate::headers::CONTENT_TYPE, "application/octet-stream"),
+                ($crate::headers::TRANSFER_ENCODING, "chunked"),
+                ($crate::headers::CONTENT_DISPOSITION, format!("attachment; filename=\"{}\"", $file_name))
             ]
         )
     };
@@ -192,9 +192,9 @@ macro_rules! file {
             $crate::StatusCode::OK, 
             $crate::HttpBody::wrap_stream($e),
             [
-                ($crate::CONTENT_TYPE, "application/octet-stream"),
-                ($crate::TRANSFER_ENCODING, "chunked"),
-                ($crate::CONTENT_DISPOSITION, format!("attachment; filename=\"{}\"", $file_name)),
+                ($crate::headers::CONTENT_TYPE, "application/octet-stream"),
+                ($crate::headers::TRANSFER_ENCODING, "chunked"),
+                ($crate::headers::CONTENT_DISPOSITION, format!("attachment; filename=\"{}\"", $file_name)),
                 $( ($key, $value) ),*
             ]
         )
@@ -352,7 +352,7 @@ macro_rules! status {
             $crate::StatusCode::from_u16($status).unwrap_or($crate::StatusCode::OK),
             $crate::HttpBody::json(serde_json::json_internal!({ $($json)* })),
             [
-                ($crate::CONTENT_TYPE, "application/json"),
+                ($crate::headers::CONTENT_TYPE, "application/json"),
             ]
         )
     };
@@ -362,7 +362,7 @@ macro_rules! status {
             $crate::StatusCode::from_u16($status).unwrap_or($crate::StatusCode::OK), 
             $crate::HttpBody::empty(),
             [
-                ($crate::CONTENT_TYPE, "text/plain")
+                ($crate::headers::CONTENT_TYPE, "text/plain")
             ]
         )
     };
@@ -380,7 +380,7 @@ macro_rules! status {
             $crate::StatusCode::from_u16($status).unwrap_or($crate::StatusCode::OK),
             $crate::HttpBody::json($e),
             [
-                ($crate::CONTENT_TYPE, "application/json"),
+                ($crate::headers::CONTENT_TYPE, "application/json"),
             ]
         )
     };

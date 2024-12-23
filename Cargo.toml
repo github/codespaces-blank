@@ -1,6 +1,6 @@
 [package]
 name = "volga"
-version = "0.4.3"
+version = "0.4.4"
 edition = "2021"
 rust-version = "1.80.0"
 authors = ["Roman Emreis <roman.emreis@outlook.com>"]

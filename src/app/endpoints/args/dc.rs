@@ -14,6 +14,34 @@ use crate::app::{
 
 /// `Dc` stands for Dependency Container, This struct wraps the injectable type of `T` 
 /// `T` must be registered in Dependency Injection Container
+/// 
+/// # Example
+/// ```no_run
+/// use volga::{App, di::Dc, ok, not_found};
+/// use std::{
+///     collections::HashMap,
+///     sync::{Arc, Mutex}
+/// };
+/// 
+/// #[derive(Clone, Default)]
+/// struct InMemoryCache {
+///     inner: Arc<Mutex<HashMap<String, String>>>
+/// }
+/// 
+///# #[tokio::main]
+///# async fn main() -> std::io::Result<()> {
+/// let mut app = App::new();
+/// 
+/// app.map_get("/user/{id}", |id: String, cache: Dc<InMemoryCache>| async move {
+///     let user = cache.inner.lock().unwrap().get(&id);
+///     match user { 
+///         Some(user) => ok!(user),
+///         None => not_found!()
+///     }
+/// });
+///# app.run().await
+///# }
+/// ```
 pub struct Dc<T: Inject>(pub T);
 
 impl<T: Inject> Deref for Dc<T> {

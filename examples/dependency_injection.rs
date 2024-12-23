@@ -1,10 +1,12 @@
-﻿use volga::{
-    App, HttpContext, Next, HttpResult,
-    headers::{Header, custom_headers},
-    Inject, Dc, ok, not_found
-};
-use hyper::http::HeaderValue;
+﻿use hyper::http::HeaderValue;
 use uuid::Uuid;
+use volga::{
+    App, HttpResult,
+    middleware::{HttpContext, Next},
+    headers::{Header, custom_headers},
+    di::{Inject, Dc},
+    ok, not_found
+};
 use std::{
     collections::HashMap,
     sync::{Arc, Mutex}

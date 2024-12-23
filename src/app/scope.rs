@@ -20,7 +20,7 @@ use crate::{HttpResponse, HttpRequest, HttpBody, status};
 use crate::app::AppInstance;
 use crate::app::endpoints::RouteOption;
 #[cfg(feature = "middleware")]
-use crate::HttpContext;
+use crate::middleware::HttpContext;
 
 /// Represents the execution scope of the current connection
 #[derive(Clone)]

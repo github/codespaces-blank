@@ -3,9 +3,8 @@
 #[cfg(feature = "middleware")]
 use crate::{
     app::middlewares::Middlewares,
-    HttpResult,
-    HttpContext,
-    Next
+    middleware::{HttpContext, Next},
+    HttpResult
 };
 
 pub(super) struct PipelineBuilder {

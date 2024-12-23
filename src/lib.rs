@@ -12,7 +12,7 @@
 //! ## Example
 //! ```toml
 //! [dependencies]
-//! volga = "0.4.3"
+//! volga = "0.4.4"
 //! tokio = { version = "1", features = ["full"] }
 //! ```
 //! ```no_run
@@ -60,26 +60,21 @@ pub use crate::app::endpoints::args::{
 };
 
 #[cfg(feature = "middleware")]
-pub use crate::app::{
-    middlewares::Next,
-    http_context::HttpContext
-};
+pub mod middleware {
+    pub use crate::app::{
+        middlewares::Next,
+        http_context::HttpContext
+    };
+}
 
+/// Tools for Dependency Injection
 #[cfg(feature = "di")]
-pub use crate::app::{
-    endpoints::args::dc::Dc,
-    di::Inject
-};
+pub mod di {
+    pub use crate::app::{
+        endpoints::args::dc::Dc,
+        di::Inject
+    };
+}
 
 // Re-exporting HTTP status codes, Response and some headers from hyper/http
-pub use hyper::{
-    StatusCode, 
-    Response, 
-    header::{    
-        CONTENT_DISPOSITION,
-        TRANSFER_ENCODING,
-        CONTENT_TYPE,
-        CONTENT_LENGTH,
-        SERVER
-    }
-};
+pub use hyper::{StatusCode, Response};
