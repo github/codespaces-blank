@@ -32,8 +32,11 @@ use crate::app::{
 ///# async fn main() -> std::io::Result<()> {
 /// let mut app = App::new();
 /// 
+/// app.add_singleton(InMemoryCache::default());
+/// 
 /// app.map_get("/user/{id}", |id: String, cache: Dc<InMemoryCache>| async move {
-///     let user = cache.inner.lock().unwrap().get(&id);
+///     let cache_guard = cache.inner.lock().unwrap();
+///     let user = cache_guard.get(&id);
 ///     match user { 
 ///         Some(user) => ok!(user),
 ///         None => not_found!()

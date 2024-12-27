@@ -14,7 +14,7 @@ use std::io::ErrorKind;
 use crate::{app::endpoints::args::FromRequestRef, headers::{FromHeaders, Header}, BoxBody};
 
 #[cfg(feature = "di")]
-use crate::app::di::Container;
+use crate::app::di::{Inject, Container};
 
 /// Wraps the incoming [`Request`] to enrich its functionality
 pub struct HttpRequest {
@@ -93,6 +93,13 @@ impl HttpRequest {
     pub fn from_parts(parts: Parts, body: Incoming, container: Container) -> Self {
         let request = Request::from_parts(parts, body);
         Self::new(request, container)
+    }
+
+    /// Resolves a service from Dependency Container
+    #[inline]
+    #[cfg(feature = "di")]
+    pub fn resolve<T: Inject + 'static>(&mut self) -> Result<T, Error> {
+        self.container.resolve::<T>()
     }
     
     /// Extracts a payload from request parts

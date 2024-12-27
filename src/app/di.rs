@@ -1,12 +1,20 @@
-﻿use std::collections::HashMap;
-use std::any::{Any, TypeId};
-use std::io::{Error, ErrorKind};
-use std::sync::Arc;
-use crate::App;
+﻿use crate::App;
+use std::{
+    io::{Error, ErrorKind},
+    collections::HashMap,
+    any::{Any, TypeId},
+    sync::Arc
+};
 
 /// Marks a type that can be used with DI
-pub trait Inject: Default + Clone + Send + Sync {}
-impl<T: Default + Clone + Send + Sync> Inject for T {}
+pub trait Inject: Clone + Send + Sync {
+    fn inject(container: &mut Container) -> Result<Self, Error>;
+}
+impl<T: Default + Clone + Send + Sync> Inject for T {
+    fn inject(_: &mut Container) -> Result<Self, Error> {
+        Ok(Self::default())
+    }
+}
 
 type ArcService = Arc<
     dyn Any 
@@ -63,7 +71,7 @@ impl ContainerBuilder {
     }
 }
 
-/// Represents a DI container
+/// Represents a DI containers
 pub struct Container {
     services: HashMap<TypeId, ServiceEntry>
 }
@@ -79,9 +87,7 @@ impl Clone for Container {
             };
             new_services.insert(*key, cloned_value);
         }
-        Self {
-            services: new_services
-        }
+        Self { services: new_services }
     }
 }
 
@@ -95,28 +101,34 @@ impl Container {
         }
         if let Some(service_entry) = entry {
             return match service_entry {
-                ServiceEntry::Transient => Ok(T::default()),
+                ServiceEntry::Transient => T::inject(self),
+                ServiceEntry::Singleton(instance) => Self::resolve_internal(instance),
                 ServiceEntry::Scoped(maybe_instance) => {
                     if let Some(instance) = maybe_instance {
-                        (**instance).downcast_ref::<T>()
-                            .ok_or(DiError::resolve_error(std::any::type_name::<T>()))
-                            .cloned()
+                        Self::resolve_internal(instance)
                     } else {
-                        let new_instance = T::default();
-                        let clone = new_instance.clone();
-                        let entry = ServiceEntry::Scoped(Some(Arc::new(new_instance)));
-                        self.services.insert(type_id, entry);
-                        Ok(clone)
+                        self.register_scoped(type_id)
                     }
-                },
-                ServiceEntry::Singleton(instance) => {
-                    (**instance).downcast_ref::<T>()
-                        .ok_or(DiError::resolve_error(std::any::type_name::<T>()))
-                        .cloned()
                 }
             }
         }
         unreachable!();
+    }
+    
+    #[inline]
+    fn resolve_internal<T: Inject + 'static>(instance: &ArcService) -> Result<T, Error> {
+        (**instance).downcast_ref::<T>()
+            .ok_or(DiError::resolve_error(std::any::type_name::<T>()))
+            .cloned()
+    }
+
+    #[inline]
+    fn register_scoped<T: Inject + 'static>(&mut self, type_id: TypeId) -> Result<T, Error> {
+        let new_instance = T::inject(self)?;
+        let clone = new_instance.clone();
+        let entry = ServiceEntry::Scoped(Some(Arc::new(new_instance)));
+        self.services.insert(type_id, entry);
+        Ok(clone)
     }
 }
 
@@ -134,15 +146,15 @@ impl DiError {
 
 /// DI specific impl for [`App`]
 impl App {
-    pub fn register_singleton<T: Inject + 'static>(&mut self, instance: T) {
+    pub fn add_singleton<T: Inject + 'static>(&mut self, instance: T) {
         self.container.register_singleton(instance);
     }
 
-    pub fn register_scoped<T: Inject + 'static>(&mut self) {
+    pub fn add_scoped<T: Inject + 'static>(&mut self) {
         self.container.register_scoped::<T>();
     }
 
-    pub fn register_transient<T: Inject + 'static>(&mut self) {
+    pub fn add_transient<T: Inject + 'static>(&mut self) {
         self.container.register_transient::<T>();
     }
 }
@@ -150,8 +162,9 @@ impl App {
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
+    use std::io::Error;
     use std::sync::{Arc, Mutex};
-    use crate::app::di::ContainerBuilder;
+    use super::{Inject, Container, ContainerBuilder};
 
     trait Cache: Send + Sync {
         fn get(&self, key: &str) -> Option<String>;
@@ -180,8 +193,19 @@ mod tests {
         }
     }
     
-    #[tokio::test]
-    async fn it_registers_singleton() {
+    #[derive(Clone)]
+    struct CacheWrapper {
+        inner: InMemoryCache
+    }
+    
+    impl Inject for CacheWrapper {
+        fn inject(container: &mut Container) -> Result<Self, Error> {
+            Ok(Self { inner: container.resolve()? })
+        }
+    }
+
+    #[test]
+    fn it_registers_singleton() {
         let mut container = ContainerBuilder::new();
         container.register_singleton(InMemoryCache::default());
         
@@ -196,8 +220,8 @@ mod tests {
         assert_eq!(key, "value");
     }
 
-    #[tokio::test]
-    async fn it_registers_transient() {
+    #[test]
+    fn it_registers_transient() {
         let mut container = ContainerBuilder::new();
         container.register_transient::<InMemoryCache>();
 
@@ -212,8 +236,8 @@ mod tests {
         assert!(key.is_none());
     }
 
-    #[tokio::test]
-    async fn it_registers_scoped() {
+    #[test]
+    fn it_registers_scoped() {
         let mut container = ContainerBuilder::new();
         container.register_scoped::<InMemoryCache>();
 
@@ -244,6 +268,27 @@ mod tests {
             assert!(key.is_none());
         }
 
+        let key = cache.get("key").unwrap();
+
+        assert_eq!(key, "value 1");
+    }
+    
+    #[test]
+    fn it_resolves_inner_dependencies() {
+        let mut container = ContainerBuilder::new();
+        
+        container.register_singleton(InMemoryCache::default());
+        container.register_scoped::<CacheWrapper>();
+        
+        let mut container = container.build();
+
+        {
+            let mut scope = container.clone();
+            let cache = scope.resolve::<CacheWrapper>().unwrap();
+            cache.inner.set("key", "value 1");
+        }
+        
+        let cache = container.resolve::<InMemoryCache>().unwrap();
         let key = cache.get("key").unwrap();
 
         assert_eq!(key, "value 1");

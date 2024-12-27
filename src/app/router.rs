@@ -1,13 +1,45 @@
 ﻿use hyper::Method;
-
-use crate::{App, HttpResult};
-use crate::app::endpoints::{
-    args::FromRequest,
-    handlers::{Func, GenericHandler}
+use crate::{
+    App, HttpResult,
+    app::endpoints::{
+        args::FromRequest,
+        handlers::{Func, GenericHandler}
+    }
 };
 
 /// Routes mapping 
 impl App {
+    /// Maps a group of request handlers combined by `prefix`
+    /// 
+    /// # Examples
+    /// ```no_run
+    /// use volga::{App, Json, ok};
+    ///# #[derive(serde::Deserialize, serde::Serialize)]
+    ///# struct User;
+    ///# #[tokio::main]
+    ///# async fn main() -> std::io::Result<()> {
+    /// let mut app = App::new();
+    /// 
+    /// app.map_group("/user")
+    ///     .map_get("/{id}", |id: i32| async move {
+    ///         // get the user from somewhere
+    ///         let user: User = get_user();
+    ///         ok!(user)
+    ///     })
+    ///     .map_post("/create", |user: Json<User>| async move {
+    ///         // create a user somewhere
+    ///         let user_id = create_user(user);
+    ///         ok!(user_id)
+    ///     });
+    ///# app.run().await
+    ///# }
+    ///# fn get_user() -> User { unimplemented!() }
+    ///# fn create_user(user: Json<User>) -> i32 { unimplemented!() }
+    /// ```
+    pub fn map_group<'a>(&'a mut self, prefix: &'a str) -> RouteGroup<'a> {
+        RouteGroup::new(self, prefix)
+    }
+    
     /// Adds a request handler that matches HTTP GET requests for the specified pattern.
     /// 
     /// # Examples
@@ -228,4 +260,43 @@ impl App {
             .endpoints_mut()
             .map_route(Method::TRACE, pattern, handler);
     }
+}
+
+/// Represents a group of routes
+pub struct RouteGroup<'a> {
+    app: &'a mut App,
+    prefix: &'a str,
+}
+
+macro_rules! define_route_group_methods({$($method:ident)*} => {
+    impl <'a> RouteGroup<'a> {
+        /// Creates a new route group
+        fn new(app: &'a mut App, prefix: &'a str) -> Self {
+            RouteGroup { app, prefix }
+        }
+            
+        $(
+        #[doc = concat!("See [`App::", stringify!($method), "`] for more details.")]
+        pub fn $method<F, Args>(self, pattern: &str, handler: F) -> Self
+        where
+            F: GenericHandler<Args, Output = HttpResult>,
+            Args: FromRequest + Send + Sync + 'static
+        {
+            let pattern = [self.prefix, pattern].concat();
+            self.app.$method(&pattern, handler);
+            self
+        }
+        )*
+        }
+});
+
+define_route_group_methods! { 
+    map_get
+    map_post
+    map_put
+    map_patch
+    map_delete
+    map_head
+    map_options
+    map_trace
 }

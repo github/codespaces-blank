@@ -18,6 +18,7 @@ pub use hyper::{
         TRANSFER_ENCODING,
         CONTENT_TYPE,
         CONTENT_LENGTH,
+        LOCATION,
         SERVER
     }
 };

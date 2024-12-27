@@ -296,6 +296,30 @@ macro_rules! bad_request {
     };
 }
 
+/// Produces HTTP 301 MOVED PERMANENTLY response
+///
+/// # Example
+/// ```no_run
+/// use volga::redirect;
+///
+/// let url = "https://www.rust-lang.org/";
+/// redirect!(url);
+/// ```
+#[macro_export]
+macro_rules! redirect {
+    ($url:expr, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {
+        $crate::status!(301, [
+            ($crate::headers::LOCATION, $url),
+            $( ($key, $value) ),*
+        ])
+    };
+    ($url:expr) => {
+        $crate::status!(301, [
+            ($crate::headers::LOCATION, $url),
+        ])
+    };
+}
+
 /// Creates HTTP Request/Response headers
 /// # Examples
 ///```no_run
@@ -1024,6 +1048,41 @@ mod tests {
 
         assert_eq!(body.len(), 0);
         assert_eq!(response.status(), 400);
+        assert_eq!(response.headers().get("x-api-key").unwrap(), "some api key");
+        assert_eq!(response.headers().get("x-req-id").unwrap(), "some req id");
+    }
+
+    #[tokio::test]
+    async fn it_creates_redirect_response() {
+        let url = "https://www.rust-lang.org/";
+        let response = redirect!(url);
+
+        assert!(response.is_ok());
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+
+        assert_eq!(body.len(), 0);
+        assert_eq!(response.status(), 301);
+        assert_eq!(response.headers().get("location").unwrap(), url);
+    }
+
+    #[tokio::test]
+    async fn it_creates_redirect_response_with_custom_headers() {
+        let url = "https://www.rust-lang.org/";
+        let response = redirect!(url, [
+            ("x-api-key", "some api key"),
+            ("x-req-id", "some req id"),
+        ]);
+
+        assert!(response.is_ok());
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+
+        assert_eq!(body.len(), 0);
+        assert_eq!(response.status(), 301);
+        assert_eq!(response.headers().get("location").unwrap(), url);
         assert_eq!(response.headers().get("x-api-key").unwrap(), "some api key");
         assert_eq!(response.headers().get("x-req-id").unwrap(), "some req id");
     }

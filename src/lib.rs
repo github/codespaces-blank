@@ -59,6 +59,10 @@ pub use crate::app::endpoints::args::{
     cancellation_token::CancellationToken,
 };
 
+pub mod routing {
+    pub  use crate::app::router::RouteGroup;
+}
+
 #[cfg(feature = "middleware")]
 pub mod middleware {
     pub use crate::app::{

@@ -34,7 +34,7 @@ impl HttpContext {
     ///
     /// # Example
     /// ```no_run
-    /// use volga::{HttpContext, Query};
+    /// use volga::{middleware::HttpContext, Query};
     /// use serde::Deserialize;
     ///
     /// #[derive(Deserialize)]
@@ -56,7 +56,7 @@ impl HttpContext {
     /// Resolves a service from Dependency Container
     #[cfg(feature = "di")]
     pub fn resolve<T: Inject + 'static>(&mut self) -> Result<T, Error> {
-        self.request.container.resolve::<T>()
+        self.request.resolve::<T>()
     }
     
     /// Inserts the [`Header<T>`] to HTTP request headers
