@@ -6,7 +6,61 @@ use std::{
     sync::Arc
 };
 
-/// Marks a type that can be used with DI
+/// A trait that adds the ability to inject dependencies when resolving a type from the DI container
+/// 
+/// If there is no need to inject other dependencies the `struct` must implement the `Default` trait
+/// 
+/// # Example
+/// ```no_run
+/// use volga::{App, di::Dc, ok};
+///
+/// #[derive(Default, Clone)]
+/// struct ScopedService;
+///
+/// let mut app = App::new();
+/// app.add_scoped::<ScopedService>();
+/// 
+/// app.map_get("/route", |scoped_service: Dc<ScopedService>| async move {
+///     // Do something with scoped service
+///     ok!()
+/// });
+/// ```
+/// 
+/// If it's required to construct a `struct` from other dependencies, the `Inject` can be implemented manually
+/// 
+/// # Example
+/// ```no_run
+/// use volga::{
+///     App,
+///     di::{Dc, Inject, Container},
+///     ok
+/// };
+///
+/// #[derive(Default, Clone)]
+/// struct ScopedService;
+/// 
+/// #[derive(Clone)]
+/// struct TransientService {
+///     service: ScopedService 
+/// }
+/// 
+/// impl Inject for TransientService {
+///     fn inject(container: &mut Container) -> Result<Self, std::io::Error> {
+///         let scoped_service = container.resolve::<ScopedService>()?;
+///         Ok(Self { service: scoped_service })
+///     }
+/// }
+///
+/// let mut app = App::new();
+/// app.add_scoped::<ScopedService>();
+/// app.add_transient::<TransientService>();
+/// 
+/// app.map_get("/route", |transient_service: Dc<TransientService>| async move {
+///     let scoped = &transient_service.service;
+///     // Do something with scoped and/or transient service
+///     ok!()
+/// });
+/// ```
 pub trait Inject: Clone + Send + Sync {
     fn inject(container: &mut Container) -> Result<Self, Error>;
 }
@@ -71,7 +125,7 @@ impl ContainerBuilder {
     }
 }
 
-/// Represents a DI containers
+/// Represents a DI container
 pub struct Container {
     services: HashMap<TypeId, ServiceEntry>
 }
@@ -146,16 +200,56 @@ impl DiError {
 
 /// DI specific impl for [`App`]
 impl App {
-    pub fn add_singleton<T: Inject + 'static>(&mut self, instance: T) {
+    /// Registers singleton service
+    /// 
+    /// # Example
+    /// ```no_run
+    /// use volga::App;
+    /// 
+    /// #[derive(Default, Clone)]
+    /// struct Singleton;
+    /// 
+    /// let mut app = App::new();
+    /// let singleton = Singleton::default();
+    /// app.add_singleton(singleton);
+    /// ```
+    pub fn add_singleton<T: Inject + 'static>(&mut self, instance: T) -> &mut Self {
         self.container.register_singleton(instance);
+        self
     }
 
-    pub fn add_scoped<T: Inject + 'static>(&mut self) {
+    /// Registers scoped service
+    ///
+    /// # Example
+    /// ```no_run
+    /// use volga::App;
+    ///
+    /// #[derive(Default, Clone)]
+    /// struct ScopedService;
+    ///
+    /// let mut app = App::new();
+    /// app.add_scoped::<ScopedService>();
+    /// ```
+    pub fn add_scoped<T: Inject + 'static>(&mut self) -> &mut Self {
         self.container.register_scoped::<T>();
+        self
     }
 
-    pub fn add_transient<T: Inject + 'static>(&mut self) {
+    /// Registers transient service
+    ///
+    /// # Example
+    /// ```no_run
+    /// use volga::App;
+    ///
+    /// #[derive(Default, Clone)]
+    /// struct TransientService;
+    ///
+    /// let mut app = App::new();
+    /// app.add_transient::<TransientService>();
+    /// ```
+    pub fn add_transient<T: Inject + 'static>(&mut self) -> &mut Self {
         self.container.register_transient::<T>();
+        self
     }
 }
 

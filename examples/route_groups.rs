@@ -7,7 +7,7 @@ async fn main() -> std::io::Result<()> {
     app.map_group("/user")
         .map_get("/{id}", get_user)
         .map_post("/create/{name}", create_user);
-
+    
     app.run().await
 }
 

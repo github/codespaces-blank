@@ -12,7 +12,7 @@
 //! ## Example
 //! ```toml
 //! [dependencies]
-//! volga = "0.4.4"
+//! volga = "0.4.5"
 //! tokio = { version = "1", features = ["full"] }
 //! ```
 //! ```no_run
@@ -76,7 +76,7 @@ pub mod middleware {
 pub mod di {
     pub use crate::app::{
         endpoints::args::dc::Dc,
-        di::Inject
+        di::{Inject, Container}
     };
 }
 

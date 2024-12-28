@@ -56,7 +56,7 @@ impl App {
     ///# app.run().await
     ///# }
     /// ```
-    pub fn map_get<F, Args>(&mut self, pattern: &str, handler: F)
+    pub fn map_get<F, Args>(&mut self, pattern: &str, handler: F) -> &mut Self
     where
         F: GenericHandler<Args, Output = HttpResult>,
         Args: FromRequest + Send + Sync + 'static
@@ -68,7 +68,8 @@ impl App {
         let head = Method::HEAD;
         if !endpoints.contains(&head, pattern) { 
             endpoints.map_route(head, pattern, handler.clone());
-        } 
+        }
+        self
     }
 
     /// Adds a request handler that matches HTTP POST requests for the specified pattern.
@@ -88,7 +89,7 @@ impl App {
     ///# app.run().await
     ///# }
     /// ```
-    pub fn map_post<F, Args>(&mut self, pattern: &str, handler: F)
+    pub fn map_post<F, Args>(&mut self, pattern: &str, handler: F) -> &mut Self
     where
         F: GenericHandler<Args, Output = HttpResult>,
         Args: FromRequest + Send + Sync + 'static,
@@ -97,6 +98,7 @@ impl App {
         self.pipeline
             .endpoints_mut()
             .map_route(Method::POST, pattern, handler);
+        self
     }
 
     /// Adds a request handler that matches HTTP PUT requests for the specified pattern.
@@ -115,7 +117,7 @@ impl App {
     ///# app.run().await
     ///# }
     /// ```
-    pub fn map_put<F, Args>(&mut self, pattern: &str, handler: F)
+    pub fn map_put<F, Args>(&mut self, pattern: &str, handler: F) -> &mut Self
     where
         F: GenericHandler<Args, Output = HttpResult>,
         Args: FromRequest + Send + Sync + 'static,
@@ -124,6 +126,7 @@ impl App {
         self.pipeline
             .endpoints_mut()
             .map_route(Method::PUT, pattern, handler);
+        self
     }
 
     /// Adds a request handler that matches HTTP PATCH requests for the specified pattern.
@@ -142,7 +145,7 @@ impl App {
     ///# app.run().await
     ///# }
     /// ```
-    pub fn map_patch<F, Args>(&mut self, pattern: &str, handler: F)
+    pub fn map_patch<F, Args>(&mut self, pattern: &str, handler: F) -> &mut Self
     where
         F: GenericHandler<Args, Output = HttpResult>,
         Args: FromRequest + Send + Sync + 'static,
@@ -151,6 +154,7 @@ impl App {
         self.pipeline
             .endpoints_mut()
             .map_route(Method::PATCH, pattern, handler);
+        self
     }
 
     /// Adds a request handler that matches HTTP DELETE requests for the specified pattern.
@@ -169,7 +173,7 @@ impl App {
     ///# app.run().await
     ///# }
     /// ```
-    pub fn map_delete<F, Args>(&mut self, pattern: &str, handler: F)
+    pub fn map_delete<F, Args>(&mut self, pattern: &str, handler: F) -> &mut Self
     where
         F: GenericHandler<Args, Output = HttpResult>,
         Args: FromRequest + Send + Sync + 'static,
@@ -178,6 +182,7 @@ impl App {
         self.pipeline
             .endpoints_mut()
             .map_route(Method::DELETE, pattern, handler);
+        self
     }
 
     /// Adds a request handler that matches HTTP HEAD requests for the specified pattern.
@@ -196,7 +201,7 @@ impl App {
     ///# app.run().await
     ///# }
     /// ```
-    pub fn map_head<F, Args>(&mut self, pattern: &str, handler: F)
+    pub fn map_head<F, Args>(&mut self, pattern: &str, handler: F) -> &mut Self
     where
         F: GenericHandler<Args, Output = HttpResult>,
         Args: FromRequest + Send + Sync + 'static,
@@ -205,6 +210,7 @@ impl App {
         self.pipeline
             .endpoints_mut()
             .map_route(Method::HEAD, pattern, handler);
+        self
     }
 
     /// Adds a request handler that matches HTTP OPTIONS requests for the specified pattern.
@@ -223,7 +229,7 @@ impl App {
     ///# app.run().await
     ///# }
     /// ```
-    pub fn map_options<F, Args>(&mut self, pattern: &str, handler: F)
+    pub fn map_options<F, Args>(&mut self, pattern: &str, handler: F) -> &mut Self
     where
         F: GenericHandler<Args, Output = HttpResult>,
         Args: FromRequest + Send + Sync + 'static,
@@ -232,6 +238,7 @@ impl App {
         self.pipeline
             .endpoints_mut()
             .map_route(Method::OPTIONS, pattern, handler);
+        self
     }
 
     /// Adds a request handler that matches HTTP TRACE requests for the specified pattern.
@@ -250,7 +257,7 @@ impl App {
     ///# app.run().await
     ///# }
     /// ```
-    pub fn map_trace<F, Args>(&mut self, pattern: &str, handler: F)
+    pub fn map_trace<F, Args>(&mut self, pattern: &str, handler: F) -> &mut Self
     where
         F: GenericHandler<Args, Output = HttpResult>,
         Args: FromRequest + Send + Sync + 'static,
@@ -259,6 +266,7 @@ impl App {
         self.pipeline
             .endpoints_mut()
             .map_route(Method::TRACE, pattern, handler);
+        self
     }
 }
 
@@ -277,7 +285,7 @@ macro_rules! define_route_group_methods({$($method:ident)*} => {
             
         $(
         #[doc = concat!("See [`App::", stringify!($method), "`] for more details.")]
-        pub fn $method<F, Args>(self, pattern: &str, handler: F) -> Self
+        pub fn $method<F, Args>(&mut self, pattern: &str, handler: F) -> &mut Self
         where
             F: GenericHandler<Args, Output = HttpResult>,
             Args: FromRequest + Send + Sync + 'static

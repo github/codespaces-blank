@@ -88,7 +88,7 @@ impl App {
     ///# app.run().await
     ///# }
     /// ```
-    pub fn use_middleware<F, Fut>(&mut self, middleware: F)
+    pub fn use_middleware<F, Fut>(&mut self, middleware: F) -> &mut Self
     where
         F: Fn(HttpContext, Next) -> Fut + Send + Sync + 'static,
         Fut: Future<Output = HttpResult> + Send,
@@ -104,6 +104,7 @@ impl App {
 
         let middlewares = self.pipeline.middlewares_mut();
         middlewares.pipeline.push(mw);
+        self
     }
 
     /// Registers default middleware
