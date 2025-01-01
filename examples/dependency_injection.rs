@@ -66,7 +66,7 @@ async fn main() -> std::io::Result<()> {
 }
 
 async fn log_request<T: RequestIdGenerator + Inject>(mut ctx: HttpContext, next: Next) -> HttpResult {
-    let log: RequestLog = ctx.resolve()?;
+    let log: RequestLog = ctx.resolve().await?;
     let req_id = HeaderValue::from_str(log.request_id.as_str()).unwrap();
     ctx.request
         .headers_mut()
@@ -132,9 +132,9 @@ impl RequestLog {
 
 /// Custom implementation of `Inject` trait that helps to construct the `RequestLog`
 impl Inject for RequestLog {
-    fn inject(container: &mut Container) -> Result<Self, Error> {
-        let req_gen = container.resolve::<UuidGenerator>()?;
-        let cache = container.resolve::<InMemoryCache>()?;
+    async fn inject(container: &mut Container) -> Result<Self, Error> {
+        let req_gen = container.resolve::<UuidGenerator>().await?;
+        let cache = container.resolve::<InMemoryCache>().await?;
         Ok(Self { 
             request_id: req_gen.generate_id(), 
             inner: Default::default(),

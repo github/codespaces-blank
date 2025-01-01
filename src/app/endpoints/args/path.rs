@@ -162,13 +162,39 @@ impl PathError {
 mod tests {
     use hyper::http::Extensions;
     use serde::Deserialize;
-    use crate::app::endpoints::route::PathArguments;
     use crate::Path;
+    use crate::app::endpoints::route::PathArguments;
+    use crate::app::endpoints::args::{FromPayload, Payload};
 
     #[derive(Deserialize)]
     struct Params {
         id: u32,
         name: String
+    }
+
+    #[tokio::test]
+    async fn it_reads_from_payload() {
+        let param = ("id".to_string(), "123".to_string());
+        
+        let id = i32::from_payload(Payload::Path(&param)).await.unwrap();
+        
+        assert_eq!(id, 123);
+    }
+
+    #[tokio::test]
+    async fn it_reads_path_from_payload() {
+        let args: PathArguments = vec![
+            ("id".to_string(), "123".to_string()),
+            ("name".to_string(), "John".to_string())
+        ];
+        
+        let mut ext = Extensions::new();
+        ext.insert(args);
+
+        let path = Path::<Params>::from_payload(Payload::Ext(&ext)).await.unwrap();
+
+        assert_eq!(path.id, 123u32);
+        assert_eq!(path.name, "John")
     }
     
     #[test]

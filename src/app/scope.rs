@@ -67,7 +67,7 @@ impl Scope {
                 let (handler, params) = endpoint_context.into_parts();
 
                 #[cfg(feature = "di")]
-                let mut request = HttpRequest::new(request, shared.container.clone());
+                let mut request = HttpRequest::new(request, shared.container.create_scope());
                 #[cfg(not(feature = "di"))]
                 let mut request = HttpRequest::new(request);
                 

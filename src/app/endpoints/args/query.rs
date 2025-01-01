@@ -123,6 +123,7 @@ mod tests {
     use hyper::Uri;
     use serde::Deserialize;
     use crate::Query;
+    use crate::app::endpoints::args::{FromPayload, Payload};
 
     #[derive(Deserialize)]
     struct User {
@@ -134,6 +135,36 @@ mod tests {
     struct OptionalUser {
         name: Option<String>,
         age: Option<i32>
+    }
+
+    #[tokio::test]
+    async fn it_reads_from_payload() {
+        let uri = "https://www.example.com/api/get?name=John&age=33".parse::<Uri>().unwrap();
+        
+        let query = Query::<User>::from_payload(Payload::Query(&uri)).await.unwrap();
+
+        assert_eq!(query.name, "John");
+        assert_eq!(query.age, 33);
+    }
+
+    #[tokio::test]
+    async fn it_reads_as_optional_from_payload() {
+        let uri = "https://www.example.com/api/get?name=John".parse::<Uri>().unwrap();
+
+        let query = Query::<OptionalUser>::from_payload(Payload::Query(&uri)).await.unwrap();
+
+        assert!(query.age.is_none());
+        assert_eq!(query.0.name.unwrap(), "John");
+    }
+
+    #[tokio::test]
+    async fn it_reads_hash_map_from_payload() {
+        let uri = "https://www.example.com/api/get?name=John&age=33".parse::<Uri>().unwrap();
+
+        let query = Query::<HashMap<String, String>>::from_payload(Payload::Query(&uri)).await.unwrap();
+
+        assert_eq!(query.0.get("name").unwrap(), "John");
+        assert_eq!(query.0.get("age").unwrap(), "33");
     }
     
     #[test]

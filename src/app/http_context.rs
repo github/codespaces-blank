@@ -55,8 +55,8 @@ impl HttpContext {
 
     /// Resolves a service from Dependency Container
     #[cfg(feature = "di")]
-    pub fn resolve<T: Inject + 'static>(&mut self) -> Result<T, Error> {
-        self.request.resolve::<T>()
+    pub async fn resolve<T: Inject + 'static>(&mut self) -> Result<T, Error> {
+        self.request.resolve::<T>().await
     }
     
     /// Inserts the [`Header<T>`] to HTTP request headers

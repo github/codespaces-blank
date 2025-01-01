@@ -98,8 +98,8 @@ impl HttpRequest {
     /// Resolves a service from Dependency Container
     #[inline]
     #[cfg(feature = "di")]
-    pub fn resolve<T: Inject + 'static>(&mut self) -> Result<T, Error> {
-        self.container.resolve::<T>()
+    pub async fn resolve<T: Inject + 'static>(&mut self) -> Result<T, Error> {
+        self.container.resolve::<T>().await
     }
     
     /// Extracts a payload from request parts

@@ -279,7 +279,28 @@ mod tests {
     use std::ops::Deref;
     use hyper::HeaderMap;
     use hyper::http::HeaderValue;
-    use crate::headers::{ContentType, Header};
+    use crate::headers::{ContentType, Header, Headers};
+    use crate::app::endpoints::args::{FromPayload, Payload};
+
+    #[tokio::test]
+    async fn it_reads_headers_from_payload() {
+        let mut headers = HeaderMap::new();
+        headers.insert("Content-Type", HeaderValue::from_static("text/plain"));
+
+        let headers = Headers::from_payload(Payload::Headers(&headers)).await.unwrap();
+
+        assert_eq!(headers.get("content-type").unwrap(), "text/plain");
+    }
+
+    #[tokio::test]
+    async fn it_reads_header_from_payload() {
+        let mut headers = HeaderMap::new();
+        headers.insert("Content-Type", HeaderValue::from_static("text/plain"));
+
+        let header: Header<ContentType> = Header::from_payload(Payload::Headers(&headers)).await.unwrap();
+
+        assert_eq!(header.deref(), "text/plain");
+    }
 
     #[test]
     fn it_gets_header() {

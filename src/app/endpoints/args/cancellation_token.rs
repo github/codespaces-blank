@@ -107,7 +107,21 @@ impl FromPayload for TokenGuard {
 mod tests {
     use hyper::http::Extensions;
     use tokio_util::sync::CancellationToken as TokioCancellationToken;
+    use crate::app::endpoints::args::{FromPayload, Payload};
     use crate::app::endpoints::args::cancellation_token::TokenGuard;
+
+    #[tokio::test]
+    async fn it_reads_from_payload() {
+        let token = TokioCancellationToken::new();
+        let mut extensions = Extensions::new();
+        extensions.insert(token.clone());
+
+        token.cancel();
+        
+        let token = TokenGuard::from_payload(Payload::Ext(&extensions)).await.unwrap();
+
+        assert!(token.is_cancelled());
+    }
 
     #[test]
     fn it_gets_from_extensions() {
