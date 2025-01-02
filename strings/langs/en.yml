@@ -209,7 +209,7 @@ H_B_9 : "Image"
 P_B_1 : "Audio"
 P_B_2 : "Video"
 P_B_3 : "Live stream"
-P_B_4 : "Normal"
+P_B_4 : "Play Playlist"
 
 
 ST_B_1 : "Auth users"
