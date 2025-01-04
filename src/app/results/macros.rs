@@ -45,7 +45,7 @@ macro_rules! ok {
     // handles ok!()
     () => {
         $crate::response!(
-            $crate::StatusCode::OK, 
+            $crate::http::StatusCode::OK, 
             $crate::HttpBody::empty(),
             [
                 ($crate::headers::CONTENT_TYPE, "text/plain")
@@ -56,7 +56,7 @@ macro_rules! ok {
     // handles ok!([("key", "val")])
     ([ $( ($key:expr, $value:expr) ),* $(,)? ]) => {
         $crate::response!(
-            $crate::StatusCode::OK, 
+            $crate::http::StatusCode::OK, 
             $crate::app::body::HttpBody::empty(),
             [ $( ($key, $value) ),* ]
         )
@@ -65,7 +65,7 @@ macro_rules! ok {
     // handles ok!({ json })
     ({ $($json:tt)* }) => {
         $crate::response!(
-            $crate::StatusCode::OK,
+            $crate::http::StatusCode::OK,
             $crate::HttpBody::json(serde_json::json_internal!({ $($json)* })),
             [
                 ($crate::headers::CONTENT_TYPE, "application/json"),
@@ -76,7 +76,7 @@ macro_rules! ok {
     // handles ok!({ json }, [("key", "val")])
     ({ $($json:tt)* }, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {
         $crate::response!(
-            $crate::StatusCode::OK,
+            $crate::http::StatusCode::OK,
             $crate::HttpBody::json(serde_json::json_internal!({ $($json)* })),
             [
                 ($crate::headers::CONTENT_TYPE, "application/json"),
@@ -88,7 +88,7 @@ macro_rules! ok {
     // handles ok!(json)
     ($var:ident) => {
         $crate::response!(
-            $crate::StatusCode::OK,
+            $crate::http::StatusCode::OK,
             $crate::HttpBody::json($var),
             [
                 ($crate::headers::CONTENT_TYPE, "application/json"),
@@ -97,10 +97,10 @@ macro_rules! ok {
     };
     
     // handles ok!(json, [("key", "val")])
-    ($e:expr, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {
+    ($body:expr, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {
         $crate::response!(
-            $crate::StatusCode::OK,
-            $crate::HttpBody::json($e),
+            $crate::http::StatusCode::OK,
+            $crate::HttpBody::json($body),
             [
                 ($crate::headers::CONTENT_TYPE, "application/json"),
                 $( ($key, $value) ),*
@@ -111,7 +111,7 @@ macro_rules! ok {
     // handles ok!("Hello {name}")
     ($fmt:tt) => {
         $crate::response!(
-            $crate::StatusCode::OK,
+            $crate::http::StatusCode::OK,
             $crate::HttpBody::json(format!($fmt)),
             [
                 ($crate::headers::CONTENT_TYPE, "application/json"),
@@ -120,10 +120,10 @@ macro_rules! ok {
     };
     
     // handles ok!(thing.to_string()) or ok!(5 + 5)
-    ($e:expr) => {
+    ($body:expr) => {
         $crate::response!(
-            $crate::StatusCode::OK,
-            $crate::HttpBody::json($e),
+            $crate::http::StatusCode::OK,
+            $crate::HttpBody::json($body),
             [
                 ($crate::headers::CONTENT_TYPE, "application/json"),
             ]
@@ -133,7 +133,7 @@ macro_rules! ok {
     // handles ok!("Hello {}", name)
     ($($fmt:tt)*) => {
         $crate::response!(
-            $crate::StatusCode::OK,
+            $crate::http::StatusCode::OK,
             $crate::HttpBody::json(format!($($fmt)*)),
             [
                 ($crate::headers::CONTENT_TYPE, "application/json"),
@@ -175,10 +175,10 @@ macro_rules! ok {
 /// ```
 #[macro_export]
 macro_rules! file {
-    ($file_name:expr, $e:expr) => {
+    ($file_name:expr, $body:expr) => {
         $crate::response!(
-            $crate::StatusCode::OK, 
-            $crate::HttpBody::wrap_stream($e),
+            $crate::http::StatusCode::OK, 
+            $crate::HttpBody::wrap_stream($body),
             [
                 ($crate::headers::CONTENT_TYPE, "application/octet-stream"),
                 ($crate::headers::TRANSFER_ENCODING, "chunked"),
@@ -187,10 +187,10 @@ macro_rules! file {
         )
     };
     
-    ($file_name:expr, $e:expr, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {
+    ($file_name:expr, $body:expr, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {
         $crate::response!(
-            $crate::StatusCode::OK, 
-            $crate::HttpBody::wrap_stream($e),
+            $crate::http::StatusCode::OK, 
+            $crate::HttpBody::wrap_stream($body),
             [
                 ($crate::headers::CONTENT_TYPE, "application/octet-stream"),
                 ($crate::headers::TRANSFER_ENCODING, "chunked"),
@@ -228,13 +228,13 @@ macro_rules! file {
 /// ```
 #[macro_export]
 macro_rules! stream {
-    ($e:expr) => {
-        $crate::response!($crate::StatusCode::OK, $e)
+    ($body:expr) => {
+        $crate::response!($crate::http::StatusCode::OK, $body)
     };
-    ($e:expr, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {
+    ($body:expr, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {
         $crate::response!(
-            $crate::StatusCode::OK, 
-            $e,
+            $crate::http::StatusCode::OK, 
+            $body,
             [ $( ($key, $value) ),* ]
         )
     };
@@ -263,8 +263,8 @@ macro_rules! not_found {
     ([ $( ($key:expr, $value:expr) ),* $(,)? ]) => {
         $crate::status!(404, [ $( ($key, $value) ),* ])
     };
-    ($e:expr) => {
-        $crate::status!(404, $e)
+    ($body:expr) => {
+        $crate::status!(404, $body)
     };
 }
 
@@ -291,8 +291,14 @@ macro_rules! bad_request {
     ({ $($json:tt)* }) => {
         $crate::status!(400, { $($json)* })
     };
-    ($e:expr) => {
-        $crate::status!(400, $e)
+    ([ $( ($key:expr, $value:expr) ),* $(,)? ]) => {
+        $crate::status!(400, [ $( ($key, $value) ),* ])
+    };
+    ($body:expr, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {
+        $crate::status!(400, $body, [ $( ($key, $value) ),* ])
+    };
+    ($body:expr) => {
+        $crate::status!(400, $body)
     };
 }
 
@@ -373,7 +379,7 @@ macro_rules! headers {
 macro_rules! status {
     ($status:expr, { $($json:tt)* }) => {
         $crate::response!(
-            $crate::StatusCode::from_u16($status).unwrap_or($crate::StatusCode::OK),
+            $crate::http::StatusCode::from_u16($status).unwrap_or($crate::http::StatusCode::OK),
             $crate::HttpBody::json(serde_json::json_internal!({ $($json)* })),
             [
                 ($crate::headers::CONTENT_TYPE, "application/json"),
@@ -383,7 +389,7 @@ macro_rules! status {
     
     ($status:expr) => {
         $crate::response!(
-            $crate::StatusCode::from_u16($status).unwrap_or($crate::StatusCode::OK), 
+            $crate::http::StatusCode::from_u16($status).unwrap_or($crate::http::StatusCode::OK), 
             $crate::HttpBody::empty(),
             [
                 ($crate::headers::CONTENT_TYPE, "text/plain")
@@ -393,16 +399,24 @@ macro_rules! status {
     
     ($status:expr, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {
         $crate::response!(
-            $crate::StatusCode::from_u16($status).unwrap_or($crate::StatusCode::OK), 
+            $crate::http::StatusCode::from_u16($status).unwrap_or($crate::http::StatusCode::OK), 
             $crate::HttpBody::empty(),
             [ $( ($key, $value) ),* ]
         )
     };
     
-    ($status:expr, $e:expr) => {
+    ($status:expr, $body:expr, [ $( ($key:expr, $value:expr) ),* $(,)? ]) => {
         $crate::response!(
-            $crate::StatusCode::from_u16($status).unwrap_or($crate::StatusCode::OK),
-            $crate::HttpBody::json($e),
+            $crate::http::StatusCode::from_u16($status).unwrap_or($crate::http::StatusCode::OK), 
+            $crate::HttpBody::json($body),
+            [ $( ($key, $value) ),* ]
+        )
+    };
+    
+    ($status:expr, $body:expr) => {
+        $crate::response!(
+            $crate::http::StatusCode::from_u16($status).unwrap_or($crate::http::StatusCode::OK),
+            $crate::HttpBody::json($body),
             [
                 ($crate::headers::CONTENT_TYPE, "application/json"),
             ]
@@ -1048,6 +1062,25 @@ mod tests {
 
         assert_eq!(body.len(), 0);
         assert_eq!(response.status(), 400);
+        assert_eq!(response.headers().get("x-api-key").unwrap(), "some api key");
+        assert_eq!(response.headers().get("x-req-id").unwrap(), "some req id");
+    }
+
+    #[tokio::test]
+    async fn it_creates_empty_status_response_with_body_and_headers() {
+        let payload = TestPayload { name: "test".into() };
+        let response = status!(406, payload, [
+            ("x-api-key", "some api key"),
+            ("x-req-id", "some req id"),
+        ]);
+
+        assert!(response.is_ok());
+
+        let mut response = response.unwrap();
+        let body = &response.body_mut().collect().await.unwrap().to_bytes();
+
+        assert_eq!(String::from_utf8_lossy(body), "{\"name\":\"test\"}");
+        assert_eq!(response.status(), 406);
         assert_eq!(response.headers().get("x-api-key").unwrap(), "some api key");
         assert_eq!(response.headers().get("x-req-id").unwrap(), "some req id");
     }

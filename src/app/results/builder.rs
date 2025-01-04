@@ -5,7 +5,7 @@ pub const RESPONSE_ERROR: &str = "HTTP Response: Unable to create a response";
 #[macro_export]
 macro_rules! builder {
     () => {
-        $crate::Response::builder()
+        $crate::http::Response::builder()
             .header($crate::headers::SERVER, $crate::SERVER_NAME)
     };
     ($status:expr) => {

@@ -14,12 +14,17 @@ pub use hyper::{
     header::{
         InvalidHeaderValue, 
         ToStrError,
+        ACCEPT_ENCODING,
+        ACCEPT_RANGES,
         CONTENT_DISPOSITION,
         TRANSFER_ENCODING,
-        CONTENT_TYPE,
+        CONTENT_ENCODING,
         CONTENT_LENGTH,
+        CONTENT_RANGE,
+        CONTENT_TYPE,
         LOCATION,
-        SERVER
+        SERVER,
+        VARY
     }
 };
 
@@ -32,6 +37,7 @@ pub use extract::*;
 pub use macros::custom_headers;
 
 pub mod extract;
+pub mod quality;
 mod macros;
 
 /// Wraps the [`HeaderMap`] extracted from request

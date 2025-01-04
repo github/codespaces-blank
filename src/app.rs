@@ -28,6 +28,20 @@ pub mod middlewares;
 pub mod http_context;
 #[cfg(feature = "di")]
 pub mod di;
+#[cfg(any(
+    feature = "brotli", 
+    feature = "gzip", 
+    feature = "zstd", 
+    feature = "compression-full"
+))]
+pub mod encoding;
+#[cfg(any(
+    feature = "brotli",
+    feature = "gzip",
+    feature = "zstd",
+    feature = "compression-full"
+))]
+pub mod compress;
 pub mod endpoints;
 pub mod body;
 pub mod request;

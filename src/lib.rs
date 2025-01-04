@@ -12,7 +12,7 @@
 //! ## Example
 //! ```toml
 //! [dependencies]
-//! volga = "0.4.5"
+//! volga = "0.4.6"
 //! tokio = { version = "1", features = ["full"] }
 //! ```
 //! ```no_run
@@ -60,7 +60,7 @@ pub use crate::app::endpoints::args::{
 };
 
 pub mod routing {
-    pub  use crate::app::router::RouteGroup;
+    pub use crate::app::router::RouteGroup;
 }
 
 #[cfg(feature = "middleware")]
@@ -80,5 +80,17 @@ pub mod di {
     };
 }
 
+#[cfg(any(
+    feature = "brotli",
+    feature = "gzip",
+    feature = "zstd",
+    feature = "compression-full"
+))]
+pub mod encoding {
+    pub use crate::app::encoding::Encoding;
+}
+
 // Re-exporting HTTP status codes, Response and some headers from hyper/http
-pub use hyper::{StatusCode, Response};
+pub mod http {
+    pub use hyper::{StatusCode, Response};
+}
