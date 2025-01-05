@@ -1,13 +1,12 @@
-﻿use crate:: app::endpoints::Endpoints;
+﻿use crate::http::endpoints::Endpoints;
 
 #[cfg(feature = "middleware")]
 use crate::{
-    app::middlewares::Middlewares,
-    middleware::{HttpContext, Next},
+    middleware::{Middlewares, HttpContext, Next},
     HttpResult
 };
 
-pub(super) struct PipelineBuilder {
+pub(crate) struct PipelineBuilder {
     #[cfg(feature = "middleware")]
     middlewares: Middlewares,
     endpoints: Endpoints
@@ -48,12 +47,12 @@ impl PipelineBuilder {
     }
 
     #[cfg(feature = "middleware")]
-    pub(super) fn has_middleware_pipeline(&self) -> bool {
+    pub(crate) fn has_middleware_pipeline(&self) -> bool {
         !self.middlewares.is_empty()
     }
 
     #[cfg(feature = "middleware")]
-    pub(super) fn middlewares_mut(&mut self) -> &mut Middlewares {
+    pub(crate) fn middlewares_mut(&mut self) -> &mut Middlewares {
         &mut self.middlewares
     }
 

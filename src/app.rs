@@ -1,55 +1,32 @@
-﻿use std::{
-    net::SocketAddr,
+﻿//! Main application entry point
+
+use std::{
     future::Future,
+    net::SocketAddr,
     sync::Arc
 };
 
 use hyper_util::rt::TokioIo;
 
 use tokio::{
-    net::{TcpListener, TcpStream},
     io::self,
-    sync::broadcast, 
-    signal
+    net::{TcpListener, TcpStream},
+    signal,
+    sync::broadcast
 };
 
+use crate::server::Server;
 use crate::app::{
     pipeline::{Pipeline, PipelineBuilder},
-    scope::Scope,
-    server::Server
+    scope::Scope
 };
 
 #[cfg(feature = "di")]
-use crate::app::di::{Container, ContainerBuilder};
+use crate::di::{Container, ContainerBuilder};
 
-#[cfg(feature = "middleware")]
-pub mod middlewares;
-#[cfg(feature = "middleware")]
-pub mod http_context;
-#[cfg(feature = "di")]
-pub mod di;
-#[cfg(any(
-    feature = "brotli", 
-    feature = "gzip", 
-    feature = "zstd", 
-    feature = "compression-full"
-))]
-pub mod encoding;
-#[cfg(any(
-    feature = "brotli",
-    feature = "gzip",
-    feature = "zstd",
-    feature = "compression-full"
-))]
-pub mod compress;
-pub mod endpoints;
-pub mod body;
-pub mod request;
-pub mod results;
 pub mod router;
 pub(crate) mod pipeline;
-mod scope;
-mod server;
+pub(crate) mod scope;
 
 const DEFAULT_PORT: u16 = 7878;
 
@@ -68,8 +45,8 @@ const DEFAULT_PORT: u16 = 7878;
 /// ```
 pub struct App {
     #[cfg(feature = "di")]
-    container: ContainerBuilder,
-    pipeline: PipelineBuilder,
+    pub(super) container: ContainerBuilder,
+    pub(super) pipeline: PipelineBuilder,
     connection: Connection
 }
 

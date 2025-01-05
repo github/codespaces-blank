@@ -18,15 +18,16 @@ use hyper::{
 
 use crate::{HttpResponse, HttpRequest, HttpBody, status};
 use crate::app::AppInstance;
-use crate::app::endpoints::RouteOption;
+use crate::http::endpoints::RouteOption;
+
 #[cfg(feature = "middleware")]
 use crate::middleware::HttpContext;
 
 /// Represents the execution scope of the current connection
 #[derive(Clone)]
-pub(super) struct Scope {
-    pub(super) shared: Arc<AppInstance>,
-    pub(super) cancellation_token: CancellationToken
+pub(crate) struct Scope {
+    pub(crate) shared: Arc<AppInstance>,
+    pub(crate) cancellation_token: CancellationToken
 }
 
 impl Service<Request<Incoming>> for Scope {

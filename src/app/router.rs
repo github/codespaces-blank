@@ -1,10 +1,10 @@
 ﻿use hyper::Method;
 use crate::{
-    App, HttpResult,
-    app::endpoints::{
-        args::FromRequest,
-        handlers::{Func, GenericHandler}
-    }
+    App, HttpResult
+};
+use crate::http::endpoints::{
+    args::FromRequest,
+    handlers::{Func, GenericHandler}
 };
 
 /// Routes mapping 

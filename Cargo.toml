@@ -48,13 +48,13 @@ mini2 = ["http2"]
 http1 = ["dep:hyper", "hyper?/http1", "dep:hyper-util", "hyper-util?/http1"]
 http2 = ["dep:hyper", "hyper?/http2", "dep:hyper-util", "hyper-util?/http2"]
 
+middleware = []
+di = []
+
 compression-full = ["brotli", "gzip", "zstd"]
 brotli = ["middleware", "async-compression/brotli"]
 gzip = ["middleware", "async-compression/zlib", "async-compression/gzip"]
 zstd = ["middleware", "async-compression/zstd"]
-
-middleware = []
-di = []
 
 [package.metadata.docs.rs]
 all-features = true
