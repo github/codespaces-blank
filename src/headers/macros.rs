@@ -48,7 +48,7 @@ mod test {
         let api_key = HeaderValue::from_str("some-api-key").unwrap();
         let api_key_header = Header::<ApiKey>::new(&api_key);
         
-        assert_eq!(api_key_header.value, "some-api-key")
+        assert_eq!(*api_key_header, "some-api-key")
     }
 
     #[test]

@@ -34,10 +34,8 @@ use crate::{
         Header,
         Encoding,
         Quality,
-        ACCEPT_ENCODING,
-        ACCEPT_RANGES,
-        CONTENT_ENCODING,
-        CONTENT_LENGTH,
+        ACCEPT_ENCODING, ACCEPT_RANGES,
+        CONTENT_ENCODING, CONTENT_LENGTH,
         VARY
     },
     HttpResponse,
@@ -67,8 +65,7 @@ struct GzipCompressor;
 #[cfg(feature = "gzip")]
 impl Compressor for GzipCompressor {
     fn compress(body: BoxBody) -> BoxBody {
-        let body_stream = body.into_data_stream();
-        let stream_reader = StreamReader::new(body_stream);
+        let stream_reader = StreamReader::new(body.into_data_stream());
 
         let encoder = GzipEncoder::new(stream_reader);
         let compressed_body = ReaderStream::new(encoder);
@@ -81,8 +78,7 @@ struct DeflateCompressor;
 #[cfg(feature = "gzip")]
 impl Compressor for DeflateCompressor {
     fn compress(body: BoxBody) -> BoxBody {
-        let body_stream = body.into_data_stream();
-        let stream_reader = StreamReader::new(body_stream);
+        let stream_reader = StreamReader::new(body.into_data_stream());
 
         let encoder = ZlibEncoder::new(stream_reader);
         let compressed_body = ReaderStream::new(encoder);
@@ -95,8 +91,7 @@ struct BrotliCompressor;
 #[cfg(feature = "brotli")]
 impl Compressor for BrotliCompressor {
     fn compress(body: BoxBody) -> BoxBody {
-        let body_stream = body.into_data_stream();
-        let stream_reader = StreamReader::new(body_stream);
+        let stream_reader = StreamReader::new(body.into_data_stream());
 
         let encoder = BrotliEncoder::with_quality(stream_reader, Level::Precise(4));
         let compressed_body = ReaderStream::new(encoder);
@@ -109,8 +104,7 @@ struct ZstdCompressor;
 #[cfg(feature = "zstd")]
 impl Compressor for ZstdCompressor {
     fn compress(body: BoxBody) -> BoxBody {
-        let body_stream = body.into_data_stream();
-        let stream_reader = StreamReader::new(body_stream);
+        let stream_reader = StreamReader::new(body.into_data_stream());
 
         let encoder = ZstdEncoder::new(stream_reader);
         let compressed_body = ReaderStream::new(encoder);

@@ -19,7 +19,6 @@ use crate::di::Inject;
 pub struct HttpContext {
     /// Current HTTP request
     pub request: HttpRequest,
-    
     /// Current handler that mapped to handle the HTTP request
     handler: RouteHandler
 }

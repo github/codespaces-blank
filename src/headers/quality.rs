@@ -74,18 +74,14 @@ impl QualityError {
 }
 
 #[cfg(test)]
-#[cfg(any(
-    feature = "brotli",
-    feature = "gzip",
-    feature = "zstd",
-    feature = "compression-full"
-))]
 mod tests {
-    use super::{super::Encoding, Quality};
-    use crate::headers::quality::Ranked;
     use std::str::FromStr;
+    use super::{super::Encoding, Quality};
+    #[cfg(feature = "gzip")]
+    use crate::headers::quality::Ranked;
 
     #[test]
+    #[cfg(feature = "brotli")]
     fn it_parses_from_str_with_value() {
         let str = "br;q=0.8";
         
@@ -96,6 +92,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "gzip")]
     fn it_parses_from_str_with_rank_value() {
         let str = "gzip";
 
@@ -106,6 +103,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "gzip")]
     fn it_returns_parse_error() {
         let str = "gzip;Q=";
 

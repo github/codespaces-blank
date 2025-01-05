@@ -1,11 +1,13 @@
 ﻿//! Tools for Dependency Injection
 
-use crate::App;
+use super::App;
 use std::io::{Error, ErrorKind};
 
-pub use dc::Dc;
-pub use inject::Inject;
-pub use container::{Container, ContainerBuilder};
+pub use self::{
+    container::{Container, ContainerBuilder},
+    dc::Dc,
+    inject::Inject,
+};
 
 pub mod dc;
 pub mod inject;

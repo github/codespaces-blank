@@ -16,7 +16,7 @@ use tokio::{
 };
 
 use crate::server::Server;
-use crate::app::{
+use self::{
     pipeline::{Pipeline, PipelineBuilder},
     scope::Scope
 };

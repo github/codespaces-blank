@@ -13,15 +13,20 @@ use std::{
 pub enum Encoding {
     Any,
     Identity,
+    #[cfg(feature = "brotli")]
     Brotli,
+    #[cfg(feature = "gzip")]
     Gzip,
+    #[cfg(feature = "gzip")]
     Deflate,
+    #[cfg(feature = "zstd")]
     Zstd
 }
 
 impl Encoding {
     /// Returns `true` is encoding is `*` (star)
     #[inline]
+    #[allow(dead_code)]
     pub(crate) fn is_any(&self) -> bool {
         self == &Encoding::Any
     }
@@ -31,9 +36,13 @@ impl Ranked for Encoding {
     #[inline]
     fn rank(&self) -> u8 {
         match self {
+            #[cfg(feature = "brotli")]
             Encoding::Brotli => 5,
+            #[cfg(feature = "zstd")]
             Encoding::Zstd => 4,
+            #[cfg(feature = "gzip")]
             Encoding::Gzip => 3,
+            #[cfg(feature = "gzip")]
             Encoding::Deflate => 2,
             Encoding::Any => 1,
             Encoding::Identity => 0,
@@ -43,14 +52,19 @@ impl Ranked for Encoding {
 
 impl FromStr for Encoding {
     type Err = Error;
+    
     #[inline]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "*" => Ok(Encoding::Any),
             "identity" => Ok(Encoding::Identity),
+            #[cfg(feature = "brotli")]
             "br" => Ok(Encoding::Brotli),
+            #[cfg(feature = "gzip")]
             "gzip" => Ok(Encoding::Gzip),
+            #[cfg(feature = "gzip")]
             "deflate" => Ok(Encoding::Deflate),
+            #[cfg(feature = "zstd")]
             "zstd" => Ok(Encoding::Zstd),
             _ => Err(EncodingError::unknown())
         }
@@ -63,20 +77,18 @@ impl fmt::Display for Encoding {
         f.write_str(match *self { 
             Encoding::Any => "*",
             Encoding::Identity => "identity",
+            #[cfg(feature = "brotli")]
             Encoding::Brotli => "br",
+            #[cfg(feature = "gzip")]
             Encoding::Gzip => "gzip",
+            #[cfg(feature = "gzip")]
             Encoding::Deflate => "deflate",
+            #[cfg(feature = "zstd")]
             Encoding::Zstd => "zstd"
         })
     }
 }
 
-#[cfg(any(
-    feature = "brotli",
-    feature = "gzip",
-    feature = "zstd",
-    feature = "compression-full"
-))]
 impl From<Encoding> for HeaderValue {
     #[inline]
     fn from(encoding: Encoding) -> HeaderValue {
@@ -104,9 +116,13 @@ mod tests {
         let encodings = [
             ("*", Encoding::Any),
             ("identity", Encoding::Identity),
+            #[cfg(feature = "brotli")]
             ("br", Encoding::Brotli),
+            #[cfg(feature = "gzip")]
             ("gzip", Encoding::Gzip),
+            #[cfg(feature = "gzip")]
             ("deflate", Encoding::Deflate),
+            #[cfg(feature = "zstd")]
             ("zstd", Encoding::Zstd),
         ];
         
@@ -120,9 +136,13 @@ mod tests {
         let encodings = [
             ("*", Encoding::Any),
             ("identity", Encoding::Identity),
+            #[cfg(feature = "brotli")]
             ("br", Encoding::Brotli),
+            #[cfg(feature = "gzip")]
             ("gzip", Encoding::Gzip),
+            #[cfg(feature = "gzip")]
             ("deflate", Encoding::Deflate),
+            #[cfg(feature = "zstd")]
             ("zstd", Encoding::Zstd),
         ];
 
@@ -149,9 +169,13 @@ mod tests {
     fn it_returns_false_for_other_encodings() {
         let encodings = [
             Encoding::Identity,
+            #[cfg(feature = "brotli")]
             Encoding::Brotli,
+            #[cfg(feature = "gzip")]
             Encoding::Gzip,
+            #[cfg(feature = "gzip")]
             Encoding::Deflate,
+            #[cfg(feature = "zstd")]
             Encoding::Zstd
         ];
 
@@ -165,9 +189,13 @@ mod tests {
         let encodings = [
             Encoding::Any,
             Encoding::Identity,
+            #[cfg(feature = "brotli")]
             Encoding::Brotli,
+            #[cfg(feature = "gzip")]
             Encoding::Gzip,
+            #[cfg(feature = "gzip")]
             Encoding::Deflate,
+            #[cfg(feature = "zstd")]
             Encoding::Zstd
         ];
 
@@ -181,9 +209,13 @@ mod tests {
         let encodings = [
             Encoding::Identity,
             Encoding::Any,
+            #[cfg(feature = "gzip")]
             Encoding::Deflate,
+            #[cfg(feature = "gzip")]
             Encoding::Gzip,
+            #[cfg(feature = "zstd")]
             Encoding::Zstd,
+            #[cfg(feature = "brotli")]
             Encoding::Brotli,
         ];
 
