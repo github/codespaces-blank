@@ -1,0 +1,74 @@
+import React from "react";
+import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+
+const Home = () => (
+  <div className="min-h-screen flex flex-col items-center justify-center text-center p-6">
+    <h1 className="text-4xl font-bold mb-4">Holistic Health Coaching</h1>
+    <p className="text-lg mb-6">Empowering you to achieve optimal wellness through natural healing and personalized guidance.</p>
+    <Link to="/services">
+      <Button className="px-6 py-3 text-lg">Explore Services</Button>
+    </Link>
+  </div>
+);
+
+const Services = () => (
+  <div className="p-6 max-w-4xl mx-auto text-center">
+    <h2 className="text-3xl font-semibold mb-4">Our Services</h2>
+    <ul className="space-y-4">
+      <li>🌿 Personalized Wellness Plans</li>
+      <li>🍵 Herbal Consultations</li>
+      <li>🧘‍♀️ Mindfulness & Stress Reduction</li>
+      <li>🥗 Nutritional Coaching</li>
+    </ul>
+    <Link to="/contact">
+      <Button className="mt-6">Book a Consultation</Button>
+    </Link>
+  </div>
+);
+
+const Blog = () => (
+  <div className="p-6 max-w-4xl mx-auto text-center">
+    <h2 className="text-3xl font-semibold mb-4">Holistic Wellness Blog</h2>
+    <p className="mb-6">Insights, tips, and inspiration to help you on your wellness journey.</p>
+    <div className="space-y-4 text-left">
+      <article className="border-b pb-4">
+        <h3 className="text-2xl font-bold">The Power of Herbal Medicine</h3>
+        <p className="text-gray-700">Learn how nature’s remedies can support your body’s healing process.</p>
+        <Link to="/blog/herbal-medicine" className="text-blue-600 underline">Read more</Link>
+      </article>
+      <article className="border-b pb-4">
+        <h3 className="text-2xl font-bold">Mindfulness for Stress Relief</h3>
+        <p className="text-gray-700">Simple daily practices to reduce stress and increase balance.</p>
+        <Link to="/blog/mindfulness" className="text-blue-600 underline">Read more</Link>
+      </article>
+    </div>
+  </div>
+);
+
+const Contact = () => (
+  <div className="p-6 max-w-4xl mx-auto text-center">
+    <h2 className="text-3xl font-semibold mb-4">Get in Touch</h2>
+    <p className="mb-6">Schedule a free discovery call to start your wellness journey.</p>
+    <a href="mailto:your.email@example.com" className="text-blue-600 underline">your.email@example.com</a>
+  </div>
+);
+
+const App = () => (
+  <Router>
+    <nav className="p-4 bg-gray-100 flex justify-center space-x-6">
+      <Link to="/" className="text-lg font-semibold">Home</Link>
+      <Link to="/services" className="text-lg font-semibold">Services</Link>
+      <Link to="/blog" className="text-lg font-semibold">Blog</Link>
+      <Link to="/contact" className="text-lg font-semibold">Contact</Link>
+    </nav>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/services" element={<Services />} />
+      <Route path="/blog" element={<Blog />} />
+      <Route path="/contact" element={<Contact />} />
+    </Routes>
+  </Router>
+);
+
+export default App;
