@@ -1,0 +1,18 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Node.js
+node_modules/
+dist/
+
+# Environment
+.env
+
+# Database
+*.sqlite3
+
+# Docker
+**/Dockerfile
+**/docker-compose.yml
