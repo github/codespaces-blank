@@ -1,0 +1,552 @@
+<!--表格组件-->
+<template>
+	<div
+		:class="[
+			'custom-fixed-table-box',
+			{ 'fixed-left-shadow': fixedLeftClass },
+			{ 'fixed-right-shadow': fixedRightClass }
+		]"
+		ref="customTableBox"
+		@scroll="customTableScrollFn"
+	>
+		<table class="df-table" ref="customTable">
+			<thead>
+			<tr class="table-fixed-tr tableFixedTr">
+				<th v-if="checkbox.show"
+				    :class="[
+						'w30 pointer',
+						checkbox.class || '',
+						checkbox.fixed ? 'table-fixed-box fixed-left' : ''
+					]"
+				    @click="headerCheckAllFn"
+				>
+					<el-checkbox v-model="rowCheckedAll"
+					             :indeterminate="isIndeterminate"
+					             :disabled="rowCheckedAllDisabled"
+					             @click.stop="tableCheckAllFn"
+					></el-checkbox>
+				</th>
+				<slot name="header"></slot>
+			</tr>
+			</thead>
+			
+			<tbody ref="tableBodyRef">
+			<tr :class="`content table-fixed-tr tableFixedTr ${bodyClass}`"
+			    ref="tbodyTrRef"
+			    v-for="(row, rowIndex) in pageData"
+			    :key="(dataKey && row[dataKey]) ? row[dataKey] : rowIndex"
+			>
+				<td v-if="checkbox.show"
+				    :class="[
+						'w30 pointer',
+						checkbox.class || '',
+						checkbox.fixed ? 'table-fixed-box fixed-left' : ''
+					]"
+				    @click="bodyCheckFn(row)"
+				>
+					<el-checkbox v-model="row.rowChecked"
+					             :disabled="row.rowCheckedDisabled"
+					             @click.stop="tableCheckFn"
+					></el-checkbox>
+				</td>
+				<slot name="body" :row="row" :list="row" :index="rowIndex"></slot>
+			</tr>
+			</tbody>
+		</table>
+		<template v-if="!pageData.length">
+			<slot name="empty">
+				<div class="no-data-box">
+					<i class="icon_noData"></i>
+					<div class="m-t6">暂无数据</div>
+				</div>
+			</slot>
+		</template>
+	</div>
+</template>
+
+<script setup lang="ts">
+/*使用示例
+<template>
+	<!--dataKey=生成表格内容数据循环时用到的key，用来减少渲染次数，提高性能，如果不传则默认用数组下标-->
+	<!--maxRow=懒加载数据一次性最大加载数量，默认不传是一次性加载10条数据渲染表格展示-->
+	<!--checkbox=是否需要展示勾选列，传对象，show=true则展示勾选列，fixed=true则勾选列固定在左侧-->
+   <Table ref="tableRef"
+	       class="max-h600"
+	       dataKey="dataId"
+	       :maxRow="10"
+	       :checkbox="{
+	            show: true, //是否显示表格的勾选项列
+				fixed: true, //勾选项列是否需要固定在左侧
+				class: '' //需要给勾选列额外添加的class类
+	       }"
+	>
+		<!--表头内容插槽-->
+		<template #header>
+			<!--如果需要设置表格左侧固定列，则需要给th设置class=table-fixed-box fixed-left；固定左侧列用fixed-left，固定右侧列用fixed-right-->
+			<th class="table-fixed-box fixed-left"><div>姓名</div></th>
+			<th><div>年龄</div></th>
+			<th><div>手机号</div></th>
+			<!--如果需要设置表格右侧固定列，则需要给th设置class=table-fixed-box fixed-right；固定左侧列用fixed-left，固定右侧列用fixed-right-->
+			<th class="table-fixed-box fixed-right"><div>操作</div></th>
+		</template>
+		
+		<!--表格内容插槽，可以获取：row=表格行数据，index=表格行数据下标-->
+		<template #body="{ row, index }">
+			<!--如果需要设置表格左侧固定列，则需要给td设置class=table-fixed-box fixed-left；固定左侧列用fixed-left，固定右侧列用fixed-right-->
+			<td class="table-fixed-box fixed-left"><div>{{ row.name }}</div></td>
+			<td><div>{{ row.age }}</div></td>
+			<td><el-input v-model="row.phone"/></td>
+			<!--如果需要设置表格右侧固定列，则需要给td设置class=table-fixed-box fixed-right；固定左侧列用fixed-left，固定右侧列用fixed-right-->
+			<td class="table-fixed-box fixed-right">
+				<i class="icon_delete" title="删除"></i>
+			</td>
+		</template>
+	</Table>
+</template>
+
+<script setup lang="ts">
+import {reactive, ref} from 'vue';
+import Table from '@/components/Table.vue';
+
+const TableData = reactive({
+	data: [{ //生成表格内容数据
+		dataId: '1',
+		name: '张三', //name对应表头列数据的key=name的姓名列数据
+		age: 23, //age对应表头列数据的key=age的年龄列数据
+		phone: '12345678910' //phone对应表头列数据的key=phone的手机号列数据
+	}, {
+		dataId: '2',
+		name: '李四',
+		age: 24,
+		phone: '12345678910'
+	}]
+});
+const tableRef = ref(); //表格组件ref
+onMounted(() => {
+	// 表格数据初始化，因为组件里面没有做watch监听，所以需要调用表格组件的更新视图方法，否则表格数据不会更新
+	tableRef.value.updateTableView(TableData.data, 'init');
+});
+//获取表格选中的数据集合
+const getTableCheckData = () => {
+	//调用getCheckData方法，如果不传参数则返回选中的那条数据的整个对象数组集合，如果传了参数则返回指定参数的数组集合
+	
+	let data = tableRef.value.getCheckData();  //如果勾选了第一条数据，且调用getCheckData没传参数，则这里获取到的data=[{dataId:'1', name: '张三', age: 23, phone: '12345678910'}]
+	
+	let data = tableRef.value.getCheckData('dataId');  //如果勾选了第一条数据，且调用getCheckData传了参数，则这里获取到的data=['1']
+};
+
+//表格数据变更时，调用表格组件的更新视图方法，否则表格数据不会更新
+const updateTableViewFn = () => {
+	TableData.data.push({
+		dataId: '3',
+		name: '王五',
+		age: 25,
+		phone: '12345678910'
+	});
+	//表格数据更新后需要手动调用一下表格组件的更新视图方法，否则表格数据不会更新，不传init时渲染当前已经渲染的条数(如滚动加载了30条数据，则当前还是渲染30条)，且保留当前滚动条所在位置
+	tableRef.value.updateTableView(TableData.data);
+	
+	//如果是需要初始化只渲染前10条表格数据，同时滚动条初始化到顶部，则需要传init参数
+	tableRef.value.updateTableView(TableData.data, 'init');
+};
+
+//跳转定位到表格指定行位置
+const scrollToRowFn = () => {
+	//第一个参数为要跳转到哪一行
+	//第二个参数为是否跳转到指定行且需要定位在指定行的子节点位置，如果传了，则跳转到子节点，如果没有传，则跳转到整行，一般在表格有横向滚动条时需要用到
+	tableRef.value.scrollToRow(30, '.children-class');
+};
+< /script>
+*/
+
+import {nextTick, onMounted, ref} from 'vue';
+
+const props = defineProps({
+	dataKey: { //表格内容数据绑定的key，用来减少循环渲染次数，提高性能
+		type: String,
+		default: ''
+	},
+	checkbox: { //表格勾选项列配置
+		type: Object,
+		default: {
+			show: false, //是否显示表格的勾选项列
+			fixed: false, //勾选项列是否需要固定在左侧
+			class: ''
+		}
+	},
+	maxRow: { //表格默认一次性展示多少条数据（用来懒加载数据，解决卡顿问题）
+		type: Number,
+		default: 10
+	},
+	bodyClass: { //表格内容tr的class类
+		type: String,
+		default: ''
+	}
+});
+
+let maxRow = 10;
+onMounted(() => {
+	maxRow = props.maxRow;
+	// pageDataAll.value = props.data || Array<any>(); //获取所有的表格数据
+	// pageData.value = pageDataAll.value.slice(0, maxRow); //先给一部分表格数据用来渲染页面，减少页面卡顿
+	// scrollLazyFn(); //调用一下表格滚动懒加载数据事件
+	
+	// nextTick(() => {
+	customTableBoxWidth = customTableBox.value.clientWidth; //获取当前节点的宽度
+	customTableWidth = customTable.value.clientWidth; //获取当前节点下的table的宽度
+	// tableFixedFn(); //调用表格滚动固定列事件，计算固定列是否需要添加class类
+	// });
+});
+
+//表格数据滚动懒加载相关逻辑 start
+const pageDataAll = ref(<any>[]); //储存所有表格数据的数组
+const pageData = ref(<any>[]); //储存需要懒加载渲染的表格数据的数组
+
+let pageDataIndex = 0; //记录滚动加载表格数据的起始下标
+
+//表格滚动懒加载数据事件
+const scrollLazyFn = () => {
+	nextTick(() => {
+		let scrollTop = customTableBox.value.scrollTop, //滚动距离
+			clientHeight = customTableBox.value.clientHeight, //表格可视高度：比如600
+			scrollHeight = customTableBox.value.scrollHeight, //表格实际高度
+			flag = false;
+		
+		//高度小于3000的时候
+		if (scrollHeight < 3000) {
+			//如果当前滚动位置到达了整体表格高度的80%，则表示快滚动到底部了
+			if ((scrollTop + clientHeight) / scrollHeight > 0.8) {
+				flag = true;
+			}
+		} else { //高度大于3000的时候
+			//如果表格的实际高度减去当前滚动位置小于300，则表示快滚动到底部了
+			if (scrollHeight - (scrollTop + clientHeight) < 300) {
+				flag = true;
+			}
+		}
+		//如果flag=true，且起始下标值小于完整数据数组的长度，则还有未渲染的数据
+		if (flag && pageDataIndex + maxRow < pageDataAll.value.length) {
+			pageDataIndex += maxRow; //加10，获取下一个10条的数据的起始下标
+			//数据合并，从记录的完整数据数组中，获取下一个10条的数据，然后合并到页面渲染用的数据数组中
+			pageData.value = pageData.value.concat(pageDataAll.value.slice(pageDataIndex, pageDataIndex + maxRow)); //slice截取，截取从起始下标开始，到加10的结束下标的数据
+			scrollLazyFn(); //再调用一次，有可能当前滚动的距离过高，还需要再继续加载剩余的数据
+			return;
+		}
+		fixedBoxFn(); //给表格固定列设置偏移量
+	});
+};
+//表格数据滚动懒加载相关逻辑 end
+
+
+
+//表格滚动固定列相关逻辑 start
+const customTableBox = ref();
+const customTable = ref();
+let customTableBoxWidth = 0;
+let customTableWidth = 0;
+const fixedLeftClass = ref(false);
+const fixedRightClass = ref(false);
+
+let tableOldScrollTop = 0; //记录滚动条高度
+let tableOldScrollLeft = 0; //记录滚动条横向滚动距离
+let scrollSto: any = null;
+//注册表格滚动监听事件
+const customTableScrollFn = () => {
+	clearTimeout(scrollSto);
+	scrollSto = setTimeout(() => {
+		clearTimeout(scrollSto);
+		scrollSto = null;
+		let newScrollTop = customTableBox.value.scrollTop,
+			newScrollLeft = customTableBox.value.scrollLeft;
+		//如果滚动条高度距离发生变化，则调用表格滚动懒加载数据事件，判断是否需要加载新数据
+		if (tableOldScrollTop !== newScrollTop) {
+			tableOldScrollTop = newScrollTop;
+			scrollLazyFn();
+		}
+		
+		//如果滚动条横向距离发生变化，则调用表格滚动固定列事件，计算固定列是否需要添加class类
+		if (tableOldScrollLeft !== newScrollLeft) {
+			tableOldScrollLeft = newScrollLeft;
+			customTableBoxWidth = customTableBox.value.clientWidth; //获取当前节点的宽度
+			customTableWidth = customTable.value.clientWidth; //获取当前节点下的table的宽度
+			tableFixedFn(); //调用表格滚动固定列事件，计算固定列是否需要添加class类
+		}
+	}, 100);
+};
+
+//给表格固定列设置偏移量
+const fixedBoxFn = () => {
+	nextTick(() => {
+		//获取所有需要固定列的tr节点
+		let $tableFixedTr = customTableBox.value.querySelectorAll('.tableFixedTr');
+		if ($tableFixedTr.length) { //判断如果有需要固定列的节点
+			//循环tr节点
+			for (let i = 0; i < $tableFixedTr.length; i++) {
+				//把当前class类去除，避免重复处理固定列
+				$tableFixedTr[i].classList.remove('tableFixedTr');
+				//获取所有需要左侧固定列的td节点
+				let $fixedLeftBox = $tableFixedTr[i].querySelectorAll('.table-fixed-box.fixed-left'),
+					left = 0;
+				//循环需要左侧固定列的td节点
+				for (let i = 0; i < $fixedLeftBox.length; i++) {
+					//设置当前td节点的left偏移量
+					$fixedLeftBox[i].style.left = left + 'px';
+					//给下一个td节点设置偏移量时，需要加上当前td节点的宽度，不然会出现两个固定列重叠
+					left += $fixedLeftBox[i].clientWidth;
+					if (i < $fixedLeftBox.length - 1) { //如果不是最后一个，则移除class类，不然表格固定列样式会每一列都有个阴影
+						$fixedLeftBox[i].classList.remove('fixed-left');
+					}
+				}
+				
+				//获取所有需要右侧固定列的td节点
+				let $fixedRightBox = $tableFixedTr[i].querySelectorAll('.table-fixed-box.fixed-right'),
+					right = 0;
+				//循环需要右侧固定列的td节点，从最后一个开始循环
+				for (let i = $fixedRightBox.length - 1; i >= 0; i--) {
+					//设置当前td节点的right偏移量
+					$fixedRightBox[i].style.right = right + 'px';
+					//给下一个td节点设置偏移量时，需要加上当前td节点的宽度，不然会出现两个固定列重叠
+					right += $fixedRightBox[i].clientWidth;
+					if (i) { //如果不是第一个，则移除class类，不然表格固定列样式会每一列都有个阴影
+						$fixedRightBox[i].classList.remove('fixed-right');
+					}
+				}
+			}
+		}
+	});
+};
+
+//表格滚动固定列事件，计算固定列是否需要添加class类
+const tableFixedFn = () => {
+	let left = customTableBox.value.scrollLeft, //获取左侧固定列需要偏移的值：当前节点横向滚动条滚动的距离
+		right = customTableWidth - customTableBoxWidth - left - 1; //获取右侧固定列需要偏移的值：表格宽-当前节点宽-当前节点的横向滚动条滚动距离值-1(这个1代表border边框，需要-1防止右侧有1px空隙，造成滚动时右侧能看到其它非固定列的内容)
+
+	//有些浏览器可以不停往后拉，判断如果小于0，则认为是拉大最后面了，直接把right赋为0
+	if (right < 0) {
+		right = 0;
+	}
+	
+	if (left > 0 && !fixedLeftClass.value) { //判断左侧固定列的偏移量是否大于0，大于则需要加阴影效果的class
+		fixedLeftClass.value = true;
+	} else if (left <= 0 && fixedLeftClass) {
+		fixedLeftClass.value = false;
+	}
+	if (right > 5 && !fixedRightClass.value) { //判断右侧固定列的偏移量是否大于5，大于则需要加阴影效果的class
+		fixedRightClass.value = true;
+	} else if (right <= 5 && fixedRightClass) {
+		fixedRightClass.value = false;
+	}
+};
+//表格滚动固定列相关逻辑 end
+
+
+
+//表格勾选框全选按钮\单选按钮选中相关逻辑 start
+const rowCheckedAll = ref(false);
+const isIndeterminate = ref(false);
+const rowCheckedAllDisabled = ref(false);
+//表格表头th点击事件
+const headerCheckAllFn = () => {
+	tableCheckAllFn(); //调用表头多选框绑定的点击事件
+	//因为点击的是表头th而不是多选框节点，所以需要在这里手动把表头多选框绑定的值更新为true或false
+	rowCheckedAll.value = !rowCheckedAll.value;
+	isIndeterminate.value = false;
+};
+
+/**
+ * 表格表头多选框点击事件-全选-联动单选选中
+ * 由于表头的多选框触发事件的方式是click触发，对应绑定的rowCheckedAll的值的变化会延后
+ * 也就是说当点击多选框选中时，rowCheckedAll还是false，需要过会才会变成true，取消选中时也一样
+ * 所以下面的判断需要取反判断，如果是false则需要全选，如果是true则需要全部取消选中
+ * */
+const tableCheckAllFn = () => {
+	let isCheck = !rowCheckedAll.value; //取反
+	
+	pageDataAll.value.forEach((row: any) => {
+		//只有没被禁用的勾选项才能设置选中或取消选中
+		if (!row.rowCheckedDisabled) {
+			row.rowChecked = isCheck;
+		}
+	});
+	
+	isIndeterminate.value = false;
+};
+
+
+//表格内容td点击事件
+const bodyCheckFn = (row: any) => {
+	row.rowChecked = !row.rowChecked;
+	tableCheckFn(); //调用表格内容多选框绑定的点击事件
+};
+
+/*
+* 表格内容多选框点击事件-单选-联动全选选中中
+* 由于表格的多选框触发事件的方式是click触发，对应绑定的rowChecked的值的变化会延后
+* 也就是说当点击多选框选中时，rowChecked还是false，需要过会才会变成true，取消选中时也一样
+* */
+const tableCheckFn = () => {
+	//延迟执行，这样rowChecked的值就已经变化了
+	let stoId: any = setTimeout(() => {
+		clearTimeout(stoId);
+		stoId = null;
+		
+		if (pageDataAll.value.length) {
+			let isAllDisabled = true, //是否全部禁用
+				isCheckAll = true, //是否全部选中
+				isIndeter = false; //是否部分选中
+			
+			for (let i = 0; i < pageDataAll.value.length; i++) {
+				let row = pageDataAll.value[i];
+				
+				//只有未禁用的勾选项数据才进入if条件
+				if (!row.rowCheckedDisabled) {
+					isAllDisabled = false; //设为false，表示当前表格数据并不是所有都是禁用的
+					//如果有勾选项未选中，则isCheckAll设为false
+					if (!row.rowChecked) {
+						isCheckAll = false;
+					} else { //如果有勾选项选中，则isIndeter设为true
+						isIndeter = true;
+					}
+					//如果全选标识变成了false，部分选中标识变成了true，则后面的循环就没必要继续了，直接结束循环
+					if (!isCheckAll && isIndeter) {
+						break;
+					}
+				}
+			}
+			//只有isAllDisabled不是true，才设置全选勾选框的全选状态标识和部分选中状态标识
+			if (!isAllDisabled) {
+				rowCheckedAllDisabled.value = false; //把全选按钮放开禁用
+				rowCheckedAll.value = isCheckAll;
+				isIndeterminate.value = !isCheckAll && isIndeter;
+			} else { //如果isAllDisabled是true，则说明当前表格数据全部都是禁用的
+				rowCheckedAllDisabled.value = true; //把全选按钮也禁用
+				rowCheckedAll.value = false; //全选标识设为false
+				isIndeterminate.value = false; //部分选中标识设为false
+			}
+		} else {
+			rowCheckedAllDisabled.value = false;
+			rowCheckedAll.value = false;
+			isIndeterminate.value = false;
+		}
+	}, 1);
+};
+//表格勾选框全选按钮\单选按钮选中相关逻辑 end
+
+
+/*
+* 获取选中数据
+* @params key 非必填，如果传了key则返回选中数据的这个key值的数组集合，如果没有传key则返回选中数据的整个row对象数组集合
+* @params isGetDisabled 非必填，是否包含被禁用的勾选项，默认不包含，传true则包含
+* */
+const getCheckData = (key?: string, isGetDisabled?: boolean) => {
+	let checkData = Array<any>();
+	pageDataAll.value.forEach((row: any) => {
+		if (isGetDisabled) { //如果传了true，则返回的选中数据包含被禁用的勾选项数据
+			if (row.rowChecked) {
+				//如果传了key则返回选中数据的这个key值的数组集合，如果没有传key则返回选中数据的整个row对象数组集合
+				checkData.push(key ? row[key] : {...row, rowChecked: false, rowCheckedDisabled: false});
+			}
+		} else { //如果没传true，则返回的选中数据不包含被禁用的勾选项数据
+			if (row.rowChecked && !row.rowCheckedDisabled) { //判断当前数据勾选项是否选中，且勾选项没有被禁用，才返回该条数据
+				//如果传了key则返回选中数据的这个key值的数组集合，如果没有传key则返回选中数据的整个row对象数组集合
+				checkData.push(key ? row[key] : {...row, rowChecked: false, rowCheckedDisabled: false});
+			}
+		}
+	});
+	return checkData;
+};
+
+/*
+* 更新表格数据视图
+* 注：因为watch监听没办法监听到数组的push和splice等方法，
+*    且没办法根据实际情况判断当前是需要初始化表格以及滚动条初始化回顶部，还是仅仅只是更新视图然后保留滚动条所在位置，
+*    所以特地封装此方法，每次需要更新视图时手动调用
+*
+* @params newData 必填，最新的表格数据
+* @params type 非必填，如果传init则需要初始化表格数据，只渲染前10条，同时滚动条初始化到顶部，如果不传或传其它，则保留当前已渲染的条数(如滚动加载了30条数据，则当前还是渲染30条)，且滚动条不初始化到顶部
+* */
+const updateTableView = (newData: Array<any>, type?: string, isNotInitChecked?: boolean) => {
+	pageDataAll.value = newData || Array<any>();
+	
+	// 如果数据为空，则不执行后面的逻辑
+	if (!pageDataAll.value.length) {
+		pageData.value = Array<any>();
+		return;
+	}
+	if (type === 'init') { //如果传init则需要初始化表格，只渲染前10条数据，同时滚动条初始化到顶部
+		pageData.value = pageDataAll.value.slice(0, maxRow); //先给一部分表格数据用来渲染页面，减少页面卡顿
+		//是否不初始化表格内容多选框选中状态，如果是flase，则初始化表格内容多选框选中状态，如果是true，则不初始化表格内容多选框选中状态
+		if (!isNotInitChecked) {
+			//把表格内容多选框初始化为false
+			pageDataAll.value.forEach((row: any) => {
+				//只有没被禁用的勾选项才能设置取消选中
+				if (!row.rowCheckedDisabled) {
+					row.rowChecked = false;
+				}
+			});
+		}
+		//把懒加载数据下标初始化为0
+		pageDataIndex = 0;
+		//把表格的滚动条位置初始化为0
+		customTableBox.value.scrollTop = 0;
+	} else { //如果没有传init，则保留当前已渲染条数数据，且滚动条不初始化到顶部
+		//更新视图，表格数据从第一个下标开始取，直到懒加载数据下标对应数据
+		pageData.value = pageDataAll.value.slice(0, pageDataIndex + maxRow);
+	}
+	scrollLazyFn(); //调用一下表格滚动懒加载数据事件
+	tableFixedFn(); //调用表格滚动固定列事件，计算固定列是否需要添加class类
+	tableCheckFn(); //调用方法更新表格全选勾选项的选中
+};
+
+const tbodyTrRef = ref();
+
+/*
+* 跳转到指定行
+* @params rowIndex 必填，要跳转到那一行
+* @params childClass 非必填，如果传了，则跳转到子节点，如果没有传，则跳转到整行
+* */
+const scrollToRow = (rowIndex: number, childClass?: string) => {
+	let scrollViewOpt = {
+		behavior: 'smooth', //默认'auto'立即滚动，无动画效果，'smooth'平滑滚动
+		block: 'center', //垂直方向上的对齐方式，默认'start'，可选值：'center'、'end'、'nearest'、'start'
+		inline: 'center' //水平方向上的对齐方式，默认'nearest'，可选值：'center'、'end'、'nearest'、'start'
+	};
+	//如果要跳转的行小于当前已渲染的行数，则不需要加载新行，直接定位即可
+	if (rowIndex < pageDataIndex + maxRow) {
+		//定位到要跳转的行
+		if (childClass) { //如果需要定位到子节点，则定位到子节点
+			nextTick(() => {
+				tbodyTrRef.value[rowIndex].querySelectorAll(childClass)[0]?.scrollIntoView(scrollViewOpt);
+			});
+		} else { //如果不需要定位到子节点，则定位到整行
+			tbodyTrRef.value[rowIndex]?.scrollIntoView(scrollViewOpt);
+		}
+	} else { //如果要跳转的行大于当前已渲染的行数，则需要加载新行，再定位
+		//需要截取从当前已渲染的行数到要跳转的行数+1，这样才能渲染出实际上要跳转的行数据
+		pageData.value = pageData.value.concat(pageDataAll.value.slice(pageDataIndex + maxRow, rowIndex + 1)); //slice截取，截取从起始下标开始，到指定行的下标的数据
+		pageDataIndex = rowIndex + 1 - maxRow; //把起始下标设置为要跳转的行数+1-maxRow，这样下一次滚动懒加载数据时，就会从当前已渲染的行数+maxRow开始，即从要跳转的行数+1开始，这样不会重复加载数据
+		nextTick(() => { //等待页面节点渲染完成
+			fixedBoxFn(); //调用给表格固定列设置偏移量的方法
+			//定位到要跳转的行
+			if (childClass) { //如果需要定位到子节点，则定位到子节点
+				tbodyTrRef.value[rowIndex].querySelectorAll(childClass)[0]?.scrollIntoView(scrollViewOpt);
+			} else { //如果不需要定位到子节点，则定位到整行
+				tbodyTrRef.value[rowIndex]?.scrollIntoView(scrollViewOpt);
+			}
+		});
+	}
+};
+
+defineExpose({
+	getCheckData,
+	updateTableView,
+	scrollToRow
+});
+</script>
+
+<style scoped>
+.no-data-box {
+	position: sticky;
+	left: 0;
+}
+</style>
