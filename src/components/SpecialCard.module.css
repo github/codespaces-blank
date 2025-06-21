@@ -1,0 +1,25 @@
+.wrapper {
+  border: 2px solid #ff9800;
+  border-radius: 14px;
+  background: #fff8e1;
+  padding: 20px 18px;
+  margin: 20px 0;
+  max-width: 370px;
+  box-shadow: 0 4px 16px rgba(255,152,0,0.10);
+  text-align: center;
+}
+
+.recommend {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #ff9800;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+.limited {
+  color: #d84315;
+  font-weight: bold;
+  margin-top: 12px;
+  font-size: 1rem;
+}

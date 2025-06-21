@@ -1,5 +1,6 @@
 import Card from "./Card";
 import type { BedType } from "./Card";
+import styles from "./SpecialCard.module.css";
 
 type Props = {
     tomareru_ninzu: number;
@@ -10,8 +11,8 @@ type Props = {
 
 function SpecialCard(props: Props) {
     return (
-        <div>
-            <p>⭐おすすめプラン⭐</p>
+        <div className={styles.wrapper}>
+            <p className={styles.recommend}>⭐おすすめプラン⭐</p>
             <Card
                 title="お得な特典付きプラン"
                 tomareru_ninzu={props.tomareru_ninzu}
@@ -19,7 +20,7 @@ function SpecialCard(props: Props) {
                 plan_money={props.plan_money}
                 bed_type={props.bed_type}
             />
-            <p>本日限り</p>
+            <p className={styles.limited}>本日限り</p>
         </div>
     );
 }
