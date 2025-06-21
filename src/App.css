@@ -1,0 +1,116 @@
+/* サイト全体の背景と余白 */
+body {
+  background: #f5f5f7;
+  margin: 0;
+  font-family: 'Segoe UI', 'Meiryo', sans-serif;
+}
+
+/* サイトのヘッダー */
+h1 {
+  text-align: center;
+  background: #e5e5ea;
+  color: #222;
+  margin: 0;
+  padding: 2rem 0 1rem 0;
+  letter-spacing: 0.1em;
+}
+
+/* ナビゲーション */
+nav {
+  display: flex;
+  justify-content: center;
+  background: #222;
+  padding: 0.5rem 0;
+  margin-bottom: 2rem;
+  list-style: none;
+}
+
+nav li {
+  color: #ccc;
+  margin: 0 1.5rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  list-style: none;
+  transition: color 0.2s;
+}
+nav li:hover {
+  color: #fff;
+}
+
+/* 宿泊プラン一覧タイトル */
+h2 {
+  margin-left: 18vw;
+  color: #222;
+  margin-bottom: 2rem;
+  font-weight: 500;
+}
+
+/* 宿泊プラン一覧の全体ラッパー */
+.plans-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #f5f5f7;
+  min-height: 100vh;
+  padding-bottom: 3rem;
+}
+
+/* SpecialCardを目立たせて中央に配置 */
+.special-card-row {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+.special-card-row > * {
+  width: 38vw;
+  min-width: 340px;
+  max-width: 600px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+  border: 2px solid #ffb300;
+  background: #fffbe6;
+  margin: 0 auto;
+  border-radius: 16px;
+  z-index: 1;
+}
+
+/* Cardを1行に3つ並べる */
+.cards-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  width: 80vw;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.cards-row > * {
+  flex: 1 1 28%;
+  min-width: 260px;
+  max-width: 340px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  margin-bottom: 2rem;
+}
+
+/* サイト左右の余白 */
+@media (min-width: 1200px) {
+  body {
+    background: linear-gradient(90deg, #f5f5f7 18vw, #e5e5ea 18vw, #e5e5ea 82vw, #f5f5f7 82vw);
+  }
+}
+@media (max-width: 900px) {
+  .cards-row {
+    flex-direction: column;
+    align-items: center;
+    width: 98vw;
+  }
+  .special-card-row > * {
+    width: 90vw;
+    min-width: unset;
+    max-width: unset;
+  }
+  h2 {
+    margin-left: 4vw;
+  }
+}
