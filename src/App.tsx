@@ -1,33 +1,34 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
+import Card from './components/Card'
+import SpecialCard from './components/SpecialCard'
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <h1>HOTEL PLANISPHERE</h1>
+      <nav>
+        <li>
+          ホーム
+        </li>
+        <li>
+          宿泊予約
+        </li>
+        <li>
+          会員登録
+        </li>
+        <li>
+          ログイン
+        </li>
+      </nav>
+      <h2>宿泊プラン一覧</h2>
+      <SpecialCard tomareru_ninzu={1} saitei_ninzu={1} plan_money={7000} bed_type='スタンダードツイン' />
+      <Card title="素泊まり" tomareru_ninzu={1} plan_money={5500} saitei_ninzu={1} bed_type='シングル' />
+      <Card title="出張ビジネスプラン" tomareru_ninzu={1} plan_money={7500} saitei_ninzu={1} bed_type='シングル' />
+      <Card title="エステ・マッサージプラン" tomareru_ninzu={1} plan_money={9000} saitei_ninzu={1} bed_type='部屋指定なし' />
+      <Card title="貸し切り露天風呂プラン" tomareru_ninzu={1} plan_money={9000} saitei_ninzu={1} bed_type='部屋指定なし' />
+      <Card title="カップル限定プラン" tomareru_ninzu={1} plan_money={8000} saitei_ninzu={2} bed_type='プレミアムツイン' />
+      <Card title="テーマパーク優待プラン" tomareru_ninzu={1} plan_money={10000} saitei_ninzu={1} bed_type='部屋指定なし' />
     </>
   )
 }
