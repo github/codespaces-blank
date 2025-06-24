@@ -21,26 +21,20 @@ const [isMenuOpen, setIsMenuOpen] = useState(false);
 						aria-label="メニューを開閉"
 						aria-expanded={isMenuOpen}
 					>
-						<span />
-						<span />
-						<span />
+						<span /><span /><span />
 					</button>
 					<ul>
 						<li>
 							<a href="/">ホーム</a>
 						</li>
 						<li>
-							<a href="/reserve" className="active-link">
-								宿泊予約
-							</a>
+							<a href="/reserve" className="active-link">宿泊予約</a>
 						</li>
 						<li>
 							<a href="/register">会員登録</a>
 						</li>
 						<li>
-							<a href="/login" className="login-btn">
-								ログイン
-							</a>
+							<a href="/login" className="login-btn">ログイン</a>
 						</li>
 					</ul>
 				</nav>
@@ -72,7 +66,6 @@ const [isMenuOpen, setIsMenuOpen] = useState(false);
 				{/* 宿泊プラン一覧 */}
 				<div className="row">
 					<div className="plan-list">
-						{/* 素泊まり */}
 						<div className="plan-column">
 							<div className="plan-card">
 								<div className="plan-content">
@@ -87,7 +80,6 @@ const [isMenuOpen, setIsMenuOpen] = useState(false);
 							</div>
 						</div>
 
-						{/* 出張ビジネスプラン */}
 						<div className="plan-column">
 							<div className="plan-card">
 								<div className="plan-content">
@@ -102,7 +94,6 @@ const [isMenuOpen, setIsMenuOpen] = useState(false);
 							</div>
 						</div>
 
-						{/* エステ・マッサージプラン */}
 						<div className="plan-column">
 							<div className="plan-card">
 								<div className="plan-content">
@@ -117,7 +108,6 @@ const [isMenuOpen, setIsMenuOpen] = useState(false);
 							</div>
 						</div>
 
-						{/* 貸し切り露天風呂プラン */}
 						<div className="plan-column">
 							<div className="plan-card">
 								<div className="plan-content">
@@ -132,7 +122,6 @@ const [isMenuOpen, setIsMenuOpen] = useState(false);
 							</div>
 						</div>
 
-						{/* カップル限定プラン */}
 						<div className="plan-column">
 							<div className="plan-card">
 								<div className="plan-content">
@@ -147,7 +136,6 @@ const [isMenuOpen, setIsMenuOpen] = useState(false);
 							</div>
 						</div>
 
-						{/* テーマパーク優待プラン */}
 						<div className="plan-column">
 							<div className="plan-card">
 								<div className="plan-content">

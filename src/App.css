@@ -6,7 +6,6 @@
 	background-color: #f8f9fa;
 }
 
-/* ヘッダーのスタイル */
 header {
 	display: flex;
 	flex-direction: column;
