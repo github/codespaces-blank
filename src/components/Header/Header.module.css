@@ -9,11 +9,10 @@
 .title {
 	margin: 40px 0;
 	padding: 0px;
-	font-size: 96px; /* display-1相当のサイズに変更 */
+	font-size: 72px; /* display-1相当のサイズに変更 */
 	font-weight: 200;
 	color: #212529;
 	text-transform: uppercase; /* 大文字変換を追加 */
-	letter-spacing: 0.025em; /* 文字間隔を少し広げる */
 }
 
 /* タブレット向け（768px〜991px） */

@@ -23,6 +23,8 @@
 @media (max-width: 767px) {
 	/* メインコンテンツとフッター */
 	.main {
-		padding: 1.5rem 1rem; /* 余白縮小 */
+		padding: 1.5rem; /* 上下左右の余白を確保 */
+		margin: 0 1rem; /* 左右にグレーの余白を残す */
+		max-width: none; /* スマホ時は最大幅制限を解除 */
 	}
 }

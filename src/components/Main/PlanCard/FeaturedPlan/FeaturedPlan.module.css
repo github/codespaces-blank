@@ -6,3 +6,10 @@
 	margin-right: auto;
 	padding: 2.5rem 0; /* py-5相当 */
 }
+
+/* モバイル向け（767px以下） */
+@media (max-width: 767px) {
+	.container {
+		padding: 1.5rem 0; /* スマホ時は上下のみpadding */
+	}
+}

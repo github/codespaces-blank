@@ -7,3 +7,10 @@
 	margin-left: auto;
 	margin-right: auto;
 }
+
+/* モバイル向け（767px以下） */
+@media (max-width: 767px) {
+	.title {
+		font-size: 1.5rem; /* スマホ時は文字サイズを調整 */
+	}
+}
