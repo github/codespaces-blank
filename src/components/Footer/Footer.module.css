@@ -1,0 +1,25 @@
+/* フッタースタイル */
+.footer {
+	text-align: center;
+	padding: 2rem 0;
+	margin-top: 2rem;
+}
+
+.link {
+	color: #007bff;
+	text-decoration: none;
+	margin-bottom: 0.5rem;
+	display: inline-block;
+}
+
+.text {
+	margin: 0.5rem 0;
+	color: #6c757d;
+}
+
+/* モバイル向け（767px以下） */
+@media (max-width: 767px) {
+	.footer {
+		padding: 1.5rem 0; /* 余白縮小 */
+	}
+}

@@ -1,0 +1,8 @@
+/* おすすめプランコンテナ */
+.container {
+	margin-bottom: 1rem;
+	max-width: 960px; /* col-lg-9 mx-auto相当 */
+	margin-left: auto;
+	margin-right: auto;
+	padding: 2.5rem 0; /* py-5相当 */
+}

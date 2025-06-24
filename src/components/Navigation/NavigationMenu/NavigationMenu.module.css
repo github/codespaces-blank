@@ -1,0 +1,59 @@
+.menu {
+	display: flex;
+	justify-content: center;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.menuItem {
+	margin: 0;
+	padding: 0 24px;
+}
+
+.menuLink {
+	display: block;
+	padding: 8px;
+	color: #ffffff80;
+	text-decoration: none;
+}
+
+.loginButton {
+	border: 1px solid #6c757d;
+	color: #6c757d;
+	border-radius: 4px;
+	margin: 0rem;
+	padding: 6px 12px;
+}
+
+.activeLink {
+	color: #ffffff;
+}
+
+/* タブレット向け（768px〜991px） */
+@media (max-width: 991px) {
+	/* メニューを非表示にする */
+	.menu {
+		display: none; /* 初期状態では非表示 */
+		width: 100%;
+		background-color: #343a40;
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	/* メニューが開いているときのスタイル */
+	.menuOpen {
+		display: block; /* メニューを表示 */
+	}
+}
+
+/* モバイル向け（767px以下） */
+@media (max-width: 767px) {
+	/* ナビゲーション */
+	.menuItem {
+		margin: 8px 0; /* 上下の余白を追加 */
+		width: 100%;
+		text-align: left;
+		padding-left: 20px;
+	}
+}
