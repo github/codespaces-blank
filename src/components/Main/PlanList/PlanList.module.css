@@ -1,0 +1,31 @@
+/* プラン一覧のグリッドレイアウト */
+.grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr); /* PCビュー: 3列 */
+	gap: 2rem;
+	row-gap: 0.5rem;
+	max-width: 1140px; /* containerの最大幅相当 */
+	margin: 0 auto;
+}
+
+/* プランカラムのスタイル */
+.column {
+	margin-bottom: 0.5rem;
+}
+
+/* タブレット向け（768px〜991px） */
+@media (max-width: 991px) {
+	/* プラン一覧 */
+	.grid {
+		grid-template-columns: repeat(2, 1fr); /* 2列に変更 */
+	}
+}
+
+/* モバイル向け（767px以下） */
+@media (max-width: 767px) {
+	/* プラン一覧 */
+	.grid {
+		grid-template-columns: 1fr; /* 1列に変更 */
+		gap: 1rem; /* スマホ時はgapを調整 */
+	}
+}

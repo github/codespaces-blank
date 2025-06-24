@@ -1,0 +1,30 @@
+/* 基本レイアウト */
+.container {
+	width: 100%;
+	margin: 0 auto;
+	font-family: sans-serif;
+	background-color: #f8f9fa;
+}
+
+/* メインコンテンツエリア */
+.main {
+	background-color: white;
+	padding: 3rem 2rem; /* py-5相当 */
+	max-width: 1140px; /* containerの最大幅相当 */
+	margin: 0 auto;
+}
+
+/* 行（section）のスタイル */
+.row {
+	width: 100%;
+}
+
+/* モバイル向け（767px以下） */
+@media (max-width: 767px) {
+	/* メインコンテンツとフッター */
+	.main {
+		padding: 1.5rem; /* 上下左右の余白を確保 */
+		margin: 0 1rem; /* 左右にグレーの余白を残す */
+		max-width: none; /* スマホ時は最大幅制限を解除 */
+	}
+}

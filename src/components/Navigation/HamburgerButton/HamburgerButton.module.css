@@ -1,0 +1,30 @@
+/* ハンバーガーボタンのスタイル */
+.button {
+	display: none; /* デフォルトでは非表示 */
+	position: absolute;
+	top: 16px;
+	right: 20px;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	padding: 10px;
+	z-index: 1000;
+}
+
+.line {
+	display: block;
+	width: 25px;
+	height: 3px;
+	margin: 5px 0;
+	background-color: white;
+	border-radius: 3px;
+	transition: all 0.3s ease;
+}
+
+/* タブレット向け（768px〜991px） */
+@media (max-width: 991px) {
+	/* ハンバーガーボタンを表示 */
+	.button {
+		display: block;
+	}
+}

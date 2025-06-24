@@ -1,0 +1,16 @@
+/* ページタイトル */
+.title {
+	font-size: 2rem;
+	font-weight: 500;
+	text-align: left; /* 左寄せに変更 */
+	max-width: 960px; /* col-lg-9 mx-auto相当 */
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/* モバイル向け（767px以下） */
+@media (max-width: 767px) {
+	.title {
+		font-size: 1.5rem; /* スマホ時は文字サイズを調整 */
+	}
+}

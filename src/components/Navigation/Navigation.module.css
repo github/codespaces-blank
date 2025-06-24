@@ -1,0 +1,20 @@
+/* ナビゲーションのスタイル */
+.nav {
+	width: 100%;
+	background-color: #343a40; /* ダークカラー */
+	padding: 24px 16px;
+	position: relative;
+}
+
+/* タブレット向け（768px〜991px） */
+@media (max-width: 991px) {
+	.nav::before {
+		content: "HOTEL PLANISPHERE";
+		color: white;
+		font-weight: bold;
+		padding: 8px;
+		display: block;
+		text-align: left;
+		padding-left: 20px;
+	}
+}
