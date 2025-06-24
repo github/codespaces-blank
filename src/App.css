@@ -1,116 +1,287 @@
-/* サイト全体の背景と余白 */
-body {
-  background: #f5f5f7;
-  margin: 0;
-  font-family: 'Segoe UI', 'Meiryo', sans-serif;
+/* 基本レイアウト */
+.hotel-app {
+	width: 100%;
+	margin: 0 auto;
+	font-family: sans-serif;
+	background-color: #f8f9fa;
 }
 
-/* サイトのヘッダー */
-h1 {
-  text-align: center;
-  background: #e5e5ea;
-  color: #222;
-  margin: 0;
-  padding: 2rem 0 1rem 0;
-  letter-spacing: 0.1em;
+/* ヘッダーのスタイル */
+header {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	font-family:
+		-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
-/* ナビゲーション */
+header h1 {
+	margin: 40px 0;
+	padding: 0px;
+	font-size: 72px;
+	font-weight: 200;
+	color: #212529;
+}
+
+/* ナビゲーションのスタイル */
 nav {
-  display: flex;
-  justify-content: center;
-  background: #222;
-  padding: 0.5rem 0;
-  margin-bottom: 2rem;
-  list-style: none;
+	width: 100%;
+	background-color: #343a40; /* ダークカラー */
+	padding: 24px 16px;
+	position: relative;
 }
 
-nav li {
-  color: #ccc;
-  margin: 0 1.5rem;
-  font-size: 1.1rem;
-  cursor: pointer;
-  list-style: none;
-  transition: color 0.2s;
-}
-nav li:hover {
-  color: #fff;
-}
-
-/* 宿泊プラン一覧タイトル */
-h2 {
-  margin-left: 18vw;
-  color: #222;
-  margin-bottom: 2rem;
-  font-weight: 500;
+/* ハンバーガーボタンのスタイル */
+.hamburger-button {
+	display: none; /* デフォルトでは非表示 */
+	position: absolute;
+	top: 16px;
+	right: 20px;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	padding: 10px;
+	z-index: 1000;
 }
 
-/* 宿泊プラン一覧の全体ラッパー */
-.plans-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: #f5f5f7;
-  min-height: 100vh;
-  padding-bottom: 3rem;
+.hamburger-button span {
+	display: block;
+	width: 25px;
+	height: 3px;
+	margin: 5px 0;
+	background-color: white;
+	border-radius: 3px;
+	transition: all 0.3s ease;
 }
 
-/* SpecialCardを目立たせて中央に配置 */
-.special-card-row {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 2rem;
-}
-.special-card-row > * {
-  width: 38vw;
-  min-width: 340px;
-  max-width: 600px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
-  border: 2px solid #ffb300;
-  background: #fffbe6;
-  margin: 0 auto;
-  border-radius: 16px;
-  z-index: 1;
+nav ul {
+	display: flex;
+	justify-content: center;
+	list-style: none;
+	padding: 0;
+	margin: 0;
 }
 
-/* Cardを1行に3つ並べる */
-.cards-row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 2rem;
-  width: 80vw;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-.cards-row > * {
-  flex: 1 1 28%;
-  min-width: 260px;
-  max-width: 340px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-  margin-bottom: 2rem;
+nav ul li {
+	margin: 0;
+	padding: 0 24px;
 }
 
-/* サイト左右の余白 */
-@media (min-width: 1200px) {
-  body {
-    background: linear-gradient(90deg, #f5f5f7 18vw, #e5e5ea 18vw, #e5e5ea 82vw, #f5f5f7 82vw);
-  }
+nav ul li a {
+	display: block;
+	padding: 8px;
+	color: #ffffff80;
+	text-decoration: none;
 }
-@media (max-width: 900px) {
-  .cards-row {
-    flex-direction: column;
-    align-items: center;
-    width: 98vw;
-  }
-  .special-card-row > * {
-    width: 90vw;
-    min-width: unset;
-    max-width: unset;
-  }
-  h2 {
-    margin-left: 4vw;
-  }
+
+.login-btn {
+	border: 1px solid #6c757d;
+	color: #6c757d;
+	border-radius: 4px;
+	margin: 0rem;
+	padding: 6px 12px;
+}
+
+.active-link {
+	color: #ffffff;
+}
+
+/* メインコンテンツエリア */
+main {
+	background-color: white;
+	padding: 3rem 2rem; /* py-5相当 */
+	max-width: 1140px; /* containerの最大幅相当 */
+	margin: 0 auto;
+}
+
+main h2 {
+	font-size: 2rem;
+	font-weight: 500;
+	text-align: left; /* 左寄せに変更 */
+	max-width: 960px; /* col-lg-9 mx-auto相当 */
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/* プラン一覧のグリッドレイアウト */
+.plan-list {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr); /* PCビュー: 3列 */
+	gap: 2rem;
+	row-gap: 0.5rem;
+	max-width: 1140px; /* containerの最大幅相当 */
+	margin: 0 auto;
+}
+
+/* カードコンポーネントのスタイル */
+.plan-card {
+	border: 1px solid rgba(0, 0, 0, 0.125);
+	border-radius: 0.25rem;
+	background-color: #fff;
+	text-align: center;
+	box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); /* shadow-sm相当 */
+}
+
+/* プランカラムのスタイル */
+.plan-column {
+	margin-bottom: 0.5rem;
+}
+
+.featured {
+	margin-bottom: 1rem;
+	max-width: 960px; /* col-lg-9 mx-auto相当 */
+	margin-left: auto;
+	margin-right: auto;
+	padding: 2.5rem 0; /* py-5相当 */
+}
+
+.plan-header {
+	padding: 0.75rem 1.25rem;
+	background-color: rgba(0, 0, 0, 0.03);
+	border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.plan-content {
+	padding: 1.25rem;
+}
+
+.plan-content h3 {
+	margin-top: 0;
+	margin-bottom: 0.5rem;
+	font-size: 1.25rem;
+	font-weight: 500;
+}
+
+.plan-content p {
+	margin: 0;
+}
+
+.plan-footer {
+	color: #6c757d;
+	padding: 0.75rem 1.25rem;
+	background-color: rgba(0, 0, 0, 0.03);
+	border-top: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+/* ボタンスタイル */
+.reserve-btn {
+	display: inline-block;
+	font-weight: 400;
+	color: #fff;
+	background-color: #007bff;
+	text-align: center;
+	vertical-align: middle;
+	border: 1px solid transparent;
+	padding: 0.375rem 0.75rem;
+	font-size: 1rem;
+	line-height: 1.5;
+	border-radius: 0.25rem;
+	cursor: pointer;
+	margin-top: 1rem;
+}
+
+.reserve-btn:hover {
+	background-color: #0069d9;
+}
+
+/* フッタースタイル */
+footer {
+	text-align: center;
+	padding: 2rem 0;
+	margin-top: 2rem;
+}
+
+footer a {
+	color: #007bff;
+	text-decoration: none;
+	margin-bottom: 0.5rem;
+	display: inline-block;
+}
+
+footer p {
+	margin: 0.5rem 0;
+	color: #6c757d;
+}
+
+/* レスポンシブデザイン */
+/* PC向け（992px以上） - デフォルトスタイル */
+
+/* タブレット向け（768px〜991px） */
+@media (max-width: 991px) {
+	/* ヘッダー */
+	header h1 {
+		display: none; /* 大きなロゴを非表示 */
+	}
+
+	nav::before {
+		content: "HOTEL PLANISPHERE";
+		color: white;
+		font-weight: bold;
+		padding: 8px;
+		display: block;
+		text-align: left;
+		padding-left: 20px;
+	}
+
+	/* ハンバーガーボタンを表示 */
+	.hamburger-button {
+		display: block;
+	}
+
+	/* メニューを非表示にする */
+	nav ul {
+		display: none; /* 初期状態では非表示 */
+		width: 100%;
+		background-color: #343a40;
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	/* メニューが開いているときのスタイル */
+	nav.menu-open ul {
+		display: block; /* メニューを表示 */
+	}
+
+	/* プラン一覧 */
+	.plan-list {
+		grid-template-columns: repeat(2, 1fr); /* 2列に変更 */
+	}
+}
+
+/* モバイル向け（767px以下） */
+@media (max-width: 767px) {
+	/* ナビゲーション */
+	nav ul li {
+		margin: 8px 0; /* 上下の余白を追加 */
+		width: 100%;
+		text-align: left;
+		padding-left: 20px;
+	}
+
+	/* プラン一覧 */
+	.plan-list {
+		grid-template-columns: 1fr; /* 1列に変更 */
+	}
+
+	/* カードデザイン */
+	.plan-card {
+		max-width: 100%; /* 幅を最大に */
+	}
+
+	.plan-content {
+		padding: 1rem; /* 余白を少し縮小 */
+	}
+
+	.reserve-btn {
+		width: 100%; /* ボタンを幅いっぱいに */
+	}
+
+	/* メインコンテンツとフッター */
+	main {
+		padding: 1.5rem 1rem; /* 余白縮小 */
+	}
+
+	footer {
+		padding: 1.5rem 0; /* 余白縮小 */
+	}
 }

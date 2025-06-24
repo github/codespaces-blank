@@ -1,42 +1,175 @@
-import './App.css'
-import Card from './components/Card'
-import SpecialCard from './components/SpecialCard'
+import "./App.css";
+import { useState } from "react";
+
 
 function App() {
+const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  return (
-    <>
-      <h1>HOTEL PLANISPHERE</h1>
-      <nav>
-        <li>
-          ホーム
-        </li>
-        <li>
-          宿泊予約
-        </li>
-        <li>
-          会員登録
-        </li>
-        <li>
-          ログイン
-        </li>
-      </nav>
-      <h2>宿泊プラン一覧</h2>
-      <div className="plans-wrapper">
-        <div className="special-card-row">
-          <SpecialCard tomareru_ninzu={1} saitei_ninzu={1} plan_money={7000} bed_type='スタンダードツイン' />
-        </div>
-        <div className="cards-row">
-          <Card title="素泊まり" tomareru_ninzu={1} plan_money={5500} saitei_ninzu={1} bed_type='シングル' />
-          <Card title="出張ビジネスプラン" tomareru_ninzu={1} plan_money={7500} saitei_ninzu={1} bed_type='シングル' />
-          <Card title="エステ・マッサージプラン" tomareru_ninzu={1} plan_money={9000} saitei_ninzu={1} bed_type='部屋指定なし' />
-          <Card title="貸し切り露天風呂プラン" tomareru_ninzu={1} plan_money={9000} saitei_ninzu={1} bed_type='部屋指定なし' />
-          <Card title="カップル限定プラン" tomareru_ninzu={1} plan_money={8000} saitei_ninzu={2} bed_type='プレミアムツイン' />
-          <Card title="テーマパーク優待プラン" tomareru_ninzu={1} plan_money={10000} saitei_ninzu={1} bed_type='部屋指定なし' />
-        </div>
-      </div>
-    </>
-  )
+	const toggleMenu = () => {
+		setIsMenuOpen(!isMenuOpen);
+	};
+
+	return (
+		<div className="hotel-app">
+			<header>
+				<h1>HOTEL PLANISPHERE</h1>
+				<nav className={isMenuOpen ? "menu-open" : ""}>
+					<button
+						type="button"
+						className="hamburger-button"
+						onClick={toggleMenu}
+						aria-label="メニューを開閉"
+						aria-expanded={isMenuOpen}
+					>
+						<span />
+						<span />
+						<span />
+					</button>
+					<ul>
+						<li>
+							<a href="/">ホーム</a>
+						</li>
+						<li>
+							<a href="/reserve" className="active-link">
+								宿泊予約
+							</a>
+						</li>
+						<li>
+							<a href="/register">会員登録</a>
+						</li>
+						<li>
+							<a href="/login" className="login-btn">
+								ログイン
+							</a>
+						</li>
+					</ul>
+				</nav>
+			</header>
+			<main>
+				<div className="row">
+					<h2>宿泊プラン一覧</h2>
+				</div>
+
+				{/* おすすめプラン */}
+				<div className="row">
+					<div className="featured">
+						<div className="plan-card">
+							<div className="plan-header">⭐おすすめプラン⭐</div>
+							<div className="plan-content">
+								<h3>お得な特典付きプラン</h3>
+								<p>大人1名7,000円</p>
+								<p>1名様から</p>
+								<p>スタンダードツイン</p>
+								<button type="button" className="reserve-btn">
+									このプランで予約
+								</button>
+							</div>
+							<div className="plan-footer">本日限り</div>
+						</div>
+					</div>
+				</div>
+
+				{/* 宿泊プラン一覧 */}
+				<div className="row">
+					<div className="plan-list">
+						{/* 素泊まり */}
+						<div className="plan-column">
+							<div className="plan-card">
+								<div className="plan-content">
+									<h3>素泊まり</h3>
+									<p>大人1名5,500円</p>
+									<p>1名様から</p>
+									<p>シングル</p>
+									<button type="button" className="reserve-btn">
+										このプランで予約
+									</button>
+								</div>
+							</div>
+						</div>
+
+						{/* 出張ビジネスプラン */}
+						<div className="plan-column">
+							<div className="plan-card">
+								<div className="plan-content">
+									<h3>出張ビジネスプラン</h3>
+									<p>大人1名7,500円</p>
+									<p>1名様から</p>
+									<p>シングル</p>
+									<button type="button" className="reserve-btn">
+										このプランで予約
+									</button>
+								</div>
+							</div>
+						</div>
+
+						{/* エステ・マッサージプラン */}
+						<div className="plan-column">
+							<div className="plan-card">
+								<div className="plan-content">
+									<h3>エステ・マッサージプラン</h3>
+									<p>大人1名9,000円</p>
+									<p>1名様から</p>
+									<p>部屋指定なし</p>
+									<button type="button" className="reserve-btn">
+										このプランで予約
+									</button>
+								</div>
+							</div>
+						</div>
+
+						{/* 貸し切り露天風呂プラン */}
+						<div className="plan-column">
+							<div className="plan-card">
+								<div className="plan-content">
+									<h3>貸し切り露天風呂プラン</h3>
+									<p>大人1名9,000円</p>
+									<p>1名様から</p>
+									<p>部屋指定なし</p>
+									<button type="button" className="reserve-btn">
+										このプランで予約
+									</button>
+								</div>
+							</div>
+						</div>
+
+						{/* カップル限定プラン */}
+						<div className="plan-column">
+							<div className="plan-card">
+								<div className="plan-content">
+									<h3>カップル限定プラン</h3>
+									<p>大人1名8,000円</p>
+									<p>2名様から</p>
+									<p>プレミアムツイン</p>
+									<button type="button" className="reserve-btn">
+										このプランで予約
+									</button>
+								</div>
+							</div>
+						</div>
+
+						{/* テーマパーク優待プラン */}
+						<div className="plan-column">
+							<div className="plan-card">
+								<div className="plan-content">
+									<h3>テーマパーク優待プラン</h3>
+									<p>大人1名10,000円</p>
+									<p>1名様から</p>
+									<p>部屋指定なし</p>
+									<button type="button" className="reserve-btn">
+										このプランで予約
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</main>
+			<footer>
+				<a href="https://github.com">GitHub</a>
+				<p>© 2020-2025 Kensuke Mishima</p>
+			</footer>
+		</div>
+	);
 }
 
-export default App
+export default App;
