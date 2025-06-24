@@ -1,9 +1,8 @@
 import "./App.css";
 import { useState } from "react";
 
-
 function App() {
-const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
 
 	const toggleMenu = () => {
 		setIsMenuOpen(!isMenuOpen);
@@ -21,20 +20,26 @@ const [isMenuOpen, setIsMenuOpen] = useState(false);
 						aria-label="メニューを開閉"
 						aria-expanded={isMenuOpen}
 					>
-						<span /><span /><span />
+						<span />
+						<span />
+						<span />
 					</button>
 					<ul>
 						<li>
 							<a href="/">ホーム</a>
 						</li>
 						<li>
-							<a href="/reserve" className="active-link">宿泊予約</a>
+							<a href="/reserve" className="active-link">
+								宿泊予約
+							</a>
 						</li>
 						<li>
 							<a href="/register">会員登録</a>
 						</li>
 						<li>
-							<a href="/login" className="login-btn">ログイン</a>
+							<a href="/login" className="login-btn">
+								ログイン
+							</a>
 						</li>
 					</ul>
 				</nav>
