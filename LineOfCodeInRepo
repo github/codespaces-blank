@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# === Configuration ===
+REPO_LIST=(
+  "git@gitlab.com:yourgroup/repo1.git"
+  "git@gitlab.com:yourgroup/repo2.git"
+  "git@gitlab.com:yourgroup/repo3.git"
+)
+BRANCH_NAME="develop"
+TMP_DIR="./repos_temp"
+
+# === Create temp directory ===
+mkdir -p "$TMP_DIR"
+
+echo "Processing ${#REPO_LIST[@]} repositories..."
+
+for REPO_URL in "${REPO_LIST[@]}"; do
+  REPO_NAME=$(basename "$REPO_URL" .git)
+  CLONE_PATH="$TMP_DIR/$REPO_NAME"
+
+  echo "Cloning $REPO_NAME..."
+
+  # Clone only the develop branch
+  git clone --depth 1 --branch "$BRANCH_NAME" "$REPO_URL" "$CLONE_PATH" &>/dev/null
+
+  if [ $? -ne 0 ]; then
+    echo "  ⚠️ Failed to clone $REPO_NAME or branch '$BRANCH_NAME' does not exist."
+    continue
+  fi
+
+  # Count non-empty lines
+  LINE_COUNT=$(find "$CLONE_PATH" -type f ! -path '*/.git/*' -exec cat {} + | grep -v '^\s*$' | wc -l)
+
+  echo "  📄 $REPO_NAME: $LINE_COUNT lines (non-empty)"
+done
+
+# === Cleanup ===
+rm -rf "$TMP_DIR"
+
+echo "✅ Done."
