@@ -1,0 +1,22 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Data and models (kept locally; generated artifacts)
+asteroid_mining_dashboard/data/
+asteroid_mining_dashboard/models/*.pkl
+
+# Streamlit cache
+.streamlit/
+
+# VS Code settings
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+.venv/
+__pycache__/
+.gitignore/
