@@ -1,0 +1,15 @@
+age = 20
+height = 1.75
+name = "Олександр"
+is_student = True
+grades = [90, 85, 78, 92]
+year = 2025
+unique_numbers = {1, 2, 3, 3, 2}
+numbers_range = range(1, 6)
+city = "Київ"
+birth_date = (2, 9, 2000)
+
+variables = [age, height, name, is_student, grades, year, unique_numbers, numbers_range, city, birth_date]
+
+for var in variables:
+    print(f"Значення: {var}, Тип: {type(var)}")
