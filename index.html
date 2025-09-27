@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Keamanan Web</title>
+    <style>
+        body { 
+            font-family: sans-serif; 
+            max-width: 600px; 
+            margin: auto; 
+            padding: 20px; 
+        }
+        form { 
+            border: 1px solid #ccc; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            border-radius: 5px; 
+        }
+        div { 
+            margin-bottom: 10px; 
+        }
+        label { 
+            display: block; 
+            margin-bottom: 5px; 
+        }
+        input[type="text"], input[type="password"], input[type="file"] { 
+            width: 100%; 
+            padding: 8px; 
+            box-sizing: border-box; 
+        }
+        button { 
+            padding: 10px 15px; 
+            cursor: pointer; 
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #login-status, #scan-result { 
+            margin-top: 15px; 
+            padding: 10px; 
+            border-radius: 3px; 
+        }
+        .success { 
+            color: #155724; 
+            background-color: #d4edda; 
+            border: 1px solid #c3e6cb; 
+        }
+        .error { 
+            color: #721c24; 
+            background-color: #f8d7da; 
+            border: 1px solid #f5c6cb; 
+        }
+        .info { 
+            color: #0c5460; 
+            background-color: #d1ecf1; 
+            border: 1px solid #bee5eb; 
+        }
+    </style>
+</head>
+<body>
+    <h1>Sistem Keamanan Web</h1>
+
+    <form id="loginForm" method="POST">
+        <h3>Login Pengguna</h3>
+        <input type="hidden" name="action" value="login">
+        <div>
+            <label for="username">Nama Pengguna:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div>
+            <label for="password">Kata Sandi:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit">Login</button>
+        <div id="login-status"></div>
+    </form>
+
+    <form id="uploadForm" method="POST" enctype="multipart/form-data">
+        <h3>Pindai File dari Malware</h3>
+        <input type="hidden" name="action" value="upload">
+        <div>
+            <label for="fileUpload">Pilih file untuk dipindai:</label>
+            <input type="file" id="fileUpload" name="fileUpload" required accept="*">
+        </div>
+        <button type="submit">Unggah dan Pindai</button>
+        <div id="scan-result"></div>
+    </form>
+
+    <script src="app.js"></script>
+</body>
+</html>
