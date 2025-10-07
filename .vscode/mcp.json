@@ -1,0 +1,61 @@
+{
+    "servers": {
+        "filesystem": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-filesystem@2025.8.21",
+                "/workspaces/codespaces-blank",
+                "/workspaces/codespaces-blank/Coding-Agent/"
+            ],
+            "type": "stdio"
+        },
+        "memory": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-memory"
+            ],
+            "type": "stdio"
+        },
+        "sequential-thinking": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-sequential-thinking"
+            ],
+            "type": "stdio"
+        },
+        "Context7": {
+            "url": "https://mcp.context7.com/mcp",
+            "type": "http"
+        },
+        "serena": {
+            "type": "stdio",
+            "command": "docker",
+            "args": [
+                "run",
+                "--rm",
+                "-i",
+                "--network",
+                "host",
+                "-v",
+                "/workspaces/webapp",
+                "ghcr.io/oraios/serena:latest",
+                "uv",
+                "run",
+                "serena",
+                "start-mcp-server",
+                "--transport",
+                "stdio",
+                "--context",
+                "ide-assistant"
+            ]
+        },
+        "Github": {
+            "url": "https://api.githubcopilot.com/mcp/",
+            "type": "http"
+        }
+    },
+    "inputs": []
+}

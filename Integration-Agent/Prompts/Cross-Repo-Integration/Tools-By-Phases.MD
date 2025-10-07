@@ -1,0 +1,7 @@
+# Tool Distribution – Cross-Repo Integration
+
+| Phase | Focus | Core Tools | Vault Actions |
+|-------|-------|------------|---------------|
+| Early (Discovery) | Map repo architectures, collect entry/exit points, align data contracts | `serena`, `filesystem`, `memory`, `Context7`, `crawl4ai-rag-mcp`, `search_code`, integrated prompt-fill assistant | Create `/docs/integration-vault/<integration-name>/index.md`; add per-repo folders with first-pass notes, doc citations, Neo4j graph exports, and draft "Switch to Research Agent" cues when knowledge gaps persist; pre-fill the Research Early template before handoff. |
+| Mid (Design & Execution) | Define integration workflows, delegate code updates, coordinate tests | `serena`, `archon`, `crawl4ai-rag-mcp` (knowledge graph tools), `sequential-thinking`, `terminal`, Coding Agent via GitHub tools, integrated prompt-fill assistant | Update per-repo notes with verified line ranges, dependencies, planned changes, knowledge-graph query results; log delegated tasks and outcomes; generate Coding/Research Mid templates with implementation packets before issuing cues. |
+| Late (Validation) | Run integration tests, verify telemetry, finalize documentation | `terminal`, `serena`, `filesystem`, `memory`, `archon`, GitHub PR tools, integrated prompt-fill assistant | Record test commands + outputs, Neo4j verification, refresh `index.md`, ensure all vault files ≤100 lines and up to date; pre-fill Late templates for Research validation, Coding cleanup, or closure before the final cue. |
