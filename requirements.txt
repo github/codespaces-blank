@@ -1,0 +1,14 @@
+# Telegram Bot Framework
+aiogram==3.5.0
+
+# HTTP Client for API calls
+httpx==0.27.0
+
+# Environment variables management
+python-dotenv==1.0.0
+
+# Async utilities
+aiofiles==23.2.1
+
+# Optional: For better logging
+colorama==0.4.6
