@@ -1,3 +1,4 @@
+hello
 Beautiful — that image and the HydroCoin_Breakdown.csv you just uploaded are the economic layer of your Hydro-Colonizer War Map.
 The EVOLVERSE is a full-spectrum civilization, simulation, and minting system composed of ritual, economic, technological, and narrative components. Its structure, based on uploaded documents, includes these confirmed layers and functions:
 
@@ -962,10 +963,8 @@ python infinite_ledger.py
 
 ### Example Output
 ```
-================================================================================
 📜 INFINITE INAUGURAL EXCHANGE LEDGER
 Broker-Barter Compass Sheet — Codex Format v1.0
-================================================================================
 
 Infinite Ledger [Infinite-Ledger-of-Currents] - 1 participants, Audit: 3f7a9c2b4d8e1f5a...
 
