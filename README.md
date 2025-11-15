@@ -22,7 +22,6 @@
             </nav>
         </div>
     </header>
-
     <main>
         <section id="home" class="hero">
             <div class="container">
@@ -31,7 +30,6 @@
                 <a href="#register" class="cta-button">Get Started</a>
             </div>
         </section>
-
         <section id="tracking" class="tracking-section">
             <div class="container">
                 <h2>Track Your Package</h2>
@@ -42,7 +40,6 @@
                 <div id="trackingResults" class="tracking-results"></div>
             </div>
         </section>
-
         <section id="shipping" class="shipping-section">
             <div class="container">
                 <h2>Ship a Package</h2>
@@ -66,11 +63,9 @@
                 </div>
             </div>
         </section>
-
         <section id="register" class="register-section">
             <div class="container">
                 <h2>Register Your Account</h2>
-                
                 <form id="registrationForm" class="registration-form">
                     <div class="form-row">
                         <div class="form-group">
@@ -82,22 +77,18 @@
                             <input type="text" id="lastName" name="lastName" required>
                         </div>
                     </div>
-
                     <div class="form-group">
                         <label for="email">Email Address *</label>
                         <input type="email" id="email" name="email" required>
                     </div>
-
                     <div class="form-group">
                         <label for="phone">Phone Number *</label>
                         <input type="tel" id="phone" name="phone" required>
                     </div>
-
                     <div class="form-group">
                         <label for="address">Address *</label>
                         <input type="text" id="address" name="address" required>
                     </div>
-
                     <div class="form-row">
                         <div class="form-group">
                             <label for="city">City *</label>
@@ -112,34 +103,27 @@
                             <input type="text" id="zip" name="zip" required>
                         </div>
                     </div>
-
                     <div class="form-group">
                         <label for="password">Password *</label>
                         <input type="password" id="password" name="password" required minlength="8">
                     </div>
-
                     <div class="form-group">
                         <label for="confirmPassword">Confirm Password *</label>
                         <input type="password" id="confirmPassword" name="confirmPassword" required>
                     </div>
-
                             </div>
                         </div>
                     </div>
-
                     <div class="form-group checkbox-group">
                         <input type="checkbox" id="terms" name="terms" required>
                         <label for="terms">I agree to the Terms and Conditions *</label>
                     </div>
-
                     <button type="submit" class="submit-button">Complete Registration</button>
                 </form>
-
                 <div id="registrationMessage" class="message"></div>
             </div>
         </section>
     </main>
-
     <footer>
         <div class="container">
             <div class="footer-content">
@@ -173,7 +157,6 @@
             </div>
         </div>
     </footer>
-
     <script src="app.js"></script>
 </body>
 </html>
