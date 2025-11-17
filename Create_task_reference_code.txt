@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Create New Task</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#5590f7",
+            "background-light": "#f5f6f8",
+            "background-dark": "#101622",
+            "card-light": "#ffffff",
+            "card-dark": "#1b2332",
+            "text-light-primary": "#0d121c",
+            "text-dark-primary": "#f1f3f7",
+            "text-light-secondary": "#49689c",
+            "text-dark-secondary": "#9aa6c3",
+            "input-light": "#e7ebf4",
+            "input-dark": "#2a3549"
+          },
+          fontFamily: {
+            "display": ["Inter", "sans-serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.5rem",
+            "lg": "1rem",
+            "xl": "1.5rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      font-size: 24px;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark">
+<div class="relative flex w-full flex-col font-display group/design-root" style="min-height: 100vh;">
+<div class="absolute inset-0 bg-black/30"></div>
+<div class="fixed inset-0 flex items-end justify-center">
+<div class="flex h-[95%] w-full max-w-3xl flex-col rounded-t-xl bg-background-light dark:bg-background-dark">
+<div class="sticky top-0 z-10 flex items-center justify-between bg-background-light/80 p-4 pb-2 backdrop-blur-sm dark:bg-background-dark/80">
+<button class="flex items-center justify-start">
+<p class="shrink-0 text-base font-medium leading-normal text-text-light-primary dark:text-text-dark-primary">Cancel</p>
+</button>
+<button class="flex items-center justify-end">
+<p class="shrink-0 text-base font-bold leading-normal tracking-[0.015em] text-primary">Create</p>
+</button>
+</div>
+<main class="flex-1 overflow-y-auto p-4 pt-0">
+<div class="flex flex-col gap-4">
+<input class="form-input h-16 w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border-none bg-card-light p-4 text-2xl font-bold leading-tight tracking-[-0.015em] text-text-light-primary placeholder:text-text-light-secondary focus:outline-0 focus:ring-2 focus:ring-primary/50 dark:bg-card-dark dark:text-text-dark-primary dark:placeholder:text-text-dark-secondary" placeholder="e.g., Finish Q3 report" value=""/>
+<div class="flex flex-col gap-4 rounded-xl bg-card-light p-4 dark:bg-card-dark">
+<div class="flex flex-wrap items-end gap-4">
+<label class="flex flex-1 flex-col min-w-40">
+<p class="pb-2 text-base font-medium leading-normal text-text-light-primary dark:text-text-dark-primary">Due Date</p>
+<div class="relative">
+<input class="form-input flex h-14 w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg border-none bg-input-light p-4 pr-12 text-base font-normal leading-normal text-text-light-primary placeholder:text-text-light-secondary focus:outline-0 focus:ring-0 dark:bg-input-dark dark:text-text-dark-primary dark:placeholder:text-text-dark-secondary" placeholder="Select Date" value=""/>
+<span class="material-symbols-outlined pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-text-light-secondary dark:text-text-dark-secondary">calendar_today</span>
+</div>
+</label>
+<label class="flex flex-1 flex-col min-w-40">
+<p class="pb-2 text-base font-medium leading-normal text-text-light-primary dark:text-text-dark-primary">Time</p>
+<div class="relative">
+<input class="form-input flex h-14 w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg border-none bg-input-light p-4 pr-12 text-base font-normal leading-normal text-text-light-primary placeholder:text-text-light-secondary focus:outline-0 focus:ring-0 dark:bg-input-dark dark:text-text-dark-primary dark:placeholder:text-text-dark-secondary" placeholder="Select Time" value=""/>
+<span class="material-symbols-outlined pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-text-light-secondary dark:text-text-dark-secondary">schedule</span>
+</div>
+</label>
+</div>
+</div>
+<div class="flex flex-col gap-4 rounded-xl bg-card-light p-4 dark:bg-card-dark">
+<div class="flex flex-col">
+<p class="pb-2 text-base font-medium leading-normal text-text-light-primary dark:text-text-dark-primary">Category</p>
+<div class="relative flex h-14 w-full items-center rounded-lg border-none bg-input-light p-4 text-base font-normal leading-normal text-text-light-primary placeholder:text-text-light-secondary focus:outline-0 focus:ring-0 dark:bg-input-dark dark:text-text-dark-primary dark:placeholder:text-text-dark-secondary">
+<span class="flex-1 text-text-light-secondary dark:text-text-dark-secondary">Select Category</span>
+<button class="flex h-8 w-8 items-center justify-center rounded-full text-text-light-secondary transition-colors hover:bg-black/10 dark:text-text-dark-secondary dark:hover:bg-white/10">
+<span class="material-symbols-outlined">add_circle</span>
+</button>
+<button class="flex h-8 w-8 items-center justify-center rounded-full text-text-light-secondary transition-colors hover:bg-black/10 dark:text-text-dark-secondary dark:hover:bg-white/10">
+<span class="material-symbols-outlined">delete</span>
+</button>
+<button class="flex h-8 w-8 items-center justify-center rounded-full text-text-light-secondary transition-colors hover:bg-black/10 dark:text-text-dark-secondary dark:hover:bg-white/10">
+<span class="material-symbols-outlined">arrow_drop_down</span>
+</button>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-4 rounded-xl bg-card-light p-4 dark:bg-card-dark">
+<label class="flex flex-1 flex-col min-w-40">
+<p class="text-base font-medium leading-normal pb-2 text-text-light-primary dark:text-text-dark-primary">Description</p>
+<textarea class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light-primary dark:text-text-dark-primary focus:outline-0 focus:ring-0 border-none bg-input-light dark:bg-input-dark min-h-36 placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary p-4 text-base font-normal leading-normal" placeholder="Add more details..."></textarea>
+</label>
+</div>
+<div class="flex flex-col gap-2 rounded-xl bg-card-light p-4 dark:bg-card-dark">
+<button class="flex items-center gap-3 rounded-lg p-2 text-left text-primary transition-colors hover:bg-primary/10">
+<span class="material-symbols-outlined">add</span>
+<span class="text-base font-medium">Add Sub-task</span>
+</button>
+</div>
+<div class="flex flex-col gap-3 rounded-xl bg-card-light p-4 dark:bg-card-dark">
+<h3 class="text-lg font-bold leading-tight tracking-[-0.015em] text-text-light-primary dark:text-text-dark-primary">Attachments &amp; Notes</h3>
+<button class="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-input-light bg-transparent p-6 text-center text-text-light-secondary transition-colors hover:border-primary/50 hover:bg-primary/5 hover:text-primary dark:border-input-dark dark:text-text-dark-secondary">
+<span class="material-symbols-outlined">add_circle_outline</span>
+<span class="text-base font-medium">Add Attachment or Note</span>
+</button>
+</div>
+</div>
+</main>
+</div>
+</div>
+</div>
+</body></html>

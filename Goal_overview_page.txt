@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>My Goals</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#4A90E2",
+            "background-light": "#F8F9FA",
+            "background-dark": "#101622",
+            "text-primary-light": "#212529",
+            "text-primary-dark": "#F8F9FA",
+            "text-secondary-light": "#6C757D",
+            "text-secondary-dark": "#ADB5BD",
+            "card-light": "#FFFFFF",
+            "card-dark": "#1A2230",
+            "border-light": "#E9ECEF",
+            "border-dark": "#343A40",
+            "accent-teal": "#00A99D",
+            "accent-mint": "#A2EAD5"
+          },
+          fontFamily: {
+            "display": ["Inter"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.5rem",
+            "lg": "1rem",
+            "xl": "1.5rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<!-- Top App Bar -->
+<header class="sticky top-0 z-10 flex h-16 w-full items-center justify-between border-b border-border-light bg-background-light/80 px-4 backdrop-blur-sm dark:border-border-dark dark:bg-background-dark/80">
+<h1 class="text-xl font-bold text-text-primary-light dark:text-text-primary-dark">My Goals</h1>
+<button class="flex h-10 w-10 items-center justify-center rounded-full text-text-secondary-light hover:bg-black/5 dark:text-text-secondary-dark dark:hover:bg-white/10">
+<span class="material-symbols-outlined text-2xl"> more_vert </span>
+</button>
+</header>
+<!-- Goals List -->
+<main class="flex-1 space-y-4 p-4 pb-24">
+<!-- Goal Overview Card 1 -->
+<div class="flex flex-col gap-4 rounded-xl bg-card-light p-4 shadow-sm dark:bg-card-dark">
+<div class="flex flex-col gap-2">
+<p class="text-lg font-bold leading-tight tracking-tight text-text-primary-light dark:text-text-primary-dark">Run a Half Marathon</p>
+<div class="flex items-center gap-3">
+<div class="h-2 flex-1 rounded-full bg-border-light dark:bg-border-dark">
+<div class="h-2 rounded-full bg-gradient-to-r from-accent-teal to-accent-mint" style="width: 75%;"></div>
+</div>
+<p class="text-sm font-semibold text-text-primary-light dark:text-text-primary-dark">75%</p>
+</div>
+</div>
+<div class="h-px w-full bg-border-light dark:bg-border-dark"></div>
+<div class="flex flex-col gap-3">
+<p class="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark">Linked Tasks (3/4)</p>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary"> check_circle </span>
+<p class="flex-1 text-base text-text-primary-light dark:text-text-primary-dark">Complete Week 4 Training Plan</p>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark"> radio_button_unchecked </span>
+<p class="flex-1 text-base text-text-primary-light dark:text-text-primary-dark">Run 10k continuous</p>
+</div>
+</div>
+</div>
+<!-- Goal Overview Card 2 -->
+<div class="flex flex-col gap-4 rounded-xl bg-card-light p-4 shadow-sm dark:bg-card-dark">
+<div class="flex flex-col gap-2">
+<p class="text-lg font-bold leading-tight tracking-tight text-text-primary-light dark:text-text-primary-dark">Learn App Development</p>
+<div class="flex items-center gap-3">
+<div class="h-2 flex-1 rounded-full bg-border-light dark:bg-border-dark">
+<div class="h-2 rounded-full bg-gradient-to-r from-accent-teal to-accent-mint" style="width: 20%;"></div>
+</div>
+<p class="text-sm font-semibold text-text-primary-light dark:text-text-primary-dark">20%</p>
+</div>
+</div>
+<div class="h-px w-full bg-border-light dark:bg-border-dark"></div>
+<div class="flex flex-col gap-3">
+<p class="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark">Linked Tasks (1/5)</p>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary"> check_circle </span>
+<p class="flex-1 text-base text-text-primary-light dark:text-text-primary-dark">Finish UI/UX Course</p>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark"> radio_button_unchecked </span>
+<p class="flex-1 text-base text-text-primary-light dark:text-text-primary-dark">Build first "Hello World" app</p>
+</div>
+</div>
+</div>
+<!-- Goal Overview Card 3 (Example) -->
+<div class="flex flex-col gap-4 rounded-xl bg-card-light p-4 shadow-sm dark:bg-card-dark">
+<div class="flex flex-col gap-2">
+<p class="text-lg font-bold leading-tight tracking-tight text-text-primary-light dark:text-text-primary-dark">Read 20 Books This Year</p>
+<div class="flex items-center gap-3">
+<div class="h-2 flex-1 rounded-full bg-border-light dark:bg-border-dark">
+<div class="h-2 rounded-full bg-gradient-to-r from-accent-teal to-accent-mint" style="width: 45%;"></div>
+</div>
+<p class="text-sm font-semibold text-text-primary-light dark:text-text-primary-dark">45%</p>
+</div>
+</div>
+<div class="h-px w-full bg-border-light dark:bg-border-dark"></div>
+<div class="flex flex-col gap-3">
+<p class="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark">Linked Tasks (9/20)</p>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary"> check_circle </span>
+<p class="flex-1 text-base text-text-primary-light dark:text-text-primary-dark">Finish "Atomic Habits"</p>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark"> radio_button_unchecked </span>
+<p class="flex-1 text-base text-text-primary-light dark:text-text-primary-dark">Start "The Psychology of Money"</p>
+</div>
+</div>
+</div>
+<!-- Empty State Card (Uncomment to view) -->
+<!--
+      <div class="flex flex-col items-center justify-center rounded-xl border border-dashed border-border-light bg-card-light p-8 text-center dark:border-border-dark dark:bg-card-dark mt-8">
+        <span class="material-symbols-outlined text-6xl text-text-secondary-light dark:text-text-secondary-dark">flag</span>
+        <h3 class="mt-4 text-lg font-semibold text-text-primary-light dark:text-text-primary-dark">No goals yet</h3>
+        <p class="mt-1 text-base text-text-secondary-light dark:text-text-secondary-dark">Tap the '+' to create your first one and start your journey!</p>
+      </div>
+      -->
+</main>
+<!-- Floating Action Button -->
+<div class="fixed bottom-6 right-6">
+<button class="flex h-14 w-14 items-center justify-center rounded-xl bg-primary text-white shadow-lg transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">
+<span class="material-symbols-outlined text-3xl"> add </span>
+</button>
+</div>
+</div>
+</body></html>

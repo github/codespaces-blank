@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Planner</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#5590f7",
+            "background-light": "#f5f6f8",
+            "background-dark": "#101622",
+          },
+          fontFamily: {
+            "display": ["Inter", "sans-serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.5rem",
+            "lg": "1rem",
+            "xl": "1.5rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
+<div class="relative flex h-screen w-full flex-col group/design-root overflow-hidden">
+<!-- Top App Bar -->
+<header class="flex shrink-0 items-center justify-between bg-background-light dark:bg-background-dark px-4 pt-4 pb-2">
+<div class="flex flex-col">
+<h1 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Planner</h1>
+<p class="text-sm font-medium text-gray-500 dark:text-gray-400">October 2024</p>
+</div>
+<button class="flex size-10 items-center justify-center rounded-full text-gray-600 dark:text-gray-300">
+<span class="material-symbols-outlined text-2xl">search</span>
+</button>
+</header>
+<!-- Horizontal Calendar Scroll -->
+<div class="shrink-0 overflow-x-auto">
+<div class="flex border-b border-gray-200 dark:border-gray-800 px-4 gap-3">
+<a class="flex shrink-0 flex-col items-center justify-center gap-2 rounded-t-lg px-2 pb-2 pt-3" href="#">
+<p class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Mon</p>
+<div class="flex size-8 items-center justify-center rounded-full">
+<p class="text-sm font-semibold text-gray-700 dark:text-gray-300">21</p>
+</div>
+</a>
+<a class="flex shrink-0 flex-col items-center justify-center gap-2 rounded-t-lg px-2 pb-2 pt-3" href="#">
+<p class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Tue</p>
+<div class="flex size-8 items-center justify-center rounded-full">
+<p class="text-sm font-semibold text-gray-700 dark:text-gray-300">22</p>
+</div>
+</a>
+<a class="flex shrink-0 flex-col items-center justify-center gap-2 rounded-t-lg bg-primary/10 px-2 pb-2 pt-3" href="#">
+<p class="text-xs font-bold uppercase text-primary">Wed</p>
+<div class="flex size-8 items-center justify-center rounded-full bg-primary text-white">
+<p class="text-sm font-bold">23</p>
+</div>
+</a>
+<a class="flex shrink-0 flex-col items-center justify-center gap-2 rounded-t-lg px-2 pb-2 pt-3" href="#">
+<p class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Thu</p>
+<div class="flex size-8 items-center justify-center rounded-full">
+<p class="text-sm font-semibold text-gray-700 dark:text-gray-300">24</p>
+</div>
+</a>
+<a class="flex shrink-0 flex-col items-center justify-center gap-2 rounded-t-lg px-2 pb-2 pt-3" href="#">
+<p class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Fri</p>
+<div class="flex size-8 items-center justify-center rounded-full">
+<p class="text-sm font-semibold text-gray-700 dark:text-gray-300">25</p>
+</div>
+</a>
+<a class="flex shrink-0 flex-col items-center justify-center gap-2 rounded-t-lg px-2 pb-2 pt-3" href="#">
+<p class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Sat</p>
+<div class="flex size-8 items-center justify-center rounded-full">
+<p class="text-sm font-semibold text-gray-700 dark:text-gray-300">26</p>
+</div>
+</a>
+<a class="flex shrink-0 flex-col items-center justify-center gap-2 rounded-t-lg px-2 pb-2 pt-3" href="#">
+<p class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Sun</p>
+<div class="flex size-8 items-center justify-center rounded-full">
+<p class="text-sm font-semibold text-gray-700 dark:text-gray-300">27</p>
+</div>
+</a>
+</div>
+</div>
+<!-- Main Content: Vertical Timeline -->
+<main class="flex-1 overflow-y-auto px-4 pt-6">
+<div class="relative grid grid-cols-[auto_1fr] gap-x-3">
+<!-- Hour Labels -->
+<div class="flex flex-col text-right">
+<div class="h-28 text-xs font-medium text-gray-400 dark:text-gray-500">9 AM</div>
+<div class="h-28 text-xs font-medium text-gray-400 dark:text-gray-500">10 AM</div>
+<div class="h-28 text-xs font-medium text-gray-400 dark:text-gray-500">11 AM</div>
+<div class="h-28 text-xs font-medium text-gray-400 dark:text-gray-500">12 PM</div>
+<div class="h-28 text-xs font-medium text-gray-400 dark:text-gray-500">1 PM</div>
+<div class="h-28 text-xs font-medium text-gray-400 dark:text-gray-500">2 PM</div>
+</div>
+<!-- Timeline & Events -->
+<div class="relative">
+<!-- Timeline Dividers -->
+<div class="absolute inset-0">
+<div class="h-28 border-b border-gray-200 dark:border-gray-800"></div>
+<div class="h-28 border-b border-gray-200 dark:border-gray-800"></div>
+<div class="h-28 border-b border-gray-200 dark:border-gray-800"></div>
+<div class="h-28 border-b border-gray-200 dark:border-gray-800"></div>
+<div class="h-28 border-b border-gray-200 dark:border-gray-800"></div>
+<div class="h-28 border-b border-gray-200 dark:border-gray-800"></div>
+</div>
+<!-- Event Cards Container -->
+<div class="relative h-full">
+<!-- Event 1: Team Standup (9:00 - 9:30, 30 min) -->
+<div class="absolute w-full" style="top: 0; height: 3.5rem;">
+<div class="relative h-full overflow-hidden rounded-lg bg-white dark:bg-gray-800/50 shadow-sm mr-2">
+<div class="absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b from-blue-400 to-teal-300"></div>
+<div class="flex items-center gap-2 pl-4 pr-2 pt-2">
+<span class="material-symbols-outlined text-base text-gray-600 dark:text-gray-300">group</span>
+<p class="text-sm font-semibold text-gray-800 dark:text-gray-100">Team Standup</p>
+</div>
+</div>
+</div>
+<!-- Event 2: Design Review (10:00 - 11:30, 90 min) -->
+<div class="absolute w-full" style="top: 7rem; height: 10.5rem;">
+<div class="relative h-full overflow-hidden rounded-lg bg-white dark:bg-gray-800/50 shadow-sm mr-2">
+<div class="absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b from-purple-400 to-pink-400"></div>
+<div class="flex items-start gap-2 pl-4 pr-2 pt-2">
+<span class="material-symbols-outlined text-base text-gray-600 dark:text-gray-300">draw</span>
+<div class="flex flex-col">
+<p class="text-sm font-semibold text-gray-800 dark:text-gray-100">Design Review</p>
+<p class="text-xs text-gray-500 dark:text-gray-400">Project Phoenix</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Event 3: Lunch (12:00 - 12:45, 45 min) -->
+<div class="absolute w-full" style="top: 21rem; height: 5.25rem;">
+<div class="relative h-full overflow-hidden rounded-lg bg-white dark:bg-gray-800/50 shadow-sm mr-2">
+<div class="absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b from-amber-400 to-orange-400"></div>
+<div class="flex items-center gap-2 pl-4 pr-2 pt-2">
+<span class="material-symbols-outlined text-base text-gray-600 dark:text-gray-300">restaurant</span>
+<p class="text-sm font-semibold text-gray-800 dark:text-gray-100">Lunch</p>
+</div>
+</div>
+</div>
+<!-- Event 4: Gym Session (14:00 - 15:00, 60 min) -->
+<div class="absolute w-full" style="top: 35rem; height: 7rem;">
+<div class="relative h-full overflow-hidden rounded-lg bg-white dark:bg-gray-800/50 shadow-sm mr-2">
+<div class="absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b from-green-400 to-lime-300"></div>
+<div class="flex items-center gap-2 pl-4 pr-2 pt-2">
+<span class="material-symbols-outlined text-base text-gray-600 dark:text-gray-300">fitness_center</span>
+<p class="text-sm font-semibold text-gray-800 dark:text-gray-100">Gym Session</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="h-24"></div> <!-- Spacer for FAB and Bottom Nav -->
+</main>
+<!-- Empty State Example (commented out) -->
+<!--
+    <main class="flex-1 overflow-y-auto px-4 pt-6">
+      <div class="flex flex-col items-center gap-6 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-700 px-6 py-14 mt-8">
+        <span class="material-symbols-outlined text-5xl text-gray-400 dark:text-gray-500">event_note</span>
+        <div class="flex max-w-[480px] flex-col items-center gap-1">
+          <p class="text-lg font-bold tracking-tight text-gray-900 dark:text-white text-center">No plans for today</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400 max-w-[480px] text-center">Enjoy your free day or tap the '+' button to add a new task or event.</p>
+        </div>
+      </div>
+    </main>
+    -->
+<!-- Floating Action Button -->
+<div class="absolute bottom-24 right-4 z-10">
+<button class="flex h-14 w-14 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-primary text-white shadow-lg transition-transform hover:scale-105">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+</div>
+<!-- Bottom Navigation Bar -->
+<nav class="shrink-0 border-t border-gray-200 dark:border-gray-800 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm px-4 pb-3 pt-2">
+<div class="flex">
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-gray-500 dark:text-gray-400" href="#">
+<span class="material-symbols-outlined">sunny</span>
+<p class="text-xs font-medium">Today</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-primary" href="#">
+<span class="material-symbols-outlined font-bold">calendar_month</span>
+<p class="text-xs font-bold">Planner</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-gray-500 dark:text-gray-400" href="#">
+<span class="material-symbols-outlined">repeat</span>
+<p class="text-xs font-medium">Habits</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-gray-500 dark:text-gray-400" href="#">
+<span class="material-symbols-outlined">track_changes</span>
+<p class="text-xs font-medium">Goals</p>
+</a>
+</div>
+</nav>
+</div>
+</body></html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Goal Details</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#5590f7",
+            "background-light": "#f5f6f8",
+            "background-dark": "#101622",
+            "card-light": "#ffffff",
+            "card-dark": "#182030",
+            "text-light-primary": "#0d121c",
+            "text-dark-primary": "#f0f2f5",
+            "text-light-secondary": "#49689c",
+            "text-dark-secondary": "#a0b3d7",
+            "border-light": "#ced8e8",
+            "border-dark": "#34425e",
+          },
+          fontFamily: {
+            "display": ["Inter", "sans-serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.5rem",
+            "lg": "1rem",
+            "xl": "1.5rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="flex-1 pb-24">
+<!-- Top App Bar -->
+<div class="sticky top-0 z-10 flex items-center bg-background-light/80 dark:bg-background-dark/80 p-4 pb-2 backdrop-blur-sm">
+<div class="flex size-12 shrink-0 items-center justify-start">
+<span class="material-symbols-outlined text-text-light-primary dark:text-text-dark-primary">arrow_back</span>
+</div>
+<h2 class="flex-1 text-center text-lg font-bold leading-tight tracking-[-0.015em] text-text-light-primary dark:text-text-dark-primary">Learn Advanced UI Design</h2>
+<div class="size-12 shrink-0"></div>
+</div>
+<!-- Progress Card -->
+<div class="p-4">
+<div class="rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark p-6 shadow-sm">
+<div class="flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<p class="text-base font-medium leading-normal text-text-light-primary dark:text-text-dark-primary">Tasks Completed</p>
+<p class="text-sm font-normal leading-normal text-text-light-secondary dark:text-text-dark-secondary">10/12</p>
+</div>
+<div class="rounded-full bg-border-light dark:bg-border-dark">
+<div class="h-2.5 rounded-full bg-primary" style="width: 83%;"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Tabs -->
+<div>
+<div class="flex border-b border-border-light dark:border-border-dark px-4">
+<a class="flex flex-1 flex-col items-center justify-center border-b-[3px] border-b-primary pb-[13px] pt-4 text-text-light-primary dark:text-text-dark-primary" href="#">
+<p class="text-sm font-bold leading-normal tracking-[0.015em]">Tasks</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center border-b-[3px] border-b-transparent pb-[13px] pt-4 text-text-light-secondary dark:text-text-dark-secondary" href="#">
+<p class="text-sm font-bold leading-normal tracking-[0.015em]">Details</p>
+</a>
+</div>
+</div>
+<!-- Tab Content: Tasks -->
+<div class="px-4 pt-4">
+<!-- New Task Section -->
+<h3 class="px-1 pt-2 pb-2 text-base font-bold text-text-light-primary dark:text-text-dark-primary">In Progress</h3>
+<div class="flex flex-col divide-y divide-border-light dark:divide-border-dark">
+<label class="flex cursor-pointer items-center gap-x-4 py-3.5">
+<input class="h-5 w-5 rounded-md border-2 border-border-light dark:border-border-dark bg-transparent text-primary checked:border-primary checked:bg-primary focus:ring-0 focus:ring-offset-0 dark:checked:border-primary" type="checkbox"/>
+<p class="flex-1 text-base font-normal leading-normal text-text-light-primary dark:text-text-dark-primary">Design 3 app mockups</p>
+</label>
+<label class="flex cursor-pointer items-center gap-x-4 py-3.5">
+<input class="h-5 w-5 rounded-md border-2 border-border-light dark:border-border-dark bg-transparent text-primary checked:border-primary checked:bg-primary focus:ring-0 focus:ring-offset-0 dark:checked:border-primary" type="checkbox"/>
+<p class="flex-1 text-base font-normal leading-normal text-text-light-primary dark:text-text-dark-primary">Create a personal portfolio</p>
+</label>
+</div>
+<!-- Completed Task Section -->
+<h3 class="px-1 pt-6 pb-2 text-base font-bold text-text-light-primary dark:text-text-dark-primary">Completed</h3>
+<div class="flex flex-col divide-y divide-border-light dark:divide-border-dark opacity-60">
+<label class="flex cursor-pointer items-center gap-x-4 py-3.5">
+<input checked="" class="h-5 w-5 rounded-md border-2 border-border-light dark:border-border-dark bg-transparent text-primary checked:border-primary checked:bg-primary focus:ring-0 focus:ring-offset-0 dark:checked:border-primary" type="checkbox"/>
+<p class="flex-1 text-base font-normal leading-normal text-text-light-primary dark:text-text-dark-primary line-through">Complete the Figma course</p>
+</label>
+<label class="flex cursor-pointer items-center gap-x-4 py-3.5">
+<input checked="" class="h-5 w-5 rounded-md border-2 border-border-light dark:border-border-dark bg-transparent text-primary checked:border-primary checked:bg-primary focus:ring-0 focus:ring-offset-0 dark:checked:border-primary" type="checkbox"/>
+<p class="flex-1 text-base font-normal leading-normal text-text-light-primary dark:text-text-dark-primary line-through">Read 'Designing Interfaces'</p>
+</label>
+<label class="flex cursor-pointer items-center gap-x-4 py-3.5">
+<input checked="" class="h-5 w-5 rounded-md border-2 border-border-light dark:border-border-dark bg-transparent text-primary checked:border-primary checked:bg-primary focus:ring-0 focus:ring-offset-0 dark:checked:border-primary" type="checkbox"/>
+<p class="flex-1 text-base font-normal leading-normal text-text-light-primary dark:text-text-dark-primary line-through">Study color theory basics</p>
+</label>
+</div>
+</div>
+</div>
+<!-- Footer Button -->
+<div class="fixed bottom-0 left-0 right-0 border-t border-border-light dark:border-border-dark bg-background-light/80 dark:bg-background-dark/80 p-4 backdrop-blur-sm">
+<button class="flex h-12 w-full min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl bg-primary px-5 text-base font-bold leading-normal tracking-[0.015em] text-white disabled:cursor-not-allowed disabled:opacity-50">
+<span class="truncate">Mark Goal as Complete</span>
+</button>
+</div>
+</div>
+</body></html>

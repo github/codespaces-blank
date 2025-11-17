@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Productivity Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style type="text/tailwindcss">
+        .material-symbols-outlined {
+          font-variation-settings:
+          'FILL' 0,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#5590f7",
+              "background-light": "#f5f6f8",
+              "background-dark": "#101622",
+              "card-light": "#ffffff",
+              "card-dark": "#1b2332",
+              "text-light-primary": "#1f2937",
+              "text-dark-primary": "#f0f2f5",
+              "text-light-secondary": "#6b7280",
+              "text-dark-secondary": "#9ca3af",
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden text-text-light-primary dark:text-text-dark-primary">
+<!-- Top App Bar -->
+<div class="flex flex-col gap-2 p-4 pb-2">
+<div class="flex items-center h-12 justify-between">
+<h1 class="text-text-light-primary dark:text-text-dark-primary tracking-light text-[28px] font-bold leading-tight">Hi, Amelia!</h1>
+<div class="flex size-12 shrink-0 items-center justify-center rounded-full bg-card-light dark:bg-card-dark">
+<span class="material-symbols-outlined text-text-light-secondary dark:text-text-dark-secondary">notifications</span>
+</div>
+</div>
+<p class="text-text-light-secondary dark:text-text-dark-secondary text-base font-normal leading-normal">You have 5 tasks for today.</p>
+</div>
+<!-- My Goals Section -->
+<h2 class="text-text-light-primary dark:text-text-dark-primary text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">My Goals</h2>
+<div class="flex overflow-x-auto [-ms-scrollbar-style:none] [scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden pl-4 pr-1">
+<div class="flex items-stretch gap-4">
+<!-- Goal Card 1 -->
+<div class="flex h-full flex-1 flex-col gap-3 rounded-xl bg-card-light dark:bg-card-dark p-4 min-w-[180px] w-[180px]">
+<div class="flex justify-between items-start">
+<p class="text-text-light-primary dark:text-text-dark-primary text-base font-semibold leading-normal">Learn SwiftUI</p>
+<span class="material-symbols-outlined text-primary">code</span>
+</div>
+<div class="flex flex-col gap-2">
+<div class="w-full bg-background-light dark:bg-background-dark rounded-full h-2">
+<div class="bg-primary h-2 rounded-full" style="width: 40%"></div>
+</div>
+<p class="text-text-light-secondary dark:text-text-dark-secondary text-sm font-normal leading-normal">40% Complete</p>
+</div>
+</div>
+<!-- Goal Card 2 -->
+<div class="flex h-full flex-1 flex-col gap-3 rounded-xl bg-card-light dark:bg-card-dark p-4 min-w-[180px] w-[180px]">
+<div class="flex justify-between items-start">
+<p class="text-text-light-primary dark:text-text-dark-primary text-base font-semibold leading-normal">Read 12 Books</p>
+<span class="material-symbols-outlined text-[#f59e0b]">auto_stories</span>
+</div>
+<div class="flex flex-col gap-2">
+<div class="w-full bg-background-light dark:bg-background-dark rounded-full h-2">
+<div class="bg-[#f59e0b] h-2 rounded-full" style="width: 75%"></div>
+</div>
+<p class="text-text-light-secondary dark:text-text-dark-secondary text-sm font-normal leading-normal">75% Complete</p>
+</div>
+</div>
+<!-- Goal Card 3 -->
+<div class="flex h-full flex-1 flex-col gap-3 rounded-xl bg-card-light dark:bg-card-dark p-4 min-w-[180px] w-[180px]">
+<div class="flex justify-between items-start">
+<p class="text-text-light-primary dark:text-text-dark-primary text-base font-semibold leading-normal">Run a 5K</p>
+<span class="material-symbols-outlined text-[#10b981]">directions_run</span>
+</div>
+<div class="flex flex-col gap-2">
+<div class="w-full bg-background-light dark:bg-background-dark rounded-full h-2">
+<div class="bg-[#10b981] h-2 rounded-full" style="width: 15%"></div>
+</div>
+<p class="text-text-light-secondary dark:text-text-dark-secondary text-sm font-normal leading-normal">15% Complete</p>
+</div>
+</div>
+</div>
+</div>
+<!-- My Habits Section -->
+<h2 class="text-text-light-primary dark:text-text-dark-primary text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">My Habits</h2>
+<div class="flex overflow-x-auto [-ms-scrollbar-style:none] [scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden pl-4 pr-1">
+<div class="flex items-center gap-5">
+<!-- Habit Icon 1 (Completed) -->
+<div class="flex flex-col items-center gap-2">
+<div class="relative flex size-16 items-center justify-center rounded-full bg-primary/20 p-1">
+<div class="absolute inset-0 rounded-full border-2 border-primary"></div>
+<span class="material-symbols-outlined text-primary !text-3xl">water_drop</span>
+</div>
+<p class="text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary">Drink Water</p>
+</div>
+<!-- Habit Icon 2 (Not Completed) -->
+<div class="flex flex-col items-center gap-2">
+<div class="flex size-16 items-center justify-center rounded-full bg-card-light dark:bg-card-dark">
+<span class="material-symbols-outlined text-text-light-secondary dark:text-text-dark-secondary !text-3xl">exercise</span>
+</div>
+<p class="text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary">Workout</p>
+</div>
+<!-- Habit Icon 3 (Completed) -->
+<div class="flex flex-col items-center gap-2">
+<div class="relative flex size-16 items-center justify-center rounded-full bg-[#ef4444]/20 p-1">
+<div class="absolute inset-0 rounded-full border-2 border-[#ef4444]"></div>
+<span class="material-symbols-outlined text-[#ef4444] !text-3xl">self_improvement</span>
+</div>
+<p class="text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary">Meditate</p>
+</div>
+<!-- Habit Icon 4 (Not Completed) -->
+<div class="flex flex-col items-center gap-2">
+<div class="flex size-16 items-center justify-center rounded-full bg-card-light dark:bg-card-dark">
+<span class="material-symbols-outlined text-text-light-secondary dark:text-text-dark-secondary !text-3xl">menu_book</span>
+</div>
+<p class="text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary">Read</p>
+</div>
+<!-- Habit Icon 5 (Not Completed) -->
+<div class="flex flex-col items-center gap-2">
+<div class="flex size-16 items-center justify-center rounded-full bg-card-light dark:bg-card-dark">
+<span class="material-symbols-outlined text-text-light-secondary dark:text-text-dark-secondary !text-3xl">edit_note</span>
+</div>
+<p class="text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary">Journal</p>
+</div>
+</div>
+</div>
+<!-- Tasks Section -->
+<div class="flex flex-col px-4 pt-5 pb-24">
+<h2 class="text-text-light-primary dark:text-text-dark-primary text-[22px] font-bold leading-tight tracking-[-0.015em] pb-3">Tasks</h2>
+<!-- Filter Tabs -->
+<div class="flex w-full items-center gap-2 rounded-lg bg-background-light dark:bg-card-dark p-1 mb-4">
+<button class="flex-1 rounded-md bg-primary py-2 text-sm font-semibold text-white">Today</button>
+<button class="flex-1 rounded-md py-2 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary">Tomorrow</button>
+<button class="flex-1 rounded-md py-2 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary">Week</button>
+</div>
+<!-- Task List -->
+<div class="flex flex-col gap-3">
+<!-- Task Card 1 -->
+<div class="flex items-center gap-4 rounded-xl bg-card-light dark:bg-card-dark p-4">
+<button class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 border-primary bg-primary">
+<span class="material-symbols-outlined text-white !text-lg">check</span>
+</button>
+<div class="flex flex-1 flex-col">
+<p class="text-base font-medium text-text-light-primary dark:text-text-dark-primary line-through">Finalize project proposal</p>
+<p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">10:00 AM</p>
+</div>
+<div class="rounded-full bg-[#ec4899]/20 px-3 py-1 text-xs font-medium text-[#ec4899]">Work</div>
+</div>
+<!-- Task Card 2 -->
+<div class="flex items-center gap-4 rounded-xl bg-card-light dark:bg-card-dark p-4">
+<button class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 border-text-light-secondary/50 dark:border-text-dark-secondary/50"></button>
+<div class="flex flex-1 flex-col">
+<p class="text-base font-medium text-text-light-primary dark:text-text-dark-primary">Doctor's Appointment</p>
+<p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">11:30 AM</p>
+</div>
+<div class="rounded-full bg-[#8b5cf6]/20 px-3 py-1 text-xs font-medium text-[#8b5cf6]">Personal</div>
+</div>
+<!-- Task Card 3 -->
+<div class="flex items-center gap-4 rounded-xl bg-card-light dark:bg-card-dark p-4">
+<button class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 border-text-light-secondary/50 dark:border-text-dark-secondary/50"></button>
+<div class="flex flex-1 flex-col">
+<p class="text-base font-medium text-text-light-primary dark:text-text-dark-primary">Call Mom</p>
+<p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">2:00 PM</p>
+</div>
+<div class="rounded-full bg-[#8b5cf6]/20 px-3 py-1 text-xs font-medium text-[#8b5cf6]">Personal</div>
+</div>
+<!-- Task Card 4 -->
+<div class="flex items-center gap-4 rounded-xl bg-card-light dark:bg-card-dark p-4">
+<button class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 border-text-light-secondary/50 dark:border-text-dark-secondary/50"></button>
+<div class="flex flex-1 flex-col">
+<p class="text-base font-medium text-text-light-primary dark:text-text-dark-primary">Pick up groceries</p>
+<p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">5:00 PM</p>
+</div>
+<div class="rounded-full bg-[#22c55e]/20 px-3 py-1 text-xs font-medium text-[#22c55e]">Errands</div>
+</div>
+</div>
+</div>
+<!-- Floating Action Button -->
+<div class="fixed bottom-6 right-6">
+<button class="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-white shadow-lg">
+<span class="material-symbols-outlined !text-4xl">add</span>
+</button>
+</div>
+</div>
+</body></html>
