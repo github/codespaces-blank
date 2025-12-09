@@ -1,1 +1,6 @@
-from src.main import add\n\ndef test_add():\n    assert add(2, 3) == 5\n    assert add(-1, 1) == 0
+tests/test_main.py
+from src.main import add
+
+def test_add():
+    assert add(2, 3) == 5
+    assert add(-1, 1) == 0
