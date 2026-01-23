@@ -1,0 +1,17 @@
+version: 1
+ownership:
+  - name: github-app-js-sample
+    long_name: GitHub App JS Sample
+    description: Sample of a GitHub App that comments new pull requests
+    kind: code
+    team: github/ecosystem-apps
+    exec_sponsor: d-sharanya
+    product_manager: hpsin
+    maintainer: nebiyou-gebretatios
+    repo: https://github.com/github/github-app-js-sample
+    sev3:
+      issue: https://github.com/github/github-app-js-sample/issues
+      slack: ce-apps
+      tta: '7 business days'
+    tier: 3
+    qos: experimental

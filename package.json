@@ -1,0 +1,18 @@
+{
+  "name": "starter_github_app",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "server": "node app.js",
+    "lint": "standard"
+  },
+  "devDependencies": {
+    "smee-client": "^2.0.1",
+    "standard": "^17.0.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "octokit": "^4.1.1"
+  }
+}
