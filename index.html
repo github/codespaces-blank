@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>The study planner</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: linear-gradient(to right, #4facfe, #00f2fe);
+      text-align: center;
+      color: white;
+    }
+    h1 {
+      margin-top: 20px;
+    }
+    .container {
+      background: white;
+      color: black;
+      width: 90%;
+      max-width: 400px;
+      margin: auto;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    input {
+      width: 70%;
+      padding: 8px;
+      margin: 5px;
+    }
+    button {
+      padding: 8px 12px;
+      background: #4facfe;
+      border: none;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    li {
+      list-style: none;
+      padding: 8px;
+      margin: 5px;
+      background: #f1f1f1;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .completed {
+      text-decoration: line-through;
+      background: lightgreen;
+    }
+    .progress {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+                                                            </head>
+
+                                                            <body>
+
+                                                            <h1>📚 Smart Study Planner</h1>
+                                        <div class="container">
+                                                    <input type="text" id="taskInput" placeholder="Enter your task">
+                                                        <button onclick="addTask()">Add</button>
+                                                <ul id="taskList"></ul>
+
+                                                    <div class="progress" id="progressText">
+                                                            Progress: 0%
+                                                                </div>
+                                                                </div>
+                                                <script>
+                                                            let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+                                                            function saveTasks() {
+                                                                        localStorage.setItem("tasks", JSON.stringify(tasks));
+                                                                            }
+                                                            function renderTasks() {
+                                                                        const list = document.getElementById("taskList");
+                                                                                list.innerHTML = "";
+
+                                                                                        let completed = 0;
+                                                            tasks.forEach((task, index) => {
+                                                                            const li = document.createElement("li");
+                                                                                        li.textContent = task.name;
+                                                            if (task.done) {
+                                                                                li.classList.add("completed");
+                                                                                                completed++;
+                                                            }
+                                                                                                         li.onclick = () => {
+                                                                                                                                                    tasks[index].done = !tasks[index].done;
+                                                                                                                                                saveTasks();
+                                                                                                                                                                renderTasks();
+                                                                                                                                                                            };
+                                                                                                                                                                            list.appendChild(li);
+                                                            });
+
+                                                                                                                                                let percent = tasks.length === 0 ? 0 :
+                                                                                                                                                            Math.round((completed / tasks.length) * 100);
+                                                                                                                                                            document.getElementById("progressText").textContent =
+                                                                                                                                                            "Progress: " + percent +"%" ;
+                                                                                                                                                                            }
+
+                                                                                                                                                                            function addTask() {
+                                                                                                                                                                                  const input = document.getElementById("taskInput");
+                                                                                                                                                                                  const name = input.value.trim();
+                                                                                                                                                                                  if (!name) return;
+                                                                                                                                                                                  tasks.push({ name: name, done: false });
+                                                                                                                                                                                  saveTasks();
+                                                                                                                                                                                  input.value = "";
+                                                                                                                                                                                  renderTasks();
+                                                                                                                                                                            }
+
+                                                                                                                                                                            // initialize
+                                                                                                                                                                            renderTasks();
+                                                                                                                                                                          </script>
+
+                                                                                                                                                                                                                          </body>
+                                                                                                                                                                                                                          </html>
