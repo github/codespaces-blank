@@ -1,0 +1,28 @@
+.loginForm {
+    max-width: 360px;
+    padding: 1.4rem 1.6rem;
+    box-shadow: 0 0 120px #bbb;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 12px;
+}
+
+.loginForm_logo {
+    text-align: center;
+    padding-bottom: 24px;
+}
+
+.loginForm_login {
+    margin-bottom: -1px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.loginForm_password {
+    margin-bottom: 10px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.loginForm .form-floating:focus-within {
+    z-index: 2;
+}

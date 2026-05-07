@@ -1,0 +1,77 @@
+on:
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - '.gitignore'
+      - '.gitattributes'
+      - 'infection.json.dist'
+      - 'psalm.xml'
+
+  push:
+    branches: ['master']
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - '.gitignore'
+      - '.gitattributes'
+      - 'infection.json.dist'
+      - 'psalm.xml'
+
+name: build
+
+jobs:
+  codeception:
+    name: PHP ${{ matrix.php }}-${{ matrix.os }}
+
+    env:
+      key: cache-v1
+      APP_C3: true
+      APP_ENV: test
+      APP_DEBUG: false
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+        php:
+          - "8.5"
+
+    steps:
+      - name: Checkout.
+        uses: actions/checkout@v4
+
+      - name: Install PHP with extensions.
+        uses: shivammathur/setup-php@v2
+        with:
+          coverage: false
+          extensions: fileinfo, intl
+          ini-values: date.timezone='UTC', register_argc_argv=On
+          php-version: ${{ matrix.php }}
+
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v3
+
+      - name: Run codeception build.
+        run: vendor/bin/codecept build
+
+      - name: Run tests with codeception with code coverage with shell bash.
+        if: matrix.os == 'ubuntu-latest'
+        run: vendor/bin/codecept run --coverage --coverage-xml --disable-coverage-php
+
+      - name: Run tests with codeception with code coverage with shell powershell.
+        if: matrix.os == 'windows-latest'
+        run: vendor/bin/codecept run
+        shell: powershell
+
+      - name: Upload coverage to Codecov.
+        if: matrix.os == 'ubuntu-latest'
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: runtime/tests/_output/coverage.xml

@@ -1,0 +1,44 @@
+name: Code Style
+
+on:
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - '.gitignore'
+      - '.gitattributes'
+      - 'infection.json.dist'
+      - 'psalm.xml'
+
+jobs:
+  cs-fix:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.5
+          tools: composer:v2
+          coverage: none
+
+      - name: Install Composer dependencies
+        uses: "ramsey/composer-install@v4"
+
+      - name: Run PHP CS Fixer
+        run: ./vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php
+
+      - name: Run Rector
+        run: ./vendor/bin/rector --output-format=github
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: "Apply PHP CS Fixer and Rector changes (CI)"
+          file_pattern: '*.php'
+          disable_globbing: true

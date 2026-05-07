@@ -1,0 +1,53 @@
+on:
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - '.gitignore'
+      - '.gitattributes'
+      - 'infection.json.dist'
+      - 'phpunit.xml.dist'
+
+  push:
+    branches: ['master']
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - '.gitignore'
+      - '.gitattributes'
+      - 'infection.json.dist'
+      - 'phpunit.xml.dist'
+
+name: static analysis
+
+jobs:
+  psalm:
+    name: PHP ${{ matrix.php }}-${{ matrix.os }}
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+        php:
+          - "8.5"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install PHP with extensions
+        uses: shivammathur/setup-php@v2
+        with:
+          coverage: none
+          php-version: ${{ matrix.php }}
+          tools: composer:v2, cs2pr
+
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v3
+
+      - name: Static analysis
+        run: vendor/bin/psalm --shepherd --stats --output-format=checkstyle --no-cache --php-version=${{ matrix.php }} | cs2pr --graceful-warnings --colorize
