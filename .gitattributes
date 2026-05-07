@@ -1,0 +1,34 @@
+# Autodetect text files
+* text=auto eol=lf
+
+# ...Unless the name matches the following overriding patterns
+
+# Definitively text files
+*.php  text
+*.css  text
+*.js   text
+*.txt  text
+*.md   text
+*.xml  text
+*.json text
+*.bat  text
+*.sql  text
+*.yml  text
+
+# Ensure those won't be messed up with
+*.png  binary
+*.jpg  binary
+*.gif  binary
+*.ttf  binary
+
+# Ignore some meta files when creating an archive of this repository
+/.github                export-ignore
+/.gitattributes         export-ignore
+/LICENSE.md             export-ignore
+/README.md              export-ignore
+/composer.lock          export-ignore
+
+# Avoid merge conflicts in CHANGELOG
+# https://about.gitlab.com/2015/02/10/gitlab-reduced-merge-conflicts-by-90-percent-with-changelog-placeholders/
+/CHANGELOG.md		merge=union
+
