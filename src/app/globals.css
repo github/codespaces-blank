@@ -2,26 +2,322 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    /* ============ CARBÓN ============ */
+    --carbon-50:  #F5F5F4;
+    --carbon-100: #E8E6E1;
+    --carbon-200: #D6D3CC;
+    --carbon-300: #B8B4AB;
+    --carbon-400: #8A8680;
+    --carbon-500: #57534E;  /* Grafito */
+    --carbon-600: #3D3A36;
+    --carbon-700: #2A2826;
+    --carbon-800: #1A1A1A;  /* Carbón base */
+    --carbon-900: #0A0A0A;  /* Negro tinta (dark mode bg) */
+
+    /* ============ CARMESÍ GRANADA ============ */
+    --crimson-50:  #FBEAEF;
+    --crimson-100: #F5C9D4;
+    --crimson-200: #E89BAE;
+    --crimson-300: #D66886;
+    --crimson-400: #C73A5C;  /* Brillante (dark mode) */
+    --crimson-500: #8B1538;  /* Base */
+    --crimson-600: #6E0F2B;
+    --crimson-700: #51081F;
+    --crimson-800: #350514;
+
+    /* ============ ORO VIEJO ============ */
+    --gold-50:  #FAF6EC;
+    --gold-100: #F0E5C5;
+    --gold-200: #E1CC8E;
+    --gold-300: #D4B574;  /* Pálido (dark mode) */
+    --gold-400: #C9A961;  /* Base */
+    --gold-500: #A88A45;
+    --gold-600: #7E682F;
+
+    /* ============ MARFIL ============ */
+    --ivory-50:  #FFFFFF;
+    --ivory-100: #FAFAF7;  /* Marfil base (light mode bg) */
+    --ivory-200: #F2F1EC;
+    --ivory-300: #E8E6E1;  /* Marfil tinta (dark mode texto) */
+
+    /* Fondos */
+    --color-background-primary:    var(--ivory-100);   /* Fondo principal */
+    --color-background-secondary:  var(--ivory-200);   /* Tarjetas, secciones */
+    --color-background-elevated:   var(--ivory-50);    /* Modales, dropdowns */
+    --color-background-inverse:    var(--carbon-800);  /* Footer, hero oscuro */
+    --color-background-accent:     var(--crimson-50);  /* Fondos sutiles de acento */
+
+    /* Texto */
+    --color-text-primary:    var(--carbon-800);   /* Texto principal */
+    --color-text-secondary:  var(--carbon-500);   /* Texto secundario, metadata */
+    --color-text-tertiary:   var(--carbon-400);   /* Hints, placeholders */
+    --color-text-inverse:    var(--ivory-100);    /* Texto sobre fondos oscuros */
+    --color-text-accent:     var(--crimson-500);  /* Texto destacado, enlaces */
+    --color-text-gold:       var(--gold-500);     /* Texto sobre oro */
+
+    /* Bordes */
+    --color-border-subtle:   var(--carbon-100);   /* Separadores delicados */
+    --color-border-default:  var(--carbon-200);   /* Bordes estándar */
+    --color-border-strong:   var(--carbon-300);   /* Bordes con énfasis */
+    --color-border-accent:   var(--crimson-500);  /* Bordes destacados */
+
+    /* Acentos */
+    --color-accent-primary:    var(--crimson-500);  /* Carmesí Granada */
+    --color-accent-secondary:  var(--gold-400);     /* Oro viejo */
+
+    /* Estados */
+    --color-state-success:  #2D6A4F;
+    --color-state-warning:  #D4A547;
+    --color-state-danger:   var(--crimson-500);
+    --color-state-info:     #3E5C76;
+
+    /* Estados de catálogo */
+    --color-status-available:  #2D6A4F;
+    --color-status-borrowed:   var(--carbon-400);
+    --color-status-reserved:   var(--gold-500);
+    --color-status-lost:       var(--crimson-500);
+    
+    /* Tipografía Base */
+    --font-serif:  "Fraunces", "Playfair Display", Georgia, "Times New Roman", serif;
+    --font-sans:   "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --font-mono:   "JetBrains Mono", "SF Mono", Monaco, Consolas, monospace;
+    --font-arabic: "Amiri", "Noto Naskh Arabic", serif;
+
+    /* Escala tipográfica */
+    --font-size-3xs: 0.625rem;  /* 10px */
+    --font-size-2xs: 0.75rem;   /* 12px */
+    --font-size-xs:  0.875rem;  /* 14px */
+    --font-size-sm:  1rem;      /* 16px */
+    --font-size-md:  1.125rem;  /* 18px */
+    --font-size-lg:  1.25rem;   /* 20px */
+    --font-size-xl:  1.5rem;    /* 24px */
+    --font-size-2xl: 1.875rem;  /* 30px */
+    --font-size-3xl: 2.375rem;  /* 38px */
+    --font-size-4xl: 3rem;      /* 48px */
+    --font-size-5xl: 3.75rem;   /* 60px */
+    --font-size-6xl: 4.75rem;   /* 76px */
+
+    /* Pesos */
+    --font-weight-regular: 400;
+    --font-weight-medium:  500;
+
+    /* Altura de línea */
+    --line-height-tight:   1.1;
+    --line-height-snug:    1.25;
+    --line-height-normal:  1.5;
+    --line-height-relaxed: 1.7;
+    --line-height-loose:   2;
+
+    /* Tracking */
+    --tracking-tighter: -0.04em;
+    --tracking-tight:   -0.02em;
+    --tracking-normal:  0;
+    --tracking-wide:    0.05em;
+    --tracking-wider:   0.15em;
+    --tracking-widest:  0.3em;
+
+    /* Espaciado */
+    --space-0:   0;
+    --space-1:   0.25rem;
+    --space-2:   0.5rem;
+    --space-3:   0.75rem;
+    --space-4:   1rem;
+    --space-5:   1.25rem;
+    --space-6:   1.5rem;
+    --space-8:   2rem;
+    --space-10:  2.5rem;
+    --space-12:  3rem;
+    --space-16:  4rem;
+    --space-20:  5rem;
+    --space-24:  6rem;
+    --space-32:  8rem;
+    --space-40:  10rem;
+
+    /* Bordes y radios */
+    --radius-none: 0;
+    --radius-sm:   2px;
+    --radius-md:   4px;
+    --radius-lg:   8px;
+    --radius-xl:   12px;
+    --radius-2xl:  20px;
+    --radius-full: 9999px;
+
+    --border-width-thin:    0.5px;
+    --border-width-default: 1px;
+    --border-width-thick:   2px;
+
+    /* Sombras */
+    --shadow-none:   none;
+    --shadow-subtle: 0 1px 2px rgba(26, 26, 26, 0.04);
+    --shadow-modal:  0 12px 32px rgba(26, 26, 26, 0.18);
+    --shadow-focus:  0 0 0 3px var(--crimson-200);
+
+    /* Motion */
+    --motion-instant: 0ms;
+    --motion-fast:    120ms;
+    --motion-normal:  220ms;
+    --motion-slow:    400ms;
+    --motion-slower:  600ms;
+
+    --ease-linear:    cubic-bezier(0, 0, 1, 1);
+    --ease-in:        cubic-bezier(0.4, 0, 1, 1);
+    --ease-out:       cubic-bezier(0, 0, 0.2, 1);
+    --ease-in-out:    cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-spring:    cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    /* Z-index */
+    --z-base:       0;
+    --z-elevated:   10;
+    --z-sticky:     20;
+    --z-dropdown:   30;
+    --z-overlay:    40;
+    --z-modal:      50;
+    --z-popover:    60;
+    --z-toast:      70;
+    --z-tooltip:    80;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      /* Fondos */
+      --color-background-primary:    var(--carbon-900);
+      --color-background-secondary:  var(--carbon-800);
+      --color-background-elevated:   var(--carbon-700);
+      --color-background-inverse:    var(--ivory-100);
+      --color-background-accent:     #2A0A14;
+
+      /* Texto */
+      --color-text-primary:    var(--ivory-300);
+      --color-text-secondary:  var(--carbon-400);
+      --color-text-tertiary:   var(--carbon-500);
+      --color-text-inverse:    var(--carbon-800);
+      --color-text-accent:     var(--crimson-400);
+      --color-text-gold:       var(--gold-300);
+
+      /* Bordes */
+      --color-border-subtle:   var(--carbon-700);
+      --color-border-default:  var(--carbon-600);
+      --color-border-strong:   var(--carbon-500);
+      --color-border-accent:   var(--crimson-400);
+
+      /* Acentos */
+      --color-accent-primary:    var(--crimson-400);
+      --color-accent-secondary:  var(--gold-300);
+    }
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  body {
+    background-color: var(--color-background-primary);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-normal);
+  }
+
+  /* Respetar preferencia del usuario */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  a {
+    transition: color var(--motion-fast) var(--ease-out);
+  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+}
+
+@layer components {
+  /* Composiciones tipográficas */
+  .type-hero {
+    font-family: var(--font-serif);
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--tracking-tight);
+  }
+  @media (min-width: 768px) {
+    .type-hero { font-size: var(--font-size-5xl); }
+  }
+
+  .type-h1 {
+    font-family: var(--font-serif);
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-snug);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  .type-h2 {
+    font-family: var(--font-serif);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-snug);
+  }
+
+  .type-h3 {
+    font-family: var(--font-serif);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-snug);
+  }
+
+  .type-body {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-normal);
+  }
+
+  .type-prose {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-relaxed);
+  }
+
+  .type-meta {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-2xs);
+    font-weight: var(--font-weight-regular);
+    color: var(--color-text-secondary);
+    line-height: var(--line-height-normal);
+  }
+
+  .type-eyebrow {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-2xs);
+    font-weight: var(--font-weight-medium);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-widest);
+    color: var(--color-accent-primary);
+  }
+
+  .type-quote {
+    font-family: var(--font-serif);
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-regular);
+    font-style: italic;
+    line-height: var(--line-height-relaxed);
+    color: var(--color-text-secondary);
+  }
+
+  .type-arabic {
+    font-family: var(--font-arabic);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-regular);
+    color: var(--color-accent-primary);
+    direction: rtl;
+    unicode-bidi: embed;
   }
 }
