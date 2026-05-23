@@ -1,54 +1,42 @@
-import { createClient } from "@/utils/supabase/server"
-import { notFound, redirect } from "next/navigation"
-import { ReservationClient } from "./ReservationClient"
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { ReservationForm } from "./ReservationForm";
 
 export default async function ReservarPage({ params }: { params: { id: string } }) {
-  const supabase = createClient()
+  const supabase = createClient();
   
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect(`/login?redirect=/reservar/${params.id}`)
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) {
+    redirect(`/login?redirect=/reservar/${params.id}`);
   }
 
-  // Fetch user profile to get full name and DNI
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("full_name, dni")
-    .eq("id", user.id)
-    .single()
-
-  const { data: book } = await supabase
+  const { data: book, error } = await supabase
     .from("books")
     .select("*")
     .eq("id", params.id)
-    .single()
+    .single();
 
-  if (!book) {
-    notFound()
-  }
-
-  if (book.status !== 'available') {
+  if (error || !book) {
     return (
-      <div className="container mx-auto px-4 max-w-md py-20 text-center">
-        <h1 className="type-h2 mb-4">Libro no disponible</h1>
-        <p className="text-[var(--color-text-secondary)] mb-6">Este libro actualmente se encuentra {book.status === 'reserved' ? 'reservado' : 'prestado'}.</p>
-        <a href="/catalogo" className="text-[var(--color-accent-primary)] hover:underline">Volver al catálogo</a>
+      <div className="container mx-auto px-4 py-16 text-center max-w-2xl bg-[var(--color-background-primary)] rounded-xl border border-[var(--color-border-default)]">
+        <h1 className="type-h2 mb-4 text-[var(--color-text-primary)]">Libro no encontrado</h1>
+        <p className="type-body text-[var(--color-text-secondary)]">El libro que intentas reservar no existe o ha sido retirado de la biblioteca.</p>
       </div>
-    )
+    );
   }
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-[var(--container-md)] py-12">
-       <ReservationClient 
-         book={book} 
-         user={{ 
-           id: user.id, 
-           email: user.email!, 
-           full_name: profile?.full_name || '', 
-           dni: profile?.dni || '' 
-         }} 
-       />
+    <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8 max-w-[var(--container-xl)]">
+      <div className="max-w-2xl mx-auto bg-[var(--color-background-primary)] rounded-xl border border-[var(--color-border-default)] p-6 sm:p-10 shadow-sm">
+        <div className="mb-8 border-b border-[var(--color-border-subtle)] pb-6">
+          <h1 className="type-h2 text-[var(--color-text-primary)] mb-2">Reservar Libro</h1>
+          <p className="type-body text-[var(--color-text-secondary)]">
+            Estás a punto de solicitar el préstamo de <strong>{book.title}</strong>.
+          </p>
+        </div>
+        
+        <ReservationForm book={book} userId={session.user.id} />
+      </div>
     </div>
-  )
+  );
 }
