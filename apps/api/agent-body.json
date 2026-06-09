@@ -1,0 +1,7 @@
+{
+  "name": "Test Agent",
+  "type": "RESEARCHER",
+  "role": "RESEARCH",
+  "userId": "user_123",
+  "description": "A test agent"
+}

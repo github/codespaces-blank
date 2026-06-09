@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Tendrra API Documentation" />
+  <title>Tendrra API Documentation</title>
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui.css" />
+  <link rel="icon" type="image/png" href="https://unpkg.com/swagger-ui-dist@5.11.0/favicon-32x32.png" />
+  <style>
+    html { box-sizing: border-box; overflow-y: scroll; }
+    *, *:before, *:after { box-sizing: inherit; }
+    body { margin: 0; background: #fafafa; }
+  </style>
+</head>
+<body>
+  <div id="swagger-ui"></div>
+  <script src="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-bundle.js"></script>
+  <script src="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-standalone-preset.js"></script>
+  <script>
+    window.onload = () => {
+      const spec = {
+        openapi: "3.0.0",
+        info: {
+          title: "Tendrra API",
+          description: "API Documentation for WorldAutomate Tendrra Platform",
+          version: "1.0.0"
+        },
+        servers: [
+          {
+            url: "/api",
+            description: "Relative path (use with dev server)"
+          },
+          {
+            url: "http://localhost:3001/api",
+            description: "Local Development Server"
+          }
+        ],
+        paths: {
+          "/users": {
+            post: {
+              tags: ["Users"],
+              summary: "Create a new user",
+              requestBody: {
+                required: true,
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "object",
+                      required: ["name", "email"],
+                      properties: {
+                        name: { type: "string" },
+                        email: { type: "string" },
+                        bio: { type: "string" },
+                        image: { type: "string" }
+                      }
+                    }
+                  }
+                }
+              },
+              responses: {
+                201: { description: "User created" },
+                500: { description: "Server error" }
+              }
+            }
+          },
+          "/users/{id}": {
+            get: {
+              tags: ["Users"],
+              summary: "Get user by ID",
+              parameters: [
+                { name: "id", in: "path", required: true, schema: { type: "string" } }
+              ],
+              responses: {
+                200: { description: "Success" },
+                404: { description: "User not found" }
+              }
+            },
+            patch: {
+              tags: ["Users"],
+              summary: "Update user",
+              parameters: [
+                { name: "id", in: "path", required: true, schema: { type: "string" } }
+              ],
+              requestBody: {
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "object",
+                      properties: {
+                        name: { type: "string" },
+                        bio: { type: "string" },
+                        image: { type: "string" }
+                      }
+                    }
+                  }
+                }
+              },
+              responses: {
+                200: { description: "Success" }
+              }
+            }
+          },
+          "/agents": {
+            get: {
+              tags: ["Agents"],
+              summary: "List all agents",
+              responses: { 200: { description: "Success" } }
+            },
+            post: {
+              tags: ["Agents"],
+              summary: "Create an agent",
+              requestBody: {
+                required: true,
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "object",
+                      required: ["name", "type", "role", "userId"],
+                      properties: {
+                        name: { type: "string" },
+                        type: { type: "string" },
+                        role: { type: "string" },
+                        userId: { type: "string" },
+                        description: { type: "string" }
+                      }
+                    }
+                  }
+                }
+              },
+              responses: { 201: { description: "Created" } }
+            }
+          },
+          "/agents/{id}": {
+            get: {
+              tags: ["Agents"],
+              summary: "Get agent by ID",
+              parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+              responses: { 200: { description: "Success" } }
+            },
+            put: {
+              tags: ["Agents"],
+              summary: "Update agent",
+              parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+              requestBody: {
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "object",
+                      properties: {
+                        name: { type: "string" },
+                        type: { type: "string" },
+                        role: { type: "string" },
+                        status: { type: "string" },
+                        config: { type: "object" }
+                      }
+                    }
+                  }
+                }
+              },
+              responses: { 200: { description: "Success" } }
+            },
+            delete: {
+              tags: ["Agents"],
+              summary: "Delete agent",
+              parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+              responses: { 204: { description: "Deleted" } }
+            }
+          },
+          "/tasks": {
+            get: {
+              tags: ["Tasks"],
+              summary: "List tasks",
+              parameters: [
+                { name: "userId", in: "query", schema: { type: "string" } },
+                { name: "status", in: "query", schema: { type: "string" } }
+              ],
+              responses: { 200: { description: "Success" } }
+            },
+            post: {
+              tags: ["Tasks"],
+              summary: "Create task",
+              requestBody: {
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "object",
+                      required: ["title"],
+                      properties: {
+                        title: { type: "string" },
+                        description: { type: "string" },
+                        status: { type: "string" },
+                        priority: { type: "string" },
+                        assigneeId: { type: "string" },
+                        dueDate: { type: "string", format: "date-time" }
+                      }
+                    }
+                  }
+                }
+              },
+              responses: { 201: { description: "Created" } }
+            }
+          },
+          "/workflows": {
+            get: {
+              tags: ["Workflows"],
+              summary: "List workflows",
+              responses: { 200: { description: "Success" } }
+            },
+            post: {
+              tags: ["Workflows"],
+              summary: "Create workflow",
+              requestBody: {
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "object",
+                      required: ["name", "userId"],
+                      properties: {
+                        name: { type: "string" },
+                        definition: { type: "object" },
+                        userId: { type: "string" }
+                      }
+                    }
+                  }
+                }
+              },
+              responses: { 201: { description: "Created" } }
+            }
+          },
+          "/workflows/{id}/run": {
+            post: {
+              tags: ["Workflows"],
+              summary: "Run a workflow",
+              parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+              requestBody: {
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "object",
+                      properties: {
+                        inputData: { type: "object" },
+                        async: { type: "boolean" },
+                        userId: { type: "string" }
+                      }
+                    }
+                  }
+                }
+              },
+              responses: {
+                200: { description: "Success" },
+                202: { description: "Queued" }
+              }
+            }
+          },
+          "/chat": {
+            post: {
+              tags: ["AI"],
+              summary: "AI Chat Stream",
+              requestBody: {
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "object",
+                      required: ["messages"],
+                      properties: {
+                        messages: { type: "array", items: { type: "object" } },
+                        userId: { type: "string" },
+                        sessionId: { type: "string" }
+                      }
+                    }
+                  }
+                }
+              },
+              responses: { 200: { description: "Stream started" } }
+            }
+          }
+        }
+      };
+
+      const ui = SwaggerUIBundle({
+        spec: spec,
+        dom_id: '#swagger-ui',
+        deepLinking: true,
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIStandalonePreset
+        ],
+        plugins: [
+          SwaggerUIBundle.plugins.DownloadUrl
+        ],
+        layout: "BaseLayout"
+      });
+
+      window.ui = ui;
+    };
+  </script>
+</body>
+</html>

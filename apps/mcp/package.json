@@ -1,0 +1,21 @@
+{
+  "name": "mcp",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/src/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "latest",
+    "@repo/database": "workspace:*",
+    "zod": "latest",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.10",
+    "tsx": "4.20.6",
+    "typescript": "^5.9.2"
+  }
+}

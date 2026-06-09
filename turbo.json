@@ -1,0 +1,44 @@
+{
+  "globalEnv": [
+    "DATABASE_URL",
+    "DIRECT_URL",
+    "EXA_AI_API_KEY",
+    "GOOGLE_GENERATIVE_AI_API_KEY",
+    "EXA_API_KEY",
+    "PERPLEXITY_API_KEY",
+    "PARALLEL_API_KEY",
+    "BROWSERBASE_API_KEY",
+    "OPENROUTER_API_KEY",
+    "HUGGING_FACE_HUB_TOKEN",
+    "DASHBOARD_URL",
+    "DAYTONA_API_KEY",
+    "BROWSERBASE_PROJECT_ID"
+  ],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [
+        "dist/**",
+        "next/**",
+        ".next/**",
+        ".next/cache/**",
+        ".prisma/client/**"
+      ]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "type-check": {
+      "dependsOn": ["^build"],
+      "outputs": ["$PWD/**/__tests__/**"]
+    },
+    "lint": {
+      "outputs": ["$PWD/**/__tests__/**"]
+    },
+    "db:generate": {
+      "cache": false,
+      "outputs": [".prisma/client/**"]
+    }
+  }
+}

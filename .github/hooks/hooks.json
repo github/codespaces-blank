@@ -1,0 +1,52 @@
+{
+	"hooks": {
+		"SessionStart": [
+			{
+				"type": "command",
+				"command": ""
+			}
+		],
+		"UserPromptSubmit": [
+			{
+				"type": "command",
+				"command": ""
+			}
+		],
+		"PreToolUse": [
+			{
+				"type": "command",
+				"command": ""
+			}
+		],
+		"PostToolUse": [
+			{
+				"type": "command",
+				"command": ""
+			}
+		],
+		"SubagentStop": [
+			{
+				"type": "command",
+				"command": ""
+			}
+		],
+		"Stop": [
+			{
+				"type": "command",
+				"command": ""
+			}
+		],
+		"SessionEnd": [
+			{
+				"type": "command",
+				"command": ""
+			}
+		],
+		"ErrorOccurred": [
+			{
+				"type": "command",
+				"command": ""
+			}
+		]
+	}
+}

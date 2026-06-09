@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Sora:wght@600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-primary": "#1000a9",
+            "on-primary-fixed": "#07006c",
+            "inverse-on-surface": "#303038",
+            "primary": "#c0c1ff",
+            "secondary": "#c6c6c6",
+            "surface": "#13131b",
+            "inverse-primary": "#494bd6",
+            "on-error": "#690005",
+            "surface-bright": "#393841",
+            "surface-variant": "#34343d",
+            "on-tertiary-fixed": "#301400",
+            "on-tertiary-fixed-variant": "#703700",
+            "secondary-fixed": "#e2e2e2",
+            "surface-container-highest": "#34343d",
+            "inverse-surface": "#e4e1ed",
+            "surface-container-high": "#292932",
+            "on-tertiary": "#4f2500",
+            "on-primary-fixed-variant": "#2f2ebe",
+            "tertiary": "#ffb783",
+            "on-secondary-container": "#b5b5b5",
+            "surface-dim": "#13131b",
+            "on-secondary-fixed": "#1b1b1b",
+            "surface-tint": "#c0c1ff",
+            "primary-fixed": "#e1e0ff",
+            "on-tertiary-container": "#452000",
+            "tertiary-fixed-dim": "#ffb783",
+            "on-surface-variant": "#c7c4d7",
+            "on-secondary-fixed-variant": "#474747",
+            "outline": "#908fa0",
+            "secondary-fixed-dim": "#c6c6c6",
+            "tertiary-container": "#d97721",
+            "primary-container": "#8083ff",
+            "error-container": "#93000a",
+            "on-secondary": "#303030",
+            "on-surface": "#e4e1ed",
+            "on-background": "#e4e1ed",
+            "surface-container": "#1f1f27",
+            "surface-container-lowest": "#0d0d15",
+            "error": "#ffb4ab",
+            "secondary-container": "#474747",
+            "surface-container-low": "#1b1b23",
+            "on-primary-container": "#0d0096",
+            "background": "#13131b",
+            "on-error-container": "#ffdad6",
+            "tertiary-fixed": "#ffdcc5",
+            "outline-variant": "#464554",
+            "primary-fixed-dim": "#c0c1ff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "grid-margin": "32px",
+            "sidebar-width": "280px",
+            "3xl": "64px",
+            "lg": "24px",
+            "2xl": "48px",
+            "md": "16px",
+            "xl": "32px",
+            "grid-gutter": "24px",
+            "unit": "4px",
+            "sm": "8px",
+            "xs": "4px",
+            "container-max": "1280px",
+            "margin-mobile": "16px",
+            "gutter": "24px",
+            "margin-desktop": "40px",
+            "base": "8px"
+          },
+          "fontFamily": {
+            "body-md": ["Sora"],
+            "button": ["Sora"],
+            "body-sm": ["Sora"],
+            "headline-xl": ["Sora"],
+            "label-md": ["JetBrains Mono"],
+            "headline-lg-mobile": ["Sora"],
+            "headline-lg": ["Sora"]
+          },
+          "fontSize": {
+            "label-md": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
+            "mono-sm": ["13px", {"lineHeight": "1.5", "fontWeight": "400"}],
+            "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+            "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+            "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+            "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+            "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+            "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      line-height: 1;
+    }
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #464554; border-radius: 10px; }
+    .glass-panel {
+      backdrop-filter: blur(12px);
+      border: 0.5px solid rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body class="bg-surface-container-lowest text-on-background font-body-md selection:bg-primary/30 overflow-hidden">
+<!-- SideNavBar Shell -->
+<aside class="flex flex-col h-screen fixed left-0 top-0 z-40 bg-surface-container-lowest border-r border-outline-variant/30 w-64 shadow-2xl">
+<div class="p-6 flex items-center gap-3">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary text-xl">smart_toy</span>
+</div>
+<div>
+<h1 class="font-headline-lg text-headline-lg font-bold tracking-tight text-primary dark:text-primary-fixed-dim leading-none">Agentic-OS</h1>
+<p class="text-[10px] font-label-md text-outline uppercase tracking-widest mt-1">Enterprise v2.4</p>
+</div>
+</div>
+<nav class="flex-1 mt-4 space-y-1">
+<a class="text-on-surface-variant hover:text-on-surface rounded-lg mx-2 px-4 py-3 flex items-center gap-3 transition-colors hover:bg-surface-bright/20" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="text-on-surface-variant hover:text-on-surface rounded-lg mx-2 px-4 py-3 flex items-center gap-3 transition-colors hover:bg-surface-bright/20" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="font-label-md text-label-md">Agent Registry</span>
+</a>
+<a class="bg-primary-container text-on-primary-container font-semibold rounded-lg mx-2 px-4 py-3 flex items-center gap-3 transition-all" href="#">
+<span class="material-symbols-outlined">terminal</span>
+<span class="font-label-md text-label-md">Playground</span>
+</a>
+<a class="text-on-surface-variant hover:text-on-surface rounded-lg mx-2 px-4 py-3 flex items-center gap-3 transition-colors hover:bg-surface-bright/20" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-md text-label-md">Trace &amp; Logs</span>
+</a>
+<a class="text-on-surface-variant hover:text-on-surface rounded-lg mx-2 px-4 py-3 flex items-center gap-3 transition-colors hover:bg-surface-bright/20" href="#">
+<span class="material-symbols-outlined">folder_copy</span>
+<span class="font-label-md text-label-md">Assets</span>
+</a>
+</nav>
+<div class="px-4 mb-4">
+<button class="w-full bg-primary text-on-primary font-button text-button py-3 rounded-xl shadow-lg shadow-primary/20 flex items-center justify-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-sm">add</span>
+        Create Agent
+      </button>
+</div>
+<div class="border-t border-outline-variant/10 pt-4 pb-6">
+<a class="text-on-surface-variant hover:text-on-surface rounded-lg mx-2 px-4 py-2 flex items-center gap-3 transition-colors" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-label-md text-label-md">Documentation</span>
+</a>
+<a class="text-on-surface-variant hover:text-on-surface rounded-lg mx-2 px-4 py-2 flex items-center gap-3 transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-64 flex flex-col h-screen overflow-hidden">
+<!-- TopAppBar Shell -->
+<header class="flex items-center justify-between px-margin-desktop w-full h-16 bg-surface-container-lowest border-b border-outline-variant/30 shadow-sm z-30">
+<div class="flex items-center gap-8">
+<div class="relative group">
+<span class="absolute inset-y-0 left-3 flex items-center text-outline">
+<span class="material-symbols-outlined text-lg">search</span>
+</span>
+<input class="bg-surface-container-low border-outline-variant/30 border rounded-full py-2 pl-10 pr-4 text-body-sm font-body-md focus:ring-2 focus:ring-primary/50 transition-all w-64 placeholder:text-outline/50" placeholder="Search experiments..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 mr-4 bg-surface-container-low px-3 py-1.5 rounded-full border border-outline-variant/30">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<span class="font-label-md text-label-md text-secondary">System Ready</span>
+</div>
+<button class="hover:bg-surface-variant/30 rounded-full p-2 transition-all text-on-surface-variant">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<button class="hover:bg-surface-variant/30 rounded-full p-2 transition-all text-on-surface-variant relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant/30 mx-2"></div>
+<button class="bg-primary-container/20 border border-primary/30 text-primary px-4 py-1.5 rounded-lg font-button text-button hover:bg-primary-container/30 transition-all">
+          Deploy
+        </button>
+<div class="flex items-center gap-3 ml-4">
+<img alt="User Profile Avatar" class="w-8 h-8 rounded-full border border-outline-variant/50" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtdI9ZoyQUIwuUEfRx0aEBul7RmtMfCONRNsYHEqSkT8AfnWD3dhnxyQlrboRpdkkApR0qm2mm6q0gr6hbHS-tAyqyGwa2ixxKqM9iLIXwUMWOF5BE0XOla6lyS_l9CuhOlzkLealbAuZnffzxAF2QcwUJXMhmEeI9Z3jWzBdUIjM94GBcHeuO1DA_mEKCsohPkJ0cc5f6S0Sd0_TnosDFPb8IuDXLWQU623kArcvsOA2nlkpT8twnvnvP3TbVR27AOnIiU90-ffCA"/>
+</div>
+</div>
+</header>
+<!-- Playground Content -->
+<div class="flex-1 flex overflow-hidden">
+<!-- Left Column: Prompt IDE -->
+<section class="w-1/2 flex flex-col border-r border-outline-variant/20 bg-surface-container-lowest">
+<!-- Editor Header -->
+<div class="h-14 flex items-center justify-between px-6 border-b border-outline-variant/10 bg-surface-container-lowest">
+<div class="flex items-center gap-4">
+<span class="font-label-md text-label-md text-outline uppercase tracking-widest">System Prompt</span>
+<div class="flex items-center gap-1 bg-surface-variant/30 px-2 py-0.5 rounded text-[10px] text-primary border border-primary/20">
+<span class="material-symbols-outlined text-[12px]">code</span>
+              MARKDOWN
+            </div>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-1.5 hover:bg-surface-variant/50 rounded transition-colors text-outline">
+<span class="material-symbols-outlined text-lg">history</span>
+</button>
+<button class="p-1.5 hover:bg-surface-variant/50 rounded transition-colors text-outline">
+<span class="material-symbols-outlined text-lg">save</span>
+</button>
+</div>
+</div>
+<!-- Code Editor Area -->
+<div class="flex-1 relative p-6 font-label-md text-label-md leading-relaxed overflow-y-auto custom-scrollbar bg-surface-container-lowest">
+<div class="absolute left-0 top-0 w-12 h-full bg-surface-container-low/10 flex flex-col items-center pt-6 text-outline/30 select-none">
+<span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+</div>
+<div class="ml-10 space-y-1">
+<p><span class="text-tertiary"># System Role Definition</span></p>
+<p><span class="text-outline">You are Agentic-OS Core, a high-precision reasoning engine.</span></p>
+<p> </p>
+<p><span class="text-secondary">## Constraints:</span></p>
+<p><span class="text-on-surface">1. Maintain technical rigor in all responses.</span></p>
+<p><span class="text-on-surface">2. Format code blocks using JetBrains Mono styling.</span></p>
+<p><span class="text-on-surface">3. Prioritize efficiency and low-latency execution.</span></p>
+<p> </p>
+<p><span class="text-primary-container">## Output Format:</span></p>
+<p><span class="text-on-surface">Provide structured JSON payloads for all tool calls.</span></p>
+<div class="mt-4 w-full h-32 bg-primary/5 rounded border border-primary/20 p-4 animate-pulse">
+<span class="text-primary">| _</span>
+</div>
+</div>
+</div>
+<!-- Editor Toolbar -->
+<div class="p-4 border-t border-outline-variant/20 bg-surface-container-lowest">
+<div class="flex items-center justify-between">
+<div class="flex gap-4">
+<div class="flex flex-col gap-1">
+<label class="text-[10px] font-label-md text-outline uppercase">Model Selector</label>
+<select class="bg-surface-container-low border-outline-variant/30 rounded-lg text-body-sm font-body-md py-1 px-3 text-on-surface focus:ring-primary/50">
+<option>AOS-Vision-Turbo-v2</option>
+<option>AOS-Reasoning-Max</option>
+<option>Legacy-3.5-Legacy</option>
+</select>
+</div>
+<div class="flex flex-col gap-1 w-40">
+<div class="flex justify-between items-center">
+<label class="text-[10px] font-label-md text-outline uppercase">Temperature</label>
+<span class="text-[10px] text-primary">0.7</span>
+</div>
+<input class="accent-primary h-1 bg-surface-variant rounded-full mt-2" type="range"/>
+</div>
+</div>
+<button class="bg-primary text-on-primary font-button text-button px-8 py-3 rounded-xl flex items-center gap-2 hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+              Run Execution
+            </button>
+</div>
+</div>
+</section>
+<!-- Right Column: Execution/Chat -->
+<section class="w-1/2 flex flex-col bg-surface-container-lowest overflow-hidden">
+<!-- Window Header -->
+<div class="h-14 flex items-center justify-between px-6 border-b border-outline-variant/10 bg-surface-container-lowest">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-sm" style="font-variation-settings: 'FILL' 1;">terminal</span>
+<span class="font-label-md text-label-md text-outline uppercase tracking-widest">Execution Stream</span>
+</div>
+<div class="flex items-center gap-4 text-outline text-[11px] font-label-md">
+<span>Latency: <span class="text-secondary">42ms</span></span>
+<span>Tokens: <span class="text-primary">1.2k/8k</span></span>
+</div>
+</div>
+<!-- Chat/Output Area -->
+<div class="flex-1 p-6 space-y-6 overflow-y-auto custom-scrollbar bg-surface-container-lowest">
+<!-- Bot Message -->
+<div class="flex gap-4">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high border border-outline-variant/30 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-primary text-lg">bolt</span>
+</div>
+<div class="flex-1 space-y-3">
+<div class="bg-surface-container-low p-4 rounded-xl rounded-tl-none border border-outline-variant/30 shadow-sm">
+<p class="text-body-sm text-on-surface">System initialized. Waiting for prompt parameters. Please define your first test case or use the system instruction editor on the left to set constraints.</p>
+</div>
+<p class="text-[10px] text-outline ml-1">09:42:12 AM</p>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex gap-4 flex-row-reverse">
+<div class="w-8 h-8 rounded-lg bg-primary-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-on-primary-container text-lg">person</span>
+</div>
+<div class="flex-1 space-y-3 text-right">
+<div class="bg-primary/10 p-4 rounded-xl rounded-tr-none border border-primary/20 shadow-sm inline-block text-left">
+<p class="text-body-sm text-primary-fixed-dim">Execute a diagnostic check on the vector database connectivity and return the latency histogram.</p>
+</div>
+<p class="text-[10px] text-outline mr-1">09:43:05 AM</p>
+</div>
+</div>
+<!-- Tool Execution Log -->
+<div class="glass-panel bg-surface-container-high/40 p-4 rounded-xl border-l-2 border-l-secondary">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-sm">settings_ethernet</span>
+<span class="font-label-md text-[11px] text-secondary uppercase font-bold tracking-tight">Tool: DB_QUERY_LATENCY</span>
+</div>
+<span class="bg-secondary/20 text-secondary text-[10px] px-2 py-0.5 rounded font-bold">SUCCESS</span>
+</div>
+<div class="bg-surface-container-lowest p-3 rounded font-label-md text-xs text-on-surface-variant border border-outline-variant/30">
+<code>{ "nodes": ["us-east-1", "eu-central-1"], "avg_latency": 12.4, "p99": 28.1 }</code>
+</div>
+</div>
+<!-- Bot Analysis -->
+<div class="flex gap-4">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high border border-outline-variant/30 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-primary text-lg">bolt</span>
+</div>
+<div class="flex-1 space-y-3">
+<div class="bg-surface-container-low p-4 rounded-xl rounded-tl-none border border-outline-variant/30 shadow-sm">
+<p class="text-body-sm text-on-surface">The diagnostic results show nominal performance across primary regions. Latency remains within the defined SLA thresholds of <code class="text-secondary bg-secondary/10 px-1 rounded">30ms</code>. No immediate scaling actions required.</p>
+</div>
+<p class="text-[10px] text-outline ml-1">Just now</p>
+</div>
+</div>
+</div>
+<!-- Input Box -->
+<div class="p-6 bg-surface-container-lowest border-t border-outline-variant/20">
+<div class="relative group">
+<div class="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 blur-xl opacity-20 group-focus-within:opacity-40 transition-opacity"></div>
+<div class="relative flex items-end gap-3 bg-surface-container-low border border-outline-variant/30 rounded-2xl p-3 focus-within:border-primary/50 transition-all shadow-xl">
+<textarea class="flex-1 bg-transparent border-none focus:ring-0 text-body-sm text-on-surface resize-none py-2 max-h-32 custom-scrollbar" placeholder="Ask the agent to perform a task..." rows="2"></textarea>
+<div class="flex gap-2 pb-1">
+<button class="p-2 hover:bg-surface-variant/50 rounded-full text-outline transition-colors">
+<span class="material-symbols-outlined">attach_file</span>
+</button>
+<button class="bg-primary text-on-primary w-10 h-10 rounded-full flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Contextual Floating Panel (Optional/Secondary) -->
+<div class="fixed bottom-8 right-8 z-50">
+<div class="glass-panel p-4 rounded-2xl bg-surface-container-high/60 flex flex-col gap-4 shadow-2xl w-64 border border-white/10">
+<div class="flex items-center justify-between">
+<span class="text-[10px] font-label-md text-outline uppercase font-bold">Metrics Hub</span>
+<button class="text-outline hover:text-white"><span class="material-symbols-outlined text-sm">close</span></button>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<span class="text-body-sm text-on-surface-variant">CPU Usage</span>
+<span class="text-body-sm font-label-md text-secondary">24%</span>
+</div>
+<div class="w-full bg-surface-variant h-1 rounded-full overflow-hidden">
+<div class="bg-secondary w-[24%] h-full"></div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-body-sm text-on-surface-variant">Memory</span>
+<span class="text-body-sm font-label-md text-primary">1.2GB</span>
+</div>
+<div class="w-full bg-surface-variant h-1 rounded-full overflow-hidden">
+<div class="bg-primary w-[65%] h-full"></div>
+</div>
+</div>
+<div class="pt-2">
+<button class="w-full py-2 bg-surface-bright/50 rounded-lg text-[10px] font-label-md uppercase tracking-wider text-on-surface hover:bg-surface-variant transition-colors border border-outline-variant/30">
+          View Detailed Logs
+        </button>
+</div>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,24 @@
+{
+  "name": "Tendrra AI Dev Environment",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:1": {},
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "Prisma.prisma",
+        "bradlc.vscode-tailwind-styled-snippets",
+        "irongeek.vscode-env"
+      ]
+    }
+  },
+  "forwardPorts": [3024, 3001],
+  "postCreateCommand": "pnpm install && pnpm prisma generate",
+  "remoteUser": "node"
+}

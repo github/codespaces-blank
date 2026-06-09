@@ -1,0 +1,10 @@
+# AI Agent Global Rules
+
+# 1. ALWAYS READ agents.md FIRST
+# The root `agents.md` file contains the definitive project configuration, architecture,
+# and instructions on how to use AI skills in this repository.
+# Do not start generating code or planning without first checking `agents.md`.
+
+# 2. Use the Skills System
+# Read the relevant skill files from `.agents/skills/<skill-name>/SKILL.md`
+# based on the technologies requested in the prompt.

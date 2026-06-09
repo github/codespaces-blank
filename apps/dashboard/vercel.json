@@ -1,0 +1,17 @@
+{
+  "builds": [
+    {
+      "src": "apps/dashboard/package.json",
+      "use": "@vercel/next",
+      "config": { "outputDirectory": ".next" }
+    },
+    {
+      "src": "apps/api/package.json",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/apps/api" },
+    { "src": "/(.*)", "dest": "/apps/dashboard" }
+  ]
+}

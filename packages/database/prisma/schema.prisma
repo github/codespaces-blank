@@ -1,0 +1,433 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 String            @id @default(cuid())
+  name               String
+  email              String            @unique
+  emailVerified      Boolean           @default(false)
+  image              String?
+  bio                String?
+  role               Role              @default(USER)
+  onboarding         Json              @default("{}")
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  accounts           Account[]
+  agents             Agent[]
+  connectors         Connector[]
+  messages           Message[]
+  posts              Post[]
+  sessions           Session[]
+  tasks              Task[]
+  workflows          Workflow[]
+  backgroundJobs     BackgroundJob[]
+  webhooks           Webhook[]
+  auditLogs          AuditLog[]
+  integrations       AgentIntegration[]
+  monitoringLogs     AgentMonitoring[]
+  knowledgeSources   AgentKnowledgeSource[]
+  chats              Chat[]
+  activityLogs       ActivityLog[]
+  researchArtifacts  ResearchArtifact[]
+
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  userId                String
+  accountId             String
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  idToken               String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("accounts")
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("verifications")
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  title     String
+  content   String?
+  published Boolean  @default(false)
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([authorId])
+  @@map("posts")
+}
+
+model Task {
+  id          String     @id @default(cuid())
+  title       String
+  description String?
+  status      TaskStatus @default(TODO)
+  priority    Priority   @default(MEDIUM)
+  dueDate     DateTime?
+  assigneeId  String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  assignee    User?      @relation(fields: [assigneeId], references: [id])
+
+  @@index([assigneeId])
+  @@index([status])
+  @@map("tasks")
+}
+
+model Message {
+  id        String      @id @default(cuid())
+  role      MessageRole
+  content   String
+  userId    String
+  sessionId String?
+  metadata  Json?
+  createdAt DateTime    @default(now())
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([sessionId])
+  @@map("messages")
+}
+
+model Workflow {
+  id              String              @id @default(cuid())
+  name            String
+  description     String?
+  status          WorkflowStatus      @default(DRAFT)
+  definition      Json                @default("{}")
+  userId          String
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  workflowExecutions WorkflowExecution[]
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@map("workflows")
+}
+
+model Agent {
+  id            String      @id @default(cuid())
+  name          String
+  description   String?
+  type          String
+  role          String
+  status        AgentStatus @default(IDLE)
+  config        Json        @default("{}")
+  instructions  String?
+  model         String?
+  userId        String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  integrations  AgentIntegration[]
+  monitoringLogs AgentMonitoring[]
+  knowledgeSources AgentKnowledgeSource[]
+
+  @@index([status])
+  @@index([userId])
+  @@map("agents")
+}
+
+model AgentKnowledgeSource {
+  id          String   @id @default(cuid())
+  agentId     String
+  userId      String
+  name        String
+  mimeType    String?
+  sizeBytes   Int?
+  content     String?
+  storageUrl  String?
+  status      String   @default("pending")
+  chunkCount  Int      @default(0)
+  error       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  agent       Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+  @@index([userId])
+  @@index([status])
+  @@map("agent_knowledge_sources")
+}
+
+model Connector {
+  id        String          @id @default(cuid())
+  name      String
+  type      String
+  status    ConnectorStatus @default(DISCONNECTED)
+  config    Json            @default("{}")
+  userId    String
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([userId])
+  @@map("connectors")
+}
+
+model Webhook {
+  id        String   @id @default(cuid())
+  name      String
+  url       String
+  event     String
+  secret    String?
+  userId    String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("webhooks")
+}
+
+model WorkflowExecution {
+  id         String    @id @default(cuid())
+  workflowId String
+  status     ExecutionStatus @default(RUNNING)
+  logs       Json      @default("{}")
+  finishedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  workflow   Workflow  @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([workflowId])
+  @@map("workflow_executions")
+}
+
+model BackgroundJob {
+  id        String       @id @default(cuid())
+  type      String
+  payload   Json         @default("{}")
+  userId    String
+  status    JobStatus    @default(QUEUED)
+  result    Json?
+  error     String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  finishedAt DateTime?
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([userId])
+  @@index([type])
+  @@map("background_jobs")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  entity    String
+  entityId  String?
+  newData   Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([entity])
+  @@map("audit_logs")
+}
+
+model AgentIntegration {
+  id          String   @id @default(cuid())
+  agentId     String
+  userId      String
+  name        String
+  type        String
+  config      Json     @default("{}")
+  status      String   @default("active")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  agent       Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+  @@index([userId])
+  @@index([type])
+  @@map("agent_integrations")
+}
+
+model AgentMonitoring {
+  id          String   @id @default(cuid())
+  agentId     String
+  userId      String
+  taskId      String?
+  action      String
+  status      String
+  metadata    Json?
+  logs        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  agent       Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+  @@index([userId])
+  @@index([taskId])
+  @@index([createdAt])
+  @@map("agent_monitoring")
+}
+
+enum Role {
+  USER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+  CANCELLED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+enum WorkflowStatus {
+  ACTIVE
+  INACTIVE
+  DRAFT
+}
+
+enum AgentStatus {
+  IDLE
+  RUNNING
+  PAUSED
+  ERROR
+}
+
+enum ConnectorStatus {
+  CONNECTED
+  DISCONNECTED
+  ERROR
+}
+
+enum RunStatus {
+  PENDING
+  RUNNING
+  SUCCESS
+  FAILED
+  CANCELLED
+}
+
+enum JobStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum ExecutionStatus {
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+model Chat {
+  id        String   @id @default(cuid())
+  title     String   @default("New Chat")
+  userId    String
+  messages  Json     @default("[]")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("chats")
+}
+
+model ResearchArtifact {
+  id           String        @id @default(cuid())
+  userId       String
+  objective    String
+  type         ResearchType  @default(SEARCH)
+  status       JobStatus     @default(COMPLETED)
+  results      Json?
+  sources      Json?
+  queryChain   String[]
+  durationMs   Int?
+  sourceCount  Int           @default(0)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([type])
+  @@map("research_artifacts")
+}
+
+model ActivityLog {
+  id          String   @id @default(cuid())
+  userId      String
+  actionType  String
+  description String?
+  timestamp   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("activity_logs")
+}
+
+enum ResearchType {
+  SEARCH
+  EXTRACT
+  DEEP_RESEARCH
+}
