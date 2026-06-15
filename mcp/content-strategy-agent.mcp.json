@@ -1,0 +1,133 @@
+{
+  "name": "content-strategy-agent",
+  "version": "1.0.0",
+  "description": "MCP server for YouTube content strategy generation and trend analysis",
+  "author": "YouTube Automation System",
+  "license": "MIT",
+  "server": {
+    "command": "node",
+    "args": ["../agents/content-strategy-agent-mcp.js"],
+    "env": {
+      "NODE_ENV": "production"
+    }
+  },
+  "capabilities": {
+    "tools": [
+      {
+        "name": "analyze_trends",
+        "description": "Analyze current YouTube trends and competitor content",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "region": {
+              "type": "string",
+              "description": "Region code for trend analysis (e.g., US, UK)"
+            },
+            "category": {
+              "type": "string",
+              "description": "Content category to focus on"
+            }
+          }
+        }
+      },
+      {
+        "name": "generate_strategy",
+        "description": "Generate a complete content strategy for a video",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "topic": {
+              "type": "string",
+              "description": "Optional specific topic to create strategy for"
+            },
+            "targetAudience": {
+              "type": "string",
+              "description": "Target audience demographic"
+            }
+          }
+        }
+      },
+      {
+        "name": "analyze_competitors",
+        "description": "Analyze competitor channels for content insights",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "channelIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of competitor channel IDs to analyze"
+            }
+          },
+          "required": ["channelIds"]
+        }
+      },
+      {
+        "name": "predict_performance",
+        "description": "Predict video performance based on topic and timing",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "topic": {
+              "type": "string",
+              "description": "Video topic"
+            },
+            "publishTime": {
+              "type": "string",
+              "description": "Planned publish time"
+            }
+          },
+          "required": ["topic"]
+        }
+      },
+      {
+        "name": "get_content_calendar",
+        "description": "Get upcoming content calendar recommendations",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "days": {
+              "type": "number",
+              "description": "Number of days to plan ahead",
+              "default": 7
+            }
+          }
+        }
+      }
+    ],
+    "resources": [
+      {
+        "name": "trending_topics",
+        "description": "Current trending topics database",
+        "mimeType": "application/json"
+      },
+      {
+        "name": "competitor_analysis",
+        "description": "Competitor channel analysis data",
+        "mimeType": "application/json"
+      },
+      {
+        "name": "historical_performance",
+        "description": "Historical content performance metrics",
+        "mimeType": "application/json"
+      }
+    ]
+  },
+  "configuration": {
+    "youtube_api": {
+      "required": true,
+      "description": "YouTube Data API credentials"
+    },
+    "competitor_channels": {
+      "required": false,
+      "description": "List of competitor channel IDs to monitor"
+    },
+    "target_region": {
+      "required": false,
+      "default": "US",
+      "description": "Primary target region for content"
+    }
+  }
+}
