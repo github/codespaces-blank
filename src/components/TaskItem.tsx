@@ -1,5 +1,5 @@
 import { Trash2, Edit2, Check } from 'lucide-react';
-import type { React.CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
 import type { Todo, Category } from '../types';
 import { isOverdue, isDueToday } from '../lib/filterSort';
 
@@ -15,7 +15,7 @@ export default function TaskItem({ todo, category, onToggle, onDelete, onEdit }:
   const overdue = isOverdue(todo);
   const dueToday = isDueToday(todo);
   const borderColor = overdue ? 'border-red-400' : category?.color ? '' : 'border-gray-300';
-  const borderStyle = overdue ? { borderLeftColor: '#EF4444' } as React.CSSProperties : category?.color ? { borderLeftColor: category.color } : undefined;
+  const borderStyle = overdue ? { borderLeftColor: '#EF4444' } as CSSProperties : category?.color ? { borderLeftColor: category.color } : undefined;
 
   return (
     <div
