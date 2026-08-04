@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { Category, Todo, AppState, TodoFilter, TodoSort } from '../types';
+import type { Category, Todo, AppState, TodoFilter } from '../types';
 
 describe('Type definitions', () => {
   it('Category has required fields', () => {

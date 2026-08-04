@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "composite": true,
     "module": "CommonJS",
     "moduleResolution": "node",
     "skipLibCheck": true,
@@ -13,5 +12,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["electron"]
+  "include": ["electron", "src/types.ts"]
 }

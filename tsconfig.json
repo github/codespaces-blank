@@ -18,5 +18,5 @@
     "esModuleInterop": true
   },
   "include": ["src"],
-  "references": [{ "path": "./tsconfig.electron.json" }]
+  "exclude": ["dist", "electron"]
 }
