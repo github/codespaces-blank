@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Notification } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import Store from 'electron-store';
 import * as path from 'path';
 import type { AppState, Todo, Category, UndoState } from '../src/types';
@@ -50,21 +50,20 @@ function getToday(): string {
 function checkOverdueNotifications() {
   if (store.get('settings.notificationPermissionGranted')) return;
 
-  (Notification as unknown as { requestPermission: () => Promise<string> }).requestPermission().then((permission: string) => {
-    if (permission === 'granted') {
-      store.set('settings.notificationPermissionGranted', true);
-      const overdueTodos = store.get('todos').filter((t) => {
-        if (t.completed || !t.dueDate) return false;
-        return t.dueDate < getToday();
-      });
-      if (overdueTodos.length > 0) {
-        new Notification({
-          title: 'Overdue Tasks',
-          body: `You have ${overdueTodos.length} task${overdueTodos.length > 1 ? 's' : ''} past due.`,
-        }).show();
-      }
-    }
+  // In Electron main process, show notification directly —
+  // Windows will prompt for permission on first show.
+  const overdueTodos = store.get('todos').filter((t) => {
+    if (t.completed || !t.dueDate) return false;
+    return t.dueDate < getToday();
   });
+  if (overdueTodos.length > 0) {
+    const { Notification } = require('electron') as typeof import('electron');
+    new Notification({
+      title: 'Overdue Tasks',
+      body: `You have ${overdueTodos.length} task${overdueTodos.length > 1 ? 's' : ''} past due.`,
+    }).show();
+    store.set('settings.notificationPermissionGranted', true);
+  }
 }
 
 // IPC handlers
