@@ -30,6 +30,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     return () => api.offStateChange(loadState);
   }, [loadState]);
 
+  if (!state) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <p className="text-gray-400">Loading...</p>
+      </div>
+    );
+  }
+
   const api = (window as unknown as { electronAPI: {
     addTodo: (t: Todo) => Promise<Todo>;
     updateTodo: (id: string, u: Partial<Todo>) => Promise<Todo | null>;
@@ -72,14 +80,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const checkNotifications = useCallback(async () => {
     return api.checkNotifications();
   }, [api]);
-
-  if (!state) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-gray-400">Loading...</p>
-      </div>
-    );
-  }
 
   return (
     <StoreContext.Provider value={{ state, addTodo, updateTodo, deleteTodo, undoDelete, addCategory, updateCategory, deleteCategory, checkNotifications }}>
