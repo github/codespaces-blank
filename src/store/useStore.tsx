@@ -17,7 +17,7 @@ const StoreContext = createContext<StoreValue | null>(null);
 
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AppState | null>(null);
-  const apiRef = useRef<(typeof window)['electronAPI']>(null!);
+  const apiRef = useRef<{ getState: () => Promise<AppState>; addTodo: (t: Todo) => Promise<Todo>; updateTodo: (id: string, u: Partial<Todo>) => Promise<Todo | null>; deleteTodo: (id: string) => Promise<Todo | null>; undoDelete: () => Promise<Todo | null>; addCategory: (c: Category) => Promise<Category>; updateCategory: (id: string, u: Partial<Category>) => Promise<Category | null>; deleteCategory: (id: string) => Promise<boolean>; checkNotifications: () => Promise<boolean>; onStateChange: (cb: (s: AppState) => void) => void; offStateChange: (cb: (s: AppState) => void) => void }>(null!);
 
   const loadState = useCallback(async () => {
     const s = await apiRef.current.getState();
