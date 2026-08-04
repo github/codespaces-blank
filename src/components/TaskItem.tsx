@@ -19,7 +19,7 @@ export default function TaskItem({ todo, category, onToggle, onDelete, onEdit }:
 
   return (
     <div
-      className={`flex items-center gap-3 px-4 py-3 bg-white rounded-lg shadow-sm border-l-4 ${borderColor} hover:shadow-md transition-shadow ${
+      className={`flex items-center gap-3 px-4 py-3 bg-white rounded-lg shadow-sm border-l-4 ${borderColor} hover:shadow-md transition-shadow group ${
         todo.completed ? 'opacity-50' : ''
       }`}
       style={borderStyle}

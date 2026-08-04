@@ -21,7 +21,7 @@ export default function TaskList({ categoryId, onEdit, onDelete, onToggle }: Tas
 
   const today = getToday();
   const filtered = filterTodos(todos, filter, categoryId);
-  const sorted = sortTodos(filtered, sort, today);
+  const sorted = sortTodos(filtered, sort);
 
   const results = search
     ? sorted.filter(

@@ -10,7 +10,6 @@ interface ElectronAPI {
   addCategory: (c: Category) => Promise<Category>;
   updateCategory: (id: string, u: Partial<Category>) => Promise<Category | null>;
   deleteCategory: (id: string) => Promise<boolean>;
-  checkNotifications: () => Promise<boolean>;
   onStateChange: (cb: (s: AppState) => void) => void;
   offStateChange: (cb: (s: AppState) => void) => void;
 }
@@ -24,7 +23,6 @@ interface StoreValue {
   addCategory: (category: Category) => Promise<void>;
   updateCategory: (id: string, updates: Partial<Category>) => Promise<void>;
   deleteCategory: (id: string) => Promise<boolean>;
-  checkNotifications: () => Promise<boolean>;
 }
 
 const StoreContext = createContext<StoreValue | null>(null);
@@ -73,10 +71,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     return apiRef.current.deleteCategory(id);
   }, []);
 
-  const checkNotifications = useCallback(async () => {
-    return apiRef.current.checkNotifications();
-  }, []);
-
   if (!state) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -86,7 +80,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <StoreContext.Provider value={{ state, addTodo, updateTodo, deleteTodo, undoDelete, addCategory, updateCategory, deleteCategory, checkNotifications }}>
+    <StoreContext.Provider value={{ state, addTodo, updateTodo, deleteTodo, undoDelete, addCategory, updateCategory, deleteCategory }}>
       {children}
     </StoreContext.Provider>
   );

@@ -138,11 +138,6 @@ ipcMain.handle('delete-category', (_event, id: string) => {
   return true;
 });
 
-ipcMain.handle('check-notifications', () => {
-  checkOverdueNotifications();
-  return store.get('settings.notificationPermissionGranted');
-});
-
 app.whenReady().then(() => {
   createWindow();
   checkOverdueNotifications();

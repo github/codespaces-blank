@@ -38,7 +38,7 @@ export function filterTodos(
   });
 }
 
-export function sortTodos(todos: Todo[], sort: TodoSort, _today: string): Todo[] {
+export function sortTodos(todos: Todo[], sort: TodoSort): Todo[] {
   return [...todos].sort((a, b) => {
     if (sort === 'dueDate') {
       if (!a.dueDate && !b.dueDate) return 0;

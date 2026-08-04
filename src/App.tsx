@@ -6,7 +6,7 @@ import TaskList from './components/TaskList';
 import TaskModal from './components/TaskModal';
 import CategoryModal from './components/CategoryModal';
 import Toast from './components/Toast';
-import type { Todo } from './types';
+import type { Todo, Category } from './types';
 
 export default function App() {
   const { state, deleteTodo, undoDelete, updateTodo } = useStore();
@@ -14,9 +14,10 @@ export default function App() {
   const [taskModalOpen, setTaskModalOpen] = useState(false);
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<any>(null);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [toast, setToast] = useState<{ message: string; visible: boolean }>({ message: '', visible: false });
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastDeletedTodoRef = useRef<Todo | null>(null);
 
   const showToast = useCallback((message: string) => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
@@ -31,18 +32,17 @@ export default function App() {
     const deleted = await deleteTodo(id);
     if (deleted) {
       showToast('Task deleted');
-      (window as unknown as { _lastDeletedTodo: unknown })._lastDeletedTodo = deleted;
+      lastDeletedTodoRef.current = deleted;
     }
   }, [deleteTodo, showToast]);
 
   const handleUndo = useCallback(async () => {
-    const lastDeleted = (window as unknown as { _lastDeletedTodo: unknown }) as { _lastDeletedTodo: unknown };
-    if (lastDeleted._lastDeletedTodo) {
+    if (lastDeletedTodoRef.current) {
       await undoDelete();
       setToast({ message: 'Task restored', visible: true });
       if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
       toastTimerRef.current = setTimeout(() => setToast((t) => ({ ...t, visible: false })), 2000);
-      lastDeleted._lastDeletedTodo = null;
+      lastDeletedTodoRef.current = null;
     }
   }, [undoDelete, showToast]);
 

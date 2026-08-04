@@ -75,26 +75,26 @@ describe('filterTodos', () => {
 
 describe('sortTodos', () => {
   it('sorts by created date newest first (default)', () => {
-    const sorted = sortTodos(todos, 'created', today);
+    const sorted = sortTodos(todos, 'created');
     // todos were created in order 1,2,3,4,5 so 5 is newest (highest createdAt)
     expect(sorted[0].id).toBe('5');
   });
 
   it('sorts by due date soonest first', () => {
-    const sorted = sortTodos(todos, 'dueDate', today);
+    const sorted = sortTodos(todos, 'dueDate');
     expect(sorted[0].dueDate).toBe(yesterday);
     // last should be the task without a due date
     expect(sorted[sorted.length - 1].dueDate).toBeUndefined();
   });
 
   it('sorts alphabetically', () => {
-    const sorted = sortTodos(todos, 'alphabetical', today);
+    const sorted = sortTodos(todos, 'alphabetical');
     expect(sorted[0].title).toBe('Buy milk');
     expect(sorted[sorted.length - 1].title).toBe('Read book');
   });
 
   it('pushes tasks without due date to the end when sorting by due date', () => {
-    const sorted = sortTodos(todos, 'dueDate', today);
+    const sorted = sortTodos(todos, 'dueDate');
     const last = sorted[sorted.length - 1];
     expect(last.dueDate).toBeUndefined();
   });
