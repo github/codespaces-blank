@@ -69,4 +69,39 @@ describe('CategoryModal', () => {
       expect(mockAPI.addCategory).toHaveBeenCalled();
     });
   });
+
+  it('shows Save button and calls updateCategory when editing', async () => {
+    const editingCat = { id: 'c1', name: 'Work', color: '#3B82F6', createdAt: 1000 };
+    const onSave = vi.fn();
+    renderWithStoreProvider(
+      <CategoryModal isOpen={true} editingCat={editingCat} onClose={vi.fn()} onSaved={onSave} />
+    );
+    await waitFor(() => {
+      expect(screen.getByText('Edit Category')).toBeInTheDocument();
+      expect(screen.getByText('Save')).toBeInTheDocument();
+      expect(screen.getByDisplayValue('Work')).toBeInTheDocument();
+    });
+    fireEvent.change(screen.getByPlaceholderText('Category name'), { target: { value: 'Personal' } });
+    fireEvent.click(screen.getByText('Save'));
+    await waitFor(() => {
+      expect(mockAPI.updateCategory).toHaveBeenCalledWith('c1', { name: 'Personal', color: '#3B82F6' });
+      expect(onSave).toHaveBeenCalledOnce();
+    });
+  });
+
+  it('calls onSaved on successful create', async () => {
+    const onSave = vi.fn();
+    renderWithStoreProvider(
+      <CategoryModal isOpen={true} onClose={vi.fn()} onSaved={onSave} />
+    );
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText('Category name')).toBeInTheDocument();
+    });
+    fireEvent.change(screen.getByPlaceholderText('Category name'), { target: { value: 'Gym' } });
+    fireEvent.click(screen.getByText('Create'));
+    await waitFor(() => {
+      expect(mockAPI.addCategory).toHaveBeenCalled();
+      expect(onSave).toHaveBeenCalledOnce();
+    });
+  });
 });
