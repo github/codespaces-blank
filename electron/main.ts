@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, Notification } from 'electron';
 import Store from 'electron-store';
 import * as path from 'path';
 import type { AppState, Todo, Category, UndoState } from '../src/types';
@@ -57,7 +57,6 @@ function checkOverdueNotifications() {
     return t.dueDate < getToday();
   });
   if (overdueTodos.length > 0) {
-    const { Notification } = require('electron') as typeof import('electron');
     new Notification({
       title: 'Overdue Tasks',
       body: `You have ${overdueTodos.length} task${overdueTodos.length > 1 ? 's' : ''} past due.`,
