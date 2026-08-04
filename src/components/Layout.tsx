@@ -18,6 +18,9 @@ export default function Layout({ children, onAddCategory }: LayoutProps) {
         onAddCategory={onAddCategory}
       />
       <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="px-6 py-4">
+          <h1 className="text-xl font-bold text-gray-800">My ToDo</h1>
+        </div>
         {children}
       </div>
     </div>
