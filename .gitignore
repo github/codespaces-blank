@@ -5,3 +5,5 @@ out/
 .DS_Store
 superpowers/
 .env
+.vscode/
+*.local
