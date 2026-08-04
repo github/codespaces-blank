@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2020",
+    "composite": true,
     "module": "CommonJS",
     "moduleResolution": "node",
     "skipLibCheck": true,

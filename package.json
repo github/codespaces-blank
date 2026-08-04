@@ -1,6 +1,7 @@
 {
   "name": "todolist-electron",
   "version": "1.0.0",
+  "type": "module",
   "description": "A Windows To-Do List app built with Electron",
   "main": "dist/electron/main.js",
   "scripts": {
