@@ -1,20 +1,19 @@
-import { useState } from 'react';
-import Sidebar from './Sidebar';
 import type { ReactNode } from 'react';
+import Sidebar from './Sidebar';
 
 interface LayoutProps {
   children: ReactNode;
+  activeCategoryId: string;
+  onCategorySelect: (categoryId: string) => void;
   onAddCategory: () => void;
 }
 
-export default function Layout({ children, onAddCategory }: LayoutProps) {
-  const [activeCategoryId, setActiveCategoryId] = useState('all');
-
+export default function Layout({ children, activeCategoryId, onCategorySelect, onAddCategory }: LayoutProps) {
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar
         activeCategoryId={activeCategoryId}
-        onCategorySelect={setActiveCategoryId}
+        onCategorySelect={onCategorySelect}
         onAddCategory={onAddCategory}
       />
       <div className="flex-1 flex flex-col overflow-hidden">

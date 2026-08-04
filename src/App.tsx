@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { Plus } from 'lucide-react';
 import { useStore } from './store/useStore';
 import Layout from './components/Layout';
@@ -6,23 +6,24 @@ import TaskList from './components/TaskList';
 import TaskModal from './components/TaskModal';
 import CategoryModal from './components/CategoryModal';
 import Toast from './components/Toast';
+import type { Todo } from './types';
 
 export default function App() {
   const { state, deleteTodo, undoDelete, updateTodo } = useStore();
-  const [activeCategoryId, _setActiveCategoryId] = useState('all');
+  const [activeCategoryId, setActiveCategoryId] = useState('all');
   const [taskModalOpen, setTaskModalOpen] = useState(false);
-  const [editingTodo, setEditingTodo] = useState<any>(null);
+  const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<any>(null);
   const [toast, setToast] = useState<{ message: string; visible: boolean }>({ message: '', visible: false });
-  let toastTimer: ReturnType<typeof setTimeout> | null = null;
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const showToast = useCallback((message: string) => {
-    if (toastTimer) clearTimeout(toastTimer);
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     setToast({ message, visible: true });
-    toastTimer = setTimeout(() => {
+    toastTimerRef.current = setTimeout(() => {
       setToast((t) => ({ ...t, visible: false }));
-      toastTimer = null;
+      toastTimerRef.current = null;
     }, 3000);
   }, []);
 
@@ -30,7 +31,6 @@ export default function App() {
     const deleted = await deleteTodo(id);
     if (deleted) {
       showToast('Task deleted');
-      // Store the deleted todo for undo
       (window as unknown as { _lastDeletedTodo: unknown })._lastDeletedTodo = deleted;
     }
   }, [deleteTodo, showToast]);
@@ -40,8 +40,8 @@ export default function App() {
     if (lastDeleted._lastDeletedTodo) {
       await undoDelete();
       setToast({ message: 'Task restored', visible: true });
-      if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => setToast((t) => ({ ...t, visible: false })), 2000);
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+      toastTimerRef.current = setTimeout(() => setToast((t) => ({ ...t, visible: false })), 2000);
       lastDeleted._lastDeletedTodo = null;
     }
   }, [undoDelete, showToast]);
@@ -53,7 +53,7 @@ export default function App() {
     }
   }, [state, updateTodo]);
 
-  const handleEdit = useCallback((todo: any) => {
+  const handleEdit = useCallback((todo: Todo) => {
     setEditingTodo(todo);
     setTaskModalOpen(true);
   }, []);
@@ -75,13 +75,16 @@ export default function App() {
 
   return (
     <>
-      <Layout onAddCategory={handleAddCategory}>
+      <Layout
+        activeCategoryId={activeCategoryId}
+        onCategorySelect={setActiveCategoryId}
+        onAddCategory={handleAddCategory}
+      >
         <div className="flex flex-col h-full">
           <header className="bg-white border-b border-gray-200 px-6 py-3 flex items-center gap-4">
             <div className="flex-1 max-w-md">
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
-                {/* Search is handled inside TaskList */}
               </div>
             </div>
             <button
