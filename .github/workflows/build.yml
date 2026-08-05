@@ -31,5 +31,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: todolist-windows-x64
-          path: out/make/
+          path: out/todolist-electron-win32-x64/
           retention-days: 14

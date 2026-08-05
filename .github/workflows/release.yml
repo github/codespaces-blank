@@ -36,7 +36,7 @@ jobs:
           tag_name: v${{ github.event.inputs.version }}
           name: ToDo App v${{ github.event.inputs.version }}
           files: |
-            out/make/**/*.zip
-            out/make/**/*.exe
+            out/todolist-electron-win32-x64/*.exe
+            out/todolist-electron-win32-x64/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
