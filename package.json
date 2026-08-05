@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -p tsconfig.electron.json && vite build",
-    "package": "npm run build && forge package",
+    "package": "npm run build && electron-forge package",
     "lint": "tsc --noEmit",
     "test": "vitest run --config vite.test.config.ts",
     "test:watch": "vitest --config vite.test.config.ts"
