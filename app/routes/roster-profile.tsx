@@ -849,9 +849,6 @@ export default function RosterProfilePage() {
                     setPreviousRankingInput(
                       previousSeasonRanking?.toString() ?? "",
                     );
-                    setPreviousPointsInput(
-                      previousSeasonPoints?.toString() ?? "",
-                    );
                     setIsEditingPreviousRanking(true);
                   }}
                   aria-label={`Modifier le classement ${PREVIOUS_SEASON}`}
