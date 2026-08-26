@@ -97,6 +97,7 @@ export default function PlayerProfilePage() {
     matchs2526: 0,
     titularisations2526: 0,
   });
+  const [statsSeasonTab, setStatsSeasonTab] = useState<"2026/2027" | "2025/2026">("2026/2027");
 
   const roster = useMemo(
     () => rosters.find((item) => item.id === rosterId) ?? null,
@@ -683,6 +684,23 @@ export default function PlayerProfilePage() {
         {statsMessage && (
           <p className="text-xs text-emerald-400">{statsMessage}</p>
         )}
+        <nav className="flex gap-1 border-b border-neutral-700 pb-0">
+          {(["2026/2027", "2025/2026"] as const).map((season) => (
+            <button
+              key={season}
+              type="button"
+              className={`px-3 py-1.5 text-xs font-semibold transition-colors ${
+                statsSeasonTab === season
+                  ? "border-b-2 border-sky-500 text-sky-400"
+                  : "text-neutral-400 hover:text-neutral-200"
+              }`}
+              onClick={() => setStatsSeasonTab(season)}
+            >
+              {season}
+            </button>
+          ))}
+        </nav>
+        {statsSeasonTab === "2026/2027" ? (
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           <div className="sp-input-shell">
             <label className="sp-input-label" htmlFor="playerStatsPoints">
@@ -787,6 +805,9 @@ export default function PlayerProfilePage() {
               disabled={!isEditingStats}
             />
           </div>
+        </div>
+        ) : (
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           <div className="sp-input-shell">
             <label className="sp-input-label" htmlFor="playerStatsMatchs2526">
               Matchs 25-26
@@ -831,11 +852,14 @@ export default function PlayerProfilePage() {
             />
           </div>
         </div>
+        )}
+        {statsSeasonTab === "2025/2026" && (
         <p className="text-xs text-neutral-500">
           Valeur initiale automatique: Matchs 25-26 et Titularisations 25-26
           sont préremplis depuis les compositions, puis restent modifiables
           manuellement.
         </p>
+        )}
       </section>
 
       <section className="sp-panel space-y-3">
