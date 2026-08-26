@@ -14,6 +14,14 @@ export function meta({ params }: Route.MetaArgs) {
   return [{ title: "Vue effectif" }];
 }
 
+function getPreviousSeason(season: string): string {
+  const [start, end] = season.split("/").map((part) => parseInt(part, 10));
+  if (!Number.isFinite(start) || !Number.isFinite(end)) return season;
+  return `${start - 1}/${end - 1}`;
+}
+
+const PREVIOUS_SEASON = getPreviousSeason(CURRENT_SEASON);
+
 function getRosterBackPath(rosterId: string | null | undefined): string {
   if (!rosterId) return "/roster";
   return `/r/${toShortId(rosterId)}`;
@@ -122,7 +130,8 @@ export default function RosterProfilePage() {
     return roster.seasons?.[selectedSeason]?.calendar ?? [];
   }, [roster, selectedSeason]);
 
-  const previousSeasonRanking = roster?.seasons?.["2025/2026"]?.ranking;
+  const previousSeasonRanking = roster?.seasons?.[PREVIOUS_SEASON]?.ranking;
+  const previousSeasonPoints = roster?.seasons?.[PREVIOUS_SEASON]?.points;
 
   const POSITION_TABS = [
     { key: "all", label: "Tous" },
@@ -190,6 +199,9 @@ export default function RosterProfilePage() {
   const [isEditingRanking, setIsEditingRanking] = useState(false);
   const [rankingInput, setRankingInput] = useState("");
   const [pointsInput, setPointsInput] = useState("");
+  const [isEditingPreviousRanking, setIsEditingPreviousRanking] = useState(false);
+  const [previousRankingInput, setPreviousRankingInput] = useState("");
+  const [previousPointsInput, setPreviousPointsInput] = useState("");
   const [isEditingLastFive, setIsEditingLastFive] = useState(false);
   const [lastFiveDraft, setLastFiveDraft] = useState<Result[]>([]);
   const [isEditingSeasonRecord, setIsEditingSeasonRecord] = useState(false);
@@ -342,6 +354,47 @@ export default function RosterProfilePage() {
     );
     setIsEditingRanking(false);
     showInlineMessage("success", "Classement mis à jour.");
+  }
+
+  function savePreviousSeasonRanking() {
+    if (!roster) return;
+    const ranking = parseInt(previousRankingInput, 10);
+    const points = parseInt(previousPointsInput, 10);
+    setRosters((current) =>
+      current.map((item) =>
+        item.id === roster.id
+          ? {
+              ...item,
+              seasons: {
+                ...item.seasons,
+                [PREVIOUS_SEASON]: {
+                  players: item.seasons?.[PREVIOUS_SEASON]?.players ?? [],
+                  coach: item.seasons?.[PREVIOUS_SEASON]?.coach,
+                  calendar: item.seasons?.[PREVIOUS_SEASON]?.calendar,
+                  ranking: Number.isFinite(ranking) && ranking > 0 ? ranking : undefined,
+                  points: Number.isFinite(points) && points >= 0 ? points : undefined,
+                },
+              },
+            }
+          : item,
+      ),
+    );
+    setIsEditingPreviousRanking(false);
+    showInlineMessage("success", `Classement ${PREVIOUS_SEASON} mis à jour.`);
+  }
+
+  function reusePreviousSeasonStats() {
+    if (!roster) return;
+    const previous = roster.seasons?.[PREVIOUS_SEASON];
+    if (!previous || (previous.ranking == null && previous.points == null)) return;
+    setRosters((current) =>
+      current.map((item) =>
+        item.id === roster.id
+          ? { ...item, currentRanking: previous.ranking, currentPoints: previous.points }
+          : item,
+      ),
+    );
+    showInlineMessage("success", `Statistiques ${PREVIOUS_SEASON} reprises pour ${CURRENT_SEASON}.`);
   }
 
   function startEditingLastFive() {
@@ -744,10 +797,78 @@ export default function RosterProfilePage() {
                 <span className="text-neutral-400">({roster.currentPoints != null ? `${roster.currentPoints} pts` : "X pts"})</span>
               </p>
             )}
-            {isCurrentSeason && previousSeasonRanking != null && (
-              <p className="text-xs text-neutral-500 mt-1">
-                Classement 2025/2026 : {previousSeasonRanking}e
+            {isCurrentSeason && !isEditingPreviousRanking && (
+              <p className="text-xs text-neutral-500 mt-1 flex items-center gap-2">
+                Classement {PREVIOUS_SEASON} :{" "}
+                {previousSeasonRanking != null
+                  ? `${previousSeasonRanking}e (${previousSeasonPoints != null ? `${previousSeasonPoints} pts` : "X pts"})`
+                  : "Non renseigné"}
+                <button
+                  type="button"
+                  className="text-neutral-500 hover:text-neutral-300 transition-colors"
+                  onClick={() => {
+                    setPreviousRankingInput(previousSeasonRanking?.toString() ?? "");
+                    setPreviousPointsInput(previousSeasonPoints?.toString() ?? "");
+                    setIsEditingPreviousRanking(true);
+                  }}
+                  aria-label={`Modifier le classement ${PREVIOUS_SEASON}`}
+                >
+                  <FontAwesomeIcon icon={faPenToSquareRegular} />
+                </button>
+                {previousSeasonRanking != null && (
+                  <button
+                    type="button"
+                    className="sp-button sp-button-xs sp-button-light"
+                    onClick={reusePreviousSeasonStats}
+                  >
+                    Réutiliser pour {CURRENT_SEASON}
+                  </button>
+                )}
               </p>
+            )}
+            {isCurrentSeason && isEditingPreviousRanking && (
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-xs text-neutral-500">Classement {PREVIOUS_SEASON} :</span>
+                <input
+                  type="number"
+                  className="sp-input-control text-sm w-20 border-l-2 border-l-sky-500"
+                  autoFocus
+                  min={1}
+                  placeholder="Rang"
+                  value={previousRankingInput}
+                  onChange={(e) => setPreviousRankingInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") savePreviousSeasonRanking();
+                    if (e.key === "Escape") setIsEditingPreviousRanking(false);
+                  }}
+                />
+                <input
+                  type="number"
+                  className="sp-input-control text-sm w-20 border-l-2 border-l-sky-500"
+                  min={0}
+                  placeholder="Points"
+                  value={previousPointsInput}
+                  onChange={(e) => setPreviousPointsInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") savePreviousSeasonRanking();
+                    if (e.key === "Escape") setIsEditingPreviousRanking(false);
+                  }}
+                />
+                <button
+                  type="button"
+                  className="sp-button sp-button-xs sp-button-blue"
+                  onClick={savePreviousSeasonRanking}
+                >
+                  Enregistrer
+                </button>
+                <button
+                  type="button"
+                  className="sp-button sp-button-xs sp-button-light"
+                  onClick={() => setIsEditingPreviousRanking(false)}
+                >
+                  Annuler
+                </button>
+              </div>
             )}
             {!isEditingRanking && (
               <button
