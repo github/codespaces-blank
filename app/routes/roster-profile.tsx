@@ -506,7 +506,10 @@ export default function RosterProfilePage() {
         <section className="sp-panel space-y-3 md:col-span-2">
           <h2 className="font-semibold">Informations</h2>
           <p className="text-sm text-neutral-200">
-            <strong>Championnat:</strong> <span className="text-neutral-400">{roster.category || "Non renseigné"}</span>
+            <strong>Championnat:</strong>{" "}
+            <span className="text-neutral-400">
+              {roster.category || "Non renseigné"}
+            </span>
           </p>
           <div className="flex items-center justify-between">
             {isEditingFoundedIn ? (
@@ -527,7 +530,9 @@ export default function RosterProfilePage() {
             ) : (
               <p className="text-sm text-neutral-200">
                 <strong>Création :</strong>{" "}
-                <span className="text-neutral-400">{roster.founded_in || "Non renseigné"}</span>
+                <span className="text-neutral-400">
+                  {roster.founded_in || "Non renseigné"}
+                </span>
               </p>
             )}
             {!isEditingFoundedIn && (
@@ -549,20 +554,24 @@ export default function RosterProfilePage() {
               {!isEditingTitles ? (
                 <p className="text-sm text-neutral-200">
                   <strong>Palmarès :</strong>{" "}
-                  <span className="text-neutral-400">{roster.titles && roster.titles.length > 0
-                    ? (() => {
-                        const grouped = new Map<string, string[]>();
-                        for (const t of roster.titles) {
-                          const key = `${t.competition} - ${t.ranking}`;
-                          const years = grouped.get(key) ?? [];
-                          years.push(String(t.year));
-                          grouped.set(key, years);
-                        }
-                        return Array.from(grouped.entries())
-                          .map(([key, years]) => `${key} (${years.join(", ")})`)
-                          .join(", ");
-                      })()
-                    : "Non renseigné"}</span>
+                  <span className="text-neutral-400">
+                    {roster.titles && roster.titles.length > 0
+                      ? (() => {
+                          const grouped = new Map<string, string[]>();
+                          for (const t of roster.titles) {
+                            const key = `${t.competition} - ${t.ranking}`;
+                            const years = grouped.get(key) ?? [];
+                            years.push(String(t.year));
+                            grouped.set(key, years);
+                          }
+                          return Array.from(grouped.entries())
+                            .map(
+                              ([key, years]) => `${key} (${years.join(", ")})`,
+                            )
+                            .join(", ");
+                        })()
+                      : "Non renseigné"}
+                  </span>
                 </p>
               ) : (
                 <p className="text-sm text-neutral-200 font-semibold">
@@ -669,8 +678,9 @@ export default function RosterProfilePage() {
             ) : (
               <p className="text-sm text-neutral-200">
                 <strong>Entraineur :</strong>{" "}
-                <span className="text-neutral-400">{seasonCoach
-                  ? (() => {
+                <span className="text-neutral-400">
+                  {seasonCoach ? (
+                    (() => {
                       const names = seasonCoach
                         .split(",")
                         .map((n) => n.trim())
@@ -687,7 +697,10 @@ export default function RosterProfilePage() {
                         </span>
                       ));
                     })()
-                  : <span className="text-neutral-400">Non renseigné</span>}</span>
+                  ) : (
+                    <span className="text-neutral-400">Non renseigné</span>
+                  )}
+                </span>
               </p>
             )}
             {isCurrentSeason && !isEditingCoach && (
@@ -793,10 +806,36 @@ export default function RosterProfilePage() {
             ) : (
               <p className="text-sm text-neutral-200">
                 <strong>Classement:</strong>{" "}
-                <span className="text-neutral-400 font-semibold text-base">{roster.currentRanking != null ? `${roster.currentRanking}e` : "Non renseigné"}</span>{" "}
-                <span className="text-neutral-400">({roster.currentPoints != null ? `${roster.currentPoints} pts` : "X pts"})</span>
+                <span className="text-neutral-400 font-semibold text-base">
+                  {roster.currentRanking != null
+                    ? `${roster.currentRanking}e`
+                    : "Non renseigné"}
+                </span>{" "}
+                <span className="text-neutral-400">
+                  (
+                  {roster.currentPoints != null
+                    ? `${roster.currentPoints} pts`
+                    : "X pts"}
+                  )
+                </span>
               </p>
             )}
+            {!isEditingRanking && (
+              <button
+                type="button"
+                className="ml-2 text-neutral-500 hover:text-neutral-300 transition-colors"
+                onClick={() => {
+                  setRankingInput(roster.currentRanking?.toString() ?? "");
+                  setPointsInput(roster.currentPoints?.toString() ?? "");
+                  setIsEditingRanking(true);
+                }}
+                aria-label="Modifier le classement"
+              >
+                <FontAwesomeIcon icon={faPenToSquareRegular} />
+              </button>
+            )}
+          </div>
+          <div className="flex items-center justify-between">
             {isCurrentSeason && !isEditingPreviousRanking && (
               <p className="text-xs text-neutral-500 mt-1 flex items-center gap-2">
                 Classement {PREVIOUS_SEASON} :{" "}
@@ -807,8 +846,12 @@ export default function RosterProfilePage() {
                   type="button"
                   className="text-neutral-500 hover:text-neutral-300 transition-colors"
                   onClick={() => {
-                    setPreviousRankingInput(previousSeasonRanking?.toString() ?? "");
-                    setPreviousPointsInput(previousSeasonPoints?.toString() ?? "");
+                    setPreviousRankingInput(
+                      previousSeasonRanking?.toString() ?? "",
+                    );
+                    setPreviousPointsInput(
+                      previousSeasonPoints?.toString() ?? "",
+                    );
                     setIsEditingPreviousRanking(true);
                   }}
                   aria-label={`Modifier le classement ${PREVIOUS_SEASON}`}
@@ -828,7 +871,9 @@ export default function RosterProfilePage() {
             )}
             {isCurrentSeason && isEditingPreviousRanking && (
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-xs text-neutral-500">Classement {PREVIOUS_SEASON} :</span>
+                <span className="text-xs text-neutral-500">
+                  Classement {PREVIOUS_SEASON} :
+                </span>
                 <input
                   type="number"
                   className="sp-input-control text-sm w-20 border-l-2 border-l-sky-500"
@@ -870,20 +915,6 @@ export default function RosterProfilePage() {
                 </button>
               </div>
             )}
-            {!isEditingRanking && (
-              <button
-                type="button"
-                className="ml-2 text-neutral-500 hover:text-neutral-300 transition-colors"
-                onClick={() => {
-                  setRankingInput(roster.currentRanking?.toString() ?? "");
-                  setPointsInput(roster.currentPoints?.toString() ?? "");
-                  setIsEditingRanking(true);
-                }}
-                aria-label="Modifier le classement"
-              >
-                <FontAwesomeIcon icon={faPenToSquareRegular} />
-              </button>
-            )}
           </div>
           <div>
             <div className="flex items-center justify-between">
@@ -892,9 +923,15 @@ export default function RosterProfilePage() {
                   <strong>Série (5 derniers matchs):</strong>{" "}
                   {roster.lastFiveMatches && roster.lastFiveMatches.length > 0
                     ? (() => {
-                        const v = roster.lastFiveMatches.filter((r) => r.outcome === "victory").length;
-                        const d = roster.lastFiveMatches.filter((r) => r.outcome === "defeat").length;
-                        const n = roster.lastFiveMatches.filter((r) => r.outcome === "draw").length;
+                        const v = roster.lastFiveMatches.filter(
+                          (r) => r.outcome === "victory",
+                        ).length;
+                        const d = roster.lastFiveMatches.filter(
+                          (r) => r.outcome === "defeat",
+                        ).length;
+                        const n = roster.lastFiveMatches.filter(
+                          (r) => r.outcome === "draw",
+                        ).length;
                         return (
                           <>
                             {roster.lastFiveMatches.map((r, i) => (
@@ -903,7 +940,11 @@ export default function RosterProfilePage() {
                                 className={`inline-block w-5 h-5 rounded text-center text-xs font-bold leading-5 mr-0.5 ${r.outcome === "victory" ? "bg-emerald-600 text-white" : r.outcome === "defeat" ? "bg-red-600 text-white" : "bg-neutral-500 text-white"}`}
                                 title={r.resultText || r.opponent}
                               >
-                                {r.outcome === "victory" ? "V" : r.outcome === "defeat" ? "D" : "N"}
+                                {r.outcome === "victory"
+                                  ? "V"
+                                  : r.outcome === "defeat"
+                                    ? "D"
+                                    : "N"}
                               </span>
                             ))}
                           </>
@@ -912,7 +953,9 @@ export default function RosterProfilePage() {
                     : "Non renseigné"}
                 </p>
               ) : (
-                <p className="text-sm text-neutral-200 font-semibold">Série (5 derniers matchs)</p>
+                <p className="text-sm text-neutral-200 font-semibold">
+                  Série (5 derniers matchs)
+                </p>
               )}
               {!isEditingLastFive && (
                 <button
@@ -932,7 +975,9 @@ export default function RosterProfilePage() {
                     <select
                       className="sp-input-control text-sm w-28"
                       value={result.outcome}
-                      onChange={(e) => updateLastFiveDraft(index, "outcome", e.target.value)}
+                      onChange={(e) =>
+                        updateLastFiveDraft(index, "outcome", e.target.value)
+                      }
                     >
                       <option value="victory">Victoire</option>
                       <option value="defeat">Défaite</option>
@@ -942,13 +987,17 @@ export default function RosterProfilePage() {
                       className="sp-input-control text-sm flex-1"
                       placeholder="Adversaire"
                       value={result.opponent}
-                      onChange={(e) => updateLastFiveDraft(index, "opponent", e.target.value)}
+                      onChange={(e) =>
+                        updateLastFiveDraft(index, "opponent", e.target.value)
+                      }
                     />
                     <input
                       className="sp-input-control text-sm w-36"
                       placeholder="Score (ex: 28-14)"
                       value={result.resultText}
-                      onChange={(e) => updateLastFiveDraft(index, "resultText", e.target.value)}
+                      onChange={(e) =>
+                        updateLastFiveDraft(index, "resultText", e.target.value)
+                      }
                     />
                     <button
                       type="button"
@@ -1047,9 +1096,14 @@ export default function RosterProfilePage() {
             ) : (
               <p className="text-sm text-neutral-200">
                 <strong>Matchs:</strong>{" "}
-                {roster.seasonRecord
-                  ? <span className="text-neutral-400 text-base">{roster.seasonRecord.victories}V {roster.seasonRecord.defeats}D {roster.seasonRecord.draws}N</span>
-                  : "Non renseigné"}
+                {roster.seasonRecord ? (
+                  <span className="text-neutral-400 text-base">
+                    {roster.seasonRecord.victories}V{" "}
+                    {roster.seasonRecord.defeats}D {roster.seasonRecord.draws}N
+                  </span>
+                ) : (
+                  "Non renseigné"
+                )}
               </p>
             )}
             {!isEditingSeasonRecord && (
@@ -1057,8 +1111,12 @@ export default function RosterProfilePage() {
                 type="button"
                 className="ml-2 text-neutral-500 hover:text-neutral-300 transition-colors"
                 onClick={() => {
-                  setSeasonVInput(roster.seasonRecord?.victories?.toString() ?? "");
-                  setSeasonDInput(roster.seasonRecord?.defeats?.toString() ?? "");
+                  setSeasonVInput(
+                    roster.seasonRecord?.victories?.toString() ?? "",
+                  );
+                  setSeasonDInput(
+                    roster.seasonRecord?.defeats?.toString() ?? "",
+                  );
                   setSeasonNInput(roster.seasonRecord?.draws?.toString() ?? "");
                   setIsEditingSeasonRecord(true);
                 }}
@@ -1068,8 +1126,7 @@ export default function RosterProfilePage() {
               </button>
             )}
           </div>
-          <p className="text-sm text-neutral-200">
-          </p>
+          <p className="text-sm text-neutral-200"></p>
         </section>
 
         {roster.logo && (
@@ -1160,11 +1217,12 @@ export default function RosterProfilePage() {
                     const hasScore =
                       match.scoreHome != null && match.scoreAway != null;
                     const isCancelled = match.status === "cancelled";
-                    const matchCompetition = match.competition || roster.category;
+                    const matchCompetition =
+                      match.competition || roster.category;
                     const opponentRoster = findOpponentRoster(
                       rosters,
                       match.opponent,
-                      matchCompetition
+                      matchCompetition,
                     );
                     return (
                       <tr
