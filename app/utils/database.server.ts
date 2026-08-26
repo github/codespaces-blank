@@ -111,7 +111,7 @@ const SEED_TEST_ACCOUNT_ID = process.env.SEED_TEST_ACCOUNT_ID?.trim() || "";
 const SEED_TEST_ACCOUNT_NAME = process.env.SEED_TEST_ACCOUNT_NAME?.trim() || "Compte test";
 const SEED_TEST_ACCOUNT_ACCESS_CODE = process.env.SEED_TEST_ACCOUNT_ACCESS_CODE?.trim() || "";
 const SEED_ELITE1_ACCOUNT_NAME = process.env.SEED_ELITE1_ACCOUNT_NAME?.trim() || "";
-const SEED_ELITE1_SEASON = process.env.SEED_ELITE1_SEASON?.trim() || "2025/2026";
+const SEED_ELITE1_SEASON = process.env.SEED_ELITE1_SEASON?.trim() || "2026/2027";
 
 const defaultRosterState: RosterStatePayload = {
   rosters: [],

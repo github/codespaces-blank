@@ -19,7 +19,7 @@ export function Welcome() {
 
   const sportOptions = ["Rugby", "Football"] as const;
   const championshipOptions = ["Top 14", "Pro D2", "Elite 1", "Women's Six Nations", "World Series"] as const;
-  const seasonOptions = ["2025/2026", "2024/2025", "2023/2024"] as const;
+  const seasonOptions = ["2026/2027", "2025/2026", "2024/2025", "2023/2024"] as const;
 
   const isWorldSeries = championship === "World Series";
 
