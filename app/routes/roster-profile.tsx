@@ -858,15 +858,6 @@ export default function RosterProfilePage() {
                 >
                   <FontAwesomeIcon icon={faPenToSquareRegular} />
                 </button>
-                {previousSeasonRanking != null && (
-                  <button
-                    type="button"
-                    className="sp-button sp-button-xs sp-button-light"
-                    onClick={reusePreviousSeasonStats}
-                  >
-                    Réutiliser pour {CURRENT_SEASON}
-                  </button>
-                )}
               </p>
             )}
             {isCurrentSeason && isEditingPreviousRanking && (
