@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useTeams } from "~/context/TeamsContext";
 import type { Championship } from "~/types/tracker";
 import {
-  TOP14_CLUBS_2025_2026,
-  PROD2_CLUBS_2025_2026,
+  TOP14_CLUBS_2026_2027,
+  PROD2_CLUBS_2026_2027,
   ELITE1_CLUBS_2025_2026,
   type ClubInfo,
 } from "~/utils/clubs";
@@ -13,8 +13,8 @@ export function meta() {
 }
 
 const STANDINGS_BY_CHAMPIONSHIP: Partial<Record<Championship, ClubInfo[]>> = {
-  "Top 14": TOP14_CLUBS_2025_2026,
-  "Pro D2": PROD2_CLUBS_2025_2026,
+  "Top 14": TOP14_CLUBS_2026_2027,
+  "Pro D2": PROD2_CLUBS_2026_2027,
   "Elite 1": ELITE1_CLUBS_2025_2026,
 };
 
@@ -78,7 +78,7 @@ export default function StandingsPage() {
 
         {/* Saison */}
         <p className="text-xs text-neutral-500 mb-4">
-          Saison 2025/2026 — données statiques (mise à jour dynamique à venir)
+          Saison 2026/2027 — données statiques (mise à jour dynamique à venir)
         </p>
 
         {clubs.length === 0 ? (

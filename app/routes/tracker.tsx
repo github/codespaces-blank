@@ -24,7 +24,7 @@ import { useTrackerContextReset } from "~/hooks/useTrackerContextReset";
 import { useTrackerMatchPresentation } from "~/hooks/useTrackerMatchPresentation";
 import { useLiveBroadcast } from "~/hooks/useLiveBroadcast";
 import { buildStatsSummaryEvent } from "~/utils/trackerSummaryEvent";
-import { Top14_Stadiums_2025_2026 } from "~/utils/stadiums";
+import { ProD2_Stadiums_2026_2027, Top14_Stadiums_2026_2027 } from "~/utils/stadiums";
 import TrackerMatchEvents from "~/components/TrackerMatchEvents";
 import TrackerMatchTimeline from "~/components/TrackerMatchTimeline";
 
@@ -109,12 +109,15 @@ export default function Tracker() {
     });
 
     const selectedTeamIds = useMemo(() => [team1Id, team2Id], [team1Id, team2Id]);
-    const top14StadiumOptions = useMemo(() => {
-      if (!fieldInput || Top14_Stadiums_2025_2026.includes(fieldInput as (typeof Top14_Stadiums_2025_2026)[number])) {
-        return Top14_Stadiums_2025_2026;
+    const stadiumOptions = useMemo(() => {
+      const defaultStadiums: readonly string[] = championship === "Pro D2"
+        ? ProD2_Stadiums_2026_2027
+        : Top14_Stadiums_2026_2027;
+      if (!fieldInput || defaultStadiums.includes(fieldInput)) {
+        return defaultStadiums;
       }
-      return [fieldInput, ...Top14_Stadiums_2025_2026] as const;
-    }, [fieldInput]);
+      return [fieldInput, ...defaultStadiums] as const;
+    }, [championship, fieldInput]);
 
     const {
         events,
@@ -383,7 +386,7 @@ export default function Tracker() {
             matchDateInput={matchDateInput}
             fieldInput={fieldInput}
             refereeInput={refereeInput}
-            top14StadiumOptions={top14StadiumOptions}
+            top14StadiumOptions={stadiumOptions}
             setupCanSubmit={setupCanSubmit}
             saveMessage={saveMessage}
             onSubmit={handleSetupSubmit}
@@ -416,7 +419,7 @@ export default function Tracker() {
           matchDateInput={matchDateInput}
           fieldInput={fieldInput}
           refereeInput={refereeInput}
-          stadiumOptions={top14StadiumOptions}
+          stadiumOptions={stadiumOptions}
           onClose={() => setShowMatchInfoEditor(false)}
           onSave={() => applyMatchInfo()}
           onMatchDateInputChange={setMatchDateInput}
@@ -454,6 +457,8 @@ export default function Tracker() {
               bonuses={computeBonuses(scores)}
               mainTimerText={mainTimerText}
               secondaryTimerText={secondaryTimerText}
+              currentTime={time}
+              events={events}
             />
           );
         })()}

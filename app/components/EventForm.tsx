@@ -58,6 +58,12 @@ export default function EventForm({
         ]
       : [];
 
+        function getPlayerOptionLabel(player: Player): string {
+                if (!team) return player.name;
+                const number = findPlayerNumberInTeam(team, player.id);
+                return number ? `#${number} ${player.name}` : player.name;
+        }
+
     function buildEventTiming(): {
         eventTime: number;
         timelineHalf: 1 | 2;
@@ -279,7 +285,7 @@ export default function EventForm({
                     <option value="">--</option>
                     {players.map((p) => (
                     <option key={p.id} value={p.id}>
-                        {p.name}
+                        {getPlayerOptionLabel(p)}
                     </option>
                     ))}
                 </select>
@@ -295,7 +301,7 @@ export default function EventForm({
                     <option value="">--</option>
                     {players.map((p) => (
                     <option key={p.id} value={p.id}>
-                        {p.name}
+                        {getPlayerOptionLabel(p)}
                     </option>
                     ))}
                 </select>
@@ -313,7 +319,7 @@ export default function EventForm({
                 <option value="">--</option>
                 {players.map((p) => (
                     <option key={p.id} value={p.id}>
-                    {p.name}
+                    {getPlayerOptionLabel(p)}
                     </option>
                 ))}
                 </select>

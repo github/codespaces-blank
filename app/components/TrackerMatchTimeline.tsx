@@ -119,7 +119,14 @@ export default function TrackerMatchTimeline({
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded bg-white px-1.5 py-0.5 text-[10px] font-bold text-black">
                   MT
                 </div>
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 rounded bg-white px-1.5 py-0.5 text-[10px] font-bold text-black">
+                <div
+                  className="absolute rounded bg-white px-1.5 py-0.5 text-[10px] font-bold text-black"
+                  style={{
+                    right: "0",
+                    top: "calc(50% - 9px)",
+                    transform: "translateX(112%)",
+                  }}
+                >
                   FT
                 </div>
 

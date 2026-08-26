@@ -6,7 +6,14 @@ import type { LiveSnapshot } from "~/types/live";
 import type { Roster, Team } from "~/types/tracker";
 import { getCompetitionScope, getCompetitionGender } from "~/types/tracker";
 import { rosterStatePayloadSchema } from "~/utils/schemas.server";
-import { ALL_CLUBS, ELITE1_CLUBS_2025_2026 } from "~/utils/clubs";
+import {
+  ALL_CLUBS,
+  ELITE1_CLUBS_2025_2026,
+  PROD2_CLUBS_2025_2026,
+  PROD2_CLUBS_2026_2027,
+  TOP14_CLUBS_2025_2026,
+  TOP14_CLUBS_2026_2027,
+} from "~/utils/clubs";
 import { FRANCE_W6N_SQUAD_2025_2026 } from "~/utils/france-w6n-squad";
 
 type Sport = "Rugby" | "Football";
@@ -111,7 +118,7 @@ const SEED_TEST_ACCOUNT_ID = process.env.SEED_TEST_ACCOUNT_ID?.trim() || "";
 const SEED_TEST_ACCOUNT_NAME = process.env.SEED_TEST_ACCOUNT_NAME?.trim() || "Compte test";
 const SEED_TEST_ACCOUNT_ACCESS_CODE = process.env.SEED_TEST_ACCOUNT_ACCESS_CODE?.trim() || "";
 const SEED_ELITE1_ACCOUNT_NAME = process.env.SEED_ELITE1_ACCOUNT_NAME?.trim() || "";
-const SEED_ELITE1_SEASON = process.env.SEED_ELITE1_SEASON?.trim() || "2025/2026";
+const SEED_ELITE1_SEASON = process.env.SEED_ELITE1_SEASON?.trim() || "2026/2027";
 
 const defaultRosterState: RosterStatePayload = {
   rosters: [],
@@ -1407,7 +1414,9 @@ async function seedRostersSubsetForAccount(
   pool: Pool,
   accountId: string,
   candidates: typeof ALL_CLUBS,
-  seedLabel: string
+  seedLabel: string,
+  previousCandidates: typeof ALL_CLUBS = [],
+  previousSeason = "2025/2026",
 ): Promise<void> {
   const existing = await pool.query<{ name: string; category: string }>(
     `SELECT name, category FROM stored_rosters WHERE account_id = $1`,
@@ -1420,9 +1429,9 @@ async function seedRostersSubsetForAccount(
   const missing = candidates.filter(
     (c) => !existingKeys.has(`${c.name}||${c.category}`)
   );
-  if (missing.length === 0) return;
-
-  console.log(`[seed] Account "${accountId}": adding ${missing.length} ${seedLabel} roster(s)…`);
+  if (missing.length > 0) {
+    console.log(`[seed] Account "${accountId}": adding ${missing.length} ${seedLabel} roster(s)…`);
+  }
 
   const currentPayload = await pool.query<{ payload: string }>(
     `SELECT payload FROM account_rosters_state WHERE account_id = $1`,
@@ -1435,19 +1444,76 @@ async function seedRostersSubsetForAccount(
   const existingRosters: Roster[] = parsed?.rosters ?? [];
   const existingTeams: Team[] = parsed?.teams ?? [];
 
+  const previousNameByCurrentName: Record<string, string> = {
+    "Stade Toulousain": "Stade Toulousain Rugby Féminin",
+    "Montpellier Hérault Rugby": "Montpellier HR",
+    "Soyaux-Angoulême XV": "Soyaux-Angoulême RC",
+    "Stade Aurillacois": "Aurillac Rugby",
+    "Biarritz Olympique PB": "Biarritz Olympique",
+    "FC Grenoble Rugby": "FC Grenoble",
+    "Valence Romans": "Valence-Romans Drôme",
+  };
+
+  const findPreviousRoster = (candidate: (typeof ALL_CLUBS)[number]) => {
+    const previousCandidate = previousCandidates.find(
+      (previous) => previous.category === candidate.category &&
+        (previous.name === previousNameByCurrentName[candidate.name] || previous.nickname === candidate.nickname)
+    );
+    if (!previousCandidate) return undefined;
+    return existingRosters.find(
+      (roster) => roster.name === previousCandidate.name && roster.category === previousCandidate.category
+    );
+  };
+
+  const clonePlayers = (players: Roster["players"]): Roster["players"] =>
+    players.map((player) => ({ ...player, id: crypto.randomUUID() }));
+
   const newRosters: Roster[] = missing.map((c) => ({
     id: crypto.randomUUID(),
     name: c.name,
     nickname: c.nickname,
     color: c.color,
     category: c.category,
-    players: [],
+    players: clonePlayers(findPreviousRoster(c)?.players ?? []),
     currentRanking: c.currentRanking,
     currentPoints: c.currentPoints,
+    seasons: (() => {
+      const previous = findPreviousRoster(c);
+      if (!previous) return undefined;
+      return {
+        [previousSeason]: {
+          players: previous.players,
+          coach: previous.coach,
+          ranking: previous.currentRanking,
+          points: previous.currentPoints,
+        },
+      };
+    })(),
   }));
 
+  const migratedRosters = existingRosters.map((roster) => {
+    const candidate = candidates.find(
+      (item) => item.name === roster.name && item.category === roster.category
+    );
+    const previous = candidate ? findPreviousRoster(candidate) : undefined;
+    if (!candidate || !previous || roster.seasons?.[previousSeason]) return roster;
+    return {
+      ...roster,
+      seasons: {
+        ...roster.seasons,
+        [previousSeason]: {
+          players: previous.players,
+          coach: previous.coach,
+          ranking: previous.currentRanking,
+          points: previous.currentPoints,
+        },
+      },
+      players: roster.players.length > 0 ? roster.players : clonePlayers(previous.players),
+    };
+  });
+
   const payload: RosterStatePayload = {
-    rosters: [...existingRosters, ...newRosters],
+    rosters: [...migratedRosters, ...newRosters],
     teams: existingTeams,
     activeRosterId: parsed?.activeRosterId ?? null,
     matchDay: parsed?.matchDay,
@@ -1455,6 +1521,8 @@ async function seedRostersSubsetForAccount(
     sport: parsed?.sport,
     championship: parsed?.championship,
   };
+
+  if (newRosters.length === 0 && migratedRosters.every((roster, index) => roster === existingRosters[index])) return;
 
   const now = new Date().toISOString();
   await pool.query(
@@ -1467,7 +1535,14 @@ async function seedRostersSubsetForAccount(
 }
 
 async function seedDefaultRostersForAccount(pool: Pool, accountId: string): Promise<void> {
-  await seedRostersSubsetForAccount(pool, accountId, ALL_CLUBS, "default club");
+  await seedRostersSubsetForAccount(
+    pool,
+    accountId,
+    [...TOP14_CLUBS_2026_2027, ...PROD2_CLUBS_2026_2027],
+    "Top 14 / Pro D2 2026/2027",
+    [...TOP14_CLUBS_2025_2026, ...PROD2_CLUBS_2025_2026],
+  );
+  await seedRostersSubsetForAccount(pool, accountId, ELITE1_CLUBS_2025_2026, "Elite 1");
 }
 
 async function seedElite1ForNamedAccount(pool: Pool): Promise<void> {
@@ -1626,61 +1701,7 @@ async function migrateStadeToulousainFeminin(pool: Pool): Promise<void> {
 }
 
 async function seedDefaultRosters(pool: Pool): Promise<void> {
-  const existing = await pool.query<{ name: string; category: string }>(
-    `SELECT name, category FROM stored_rosters WHERE account_id = $1`,
-    [LEGACY_ACCOUNT_ID]
-  );
-  const existingKeys = new Set(
-    existing.rows.map((r) => `${r.name}||${r.category}`)
-  );
-
-  const missing = ALL_CLUBS.filter(
-    (c) => !existingKeys.has(`${c.name}||${c.category}`)
-  );
-  if (missing.length === 0) return;
-
-  console.log(`[seed] Adding ${missing.length} default club roster(s)…`);
-
-  const currentPayload = await pool.query<{ payload: string }>(
-    `SELECT payload FROM account_rosters_state WHERE account_id = $1`,
-    [LEGACY_ACCOUNT_ID]
-  );
-  const parsed = currentPayload.rows[0]
-    ? parseJsonOrNull<RosterStatePayload>(currentPayload.rows[0].payload)
-    : null;
-
-  const existingRosters: Roster[] = parsed?.rosters ?? [];
-  const existingTeams: Team[] = parsed?.teams ?? [];
-
-  const newRosters: Roster[] = missing.map((c) => ({
-    id: crypto.randomUUID(),
-    name: c.name,
-    nickname: c.nickname,
-    color: c.color,
-    category: c.category,
-    players: [],
-    currentRanking: c.currentRanking,
-    currentPoints: c.currentPoints,
-  }));
-
-  const payload: RosterStatePayload = {
-    rosters: [...existingRosters, ...newRosters],
-    teams: existingTeams,
-    activeRosterId: parsed?.activeRosterId ?? null,
-    matchDay: parsed?.matchDay,
-    season: parsed?.season,
-    sport: parsed?.sport,
-    championship: parsed?.championship,
-  };
-
-  const now = new Date().toISOString();
-  await pool.query(
-    `INSERT INTO account_rosters_state (account_id, payload, updated_at)
-     VALUES ($1, $2, $3)
-     ON CONFLICT (account_id) DO UPDATE SET payload = EXCLUDED.payload, updated_at = EXCLUDED.updated_at`,
-    [LEGACY_ACCOUNT_ID, JSON.stringify(payload), now]
-  );
-  await syncRosterDataToTables(pool, LEGACY_ACCOUNT_ID, payload);
+  await seedDefaultRostersForAccount(pool, LEGACY_ACCOUNT_ID);
 }
 
 /**

@@ -109,6 +109,8 @@ export default function RosterProfilePage() {
     return roster.seasons?.[selectedSeason]?.calendar ?? [];
   }, [roster, selectedSeason]);
 
+  const previousSeasonRanking = roster?.seasons?.["2025/2026"]?.ranking;
+
   const POSITION_TABS = [
     { key: "all", label: "Tous" },
     { key: "avants", label: "Avants", positions: ["première ligne", "talonneur", "deuxième ligne", "troisième ligne"] as PlayerPosition[] },
@@ -727,6 +729,11 @@ export default function RosterProfilePage() {
                 <strong>Classement:</strong>{" "}
                 <span className="text-neutral-400 font-semibold text-base">{roster.currentRanking != null ? `${roster.currentRanking}e` : "Non renseigné"}</span>{" "}
                 <span className="text-neutral-400">({roster.currentPoints != null ? `${roster.currentPoints} pts` : "X pts"})</span>
+              </p>
+            )}
+            {isCurrentSeason && previousSeasonRanking != null && (
+              <p className="text-xs text-neutral-500 mt-1">
+                Classement 2025/2026 : {previousSeasonRanking}e
               </p>
             )}
             {!isEditingRanking && (

@@ -287,7 +287,13 @@ export default function LiveViewPage() {
       </div>
       {updatedAt && <p className="text-center text-sm text-neutral-400">Mise à jour: {new Date(updatedAt).toLocaleTimeString("fr-FR")}</p>}
 
-      <Scoreboard teams={teams} scores={snapshot.scores} mainTimerText={mainTimerText} />
+      <Scoreboard
+        teams={teams}
+        scores={snapshot.scores}
+        mainTimerText={mainTimerText}
+        currentTime={snapshot.currentTime}
+        events={snapshot.events}
+      />
 
       <section className="space-y-2">
         <h2 className="text-xl font-semibold">Événements</h2>

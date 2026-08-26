@@ -120,7 +120,7 @@ export interface SeasonData {
     points?: number;   // points en fin de saison
 }
 
-export const CURRENT_SEASON = "2025/2026";
+export const CURRENT_SEASON = "2026/2027";
 
 export interface Roster {
     id: string;
