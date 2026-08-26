@@ -46,7 +46,7 @@ body {
   }
 
   select {
-    @apply bg-neutral-950;
+    @apply bg-transparent;
   }
 
   select option {
@@ -208,6 +208,10 @@ body {
   .sp-input-control {
     @apply h-auto w-full min-w-0 border-0 bg-transparent p-0 text-sm leading-5 text-neutral-200 shadow-none pl-[4px];
     @apply focus:outline-none focus:ring-0 focus:border-0;
+  }
+
+  .sp-input-shell select.sp-input-control {
+    @apply bg-transparent;
   }
 
   .sp-row-responsive {

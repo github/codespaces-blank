@@ -14,6 +14,14 @@ export function meta({ params }: Route.MetaArgs) {
   return [{ title: "Vue effectif" }];
 }
 
+function getPreviousSeason(season: string): string {
+  const [start, end] = season.split("/").map((part) => parseInt(part, 10));
+  if (!Number.isFinite(start) || !Number.isFinite(end)) return season;
+  return `${start - 1}/${end - 1}`;
+}
+
+const PREVIOUS_SEASON = getPreviousSeason(CURRENT_SEASON);
+
 function getRosterBackPath(rosterId: string | null | undefined): string {
   if (!rosterId) return "/roster";
   return `/r/${toShortId(rosterId)}`;
@@ -22,6 +30,19 @@ function getRosterBackPath(rosterId: string | null | undefined): string {
 function getPlayerProfilePath(rosterId: string | null | undefined, playerId: string): string {
   if (!rosterId) return "/roster";
   return `/r/${toShortId(rosterId)}/p/${toShortId(playerId)}`;
+}
+
+function findOpponentRoster(
+  rosters: { id: string; name: string; category?: string }[],
+  opponentName: string,
+  competition: string | undefined
+) {
+  const candidates = rosters.filter(
+    (item) => item.name.trim().toLowerCase() === opponentName.trim().toLowerCase()
+  );
+  if (candidates.length === 0) return null;
+  if (candidates.length === 1) return candidates[0];
+  return candidates.find((item) => item.category === competition) ?? candidates[0];
 }
 
 
@@ -109,6 +130,9 @@ export default function RosterProfilePage() {
     return roster.seasons?.[selectedSeason]?.calendar ?? [];
   }, [roster, selectedSeason]);
 
+  const previousSeasonRanking = roster?.seasons?.[PREVIOUS_SEASON]?.ranking;
+  const previousSeasonPoints = roster?.seasons?.[PREVIOUS_SEASON]?.points;
+
   const POSITION_TABS = [
     { key: "all", label: "Tous" },
     { key: "avants", label: "Avants", positions: ["première ligne", "talonneur", "deuxième ligne", "troisième ligne"] as PlayerPosition[] },
@@ -175,6 +199,9 @@ export default function RosterProfilePage() {
   const [isEditingRanking, setIsEditingRanking] = useState(false);
   const [rankingInput, setRankingInput] = useState("");
   const [pointsInput, setPointsInput] = useState("");
+  const [isEditingPreviousRanking, setIsEditingPreviousRanking] = useState(false);
+  const [previousRankingInput, setPreviousRankingInput] = useState("");
+  const [previousPointsInput, setPreviousPointsInput] = useState("");
   const [isEditingLastFive, setIsEditingLastFive] = useState(false);
   const [lastFiveDraft, setLastFiveDraft] = useState<Result[]>([]);
   const [isEditingSeasonRecord, setIsEditingSeasonRecord] = useState(false);
@@ -329,6 +356,47 @@ export default function RosterProfilePage() {
     showInlineMessage("success", "Classement mis à jour.");
   }
 
+  function savePreviousSeasonRanking() {
+    if (!roster) return;
+    const ranking = parseInt(previousRankingInput, 10);
+    const points = parseInt(previousPointsInput, 10);
+    setRosters((current) =>
+      current.map((item) =>
+        item.id === roster.id
+          ? {
+              ...item,
+              seasons: {
+                ...item.seasons,
+                [PREVIOUS_SEASON]: {
+                  players: item.seasons?.[PREVIOUS_SEASON]?.players ?? [],
+                  coach: item.seasons?.[PREVIOUS_SEASON]?.coach,
+                  calendar: item.seasons?.[PREVIOUS_SEASON]?.calendar,
+                  ranking: Number.isFinite(ranking) && ranking > 0 ? ranking : undefined,
+                  points: Number.isFinite(points) && points >= 0 ? points : undefined,
+                },
+              },
+            }
+          : item,
+      ),
+    );
+    setIsEditingPreviousRanking(false);
+    showInlineMessage("success", `Classement ${PREVIOUS_SEASON} mis à jour.`);
+  }
+
+  function reusePreviousSeasonStats() {
+    if (!roster) return;
+    const previous = roster.seasons?.[PREVIOUS_SEASON];
+    if (!previous || (previous.ranking == null && previous.points == null)) return;
+    setRosters((current) =>
+      current.map((item) =>
+        item.id === roster.id
+          ? { ...item, currentRanking: previous.ranking, currentPoints: previous.points }
+          : item,
+      ),
+    );
+    showInlineMessage("success", `Statistiques ${PREVIOUS_SEASON} reprises pour ${CURRENT_SEASON}.`);
+  }
+
   function startEditingLastFive() {
     setLastFiveDraft(
       roster?.lastFiveMatches && roster.lastFiveMatches.length > 0
@@ -438,7 +506,10 @@ export default function RosterProfilePage() {
         <section className="sp-panel space-y-3 md:col-span-2">
           <h2 className="font-semibold">Informations</h2>
           <p className="text-sm text-neutral-200">
-            <strong>Championnat:</strong> <span className="text-neutral-400">{roster.category || "Non renseigné"}</span>
+            <strong>Championnat:</strong>{" "}
+            <span className="text-neutral-400">
+              {roster.category || "Non renseigné"}
+            </span>
           </p>
           <div className="flex items-center justify-between">
             {isEditingFoundedIn ? (
@@ -459,7 +530,9 @@ export default function RosterProfilePage() {
             ) : (
               <p className="text-sm text-neutral-200">
                 <strong>Création :</strong>{" "}
-                <span className="text-neutral-400">{roster.founded_in || "Non renseigné"}</span>
+                <span className="text-neutral-400">
+                  {roster.founded_in || "Non renseigné"}
+                </span>
               </p>
             )}
             {!isEditingFoundedIn && (
@@ -481,20 +554,24 @@ export default function RosterProfilePage() {
               {!isEditingTitles ? (
                 <p className="text-sm text-neutral-200">
                   <strong>Palmarès :</strong>{" "}
-                  <span className="text-neutral-400">{roster.titles && roster.titles.length > 0
-                    ? (() => {
-                        const grouped = new Map<string, string[]>();
-                        for (const t of roster.titles) {
-                          const key = `${t.competition} - ${t.ranking}`;
-                          const years = grouped.get(key) ?? [];
-                          years.push(String(t.year));
-                          grouped.set(key, years);
-                        }
-                        return Array.from(grouped.entries())
-                          .map(([key, years]) => `${key} (${years.join(", ")})`)
-                          .join(", ");
-                      })()
-                    : "Non renseigné"}</span>
+                  <span className="text-neutral-400">
+                    {roster.titles && roster.titles.length > 0
+                      ? (() => {
+                          const grouped = new Map<string, string[]>();
+                          for (const t of roster.titles) {
+                            const key = `${t.competition} - ${t.ranking}`;
+                            const years = grouped.get(key) ?? [];
+                            years.push(String(t.year));
+                            grouped.set(key, years);
+                          }
+                          return Array.from(grouped.entries())
+                            .map(
+                              ([key, years]) => `${key} (${years.join(", ")})`,
+                            )
+                            .join(", ");
+                        })()
+                      : "Non renseigné"}
+                  </span>
                 </p>
               ) : (
                 <p className="text-sm text-neutral-200 font-semibold">
@@ -601,8 +678,9 @@ export default function RosterProfilePage() {
             ) : (
               <p className="text-sm text-neutral-200">
                 <strong>Entraineur :</strong>{" "}
-                <span className="text-neutral-400">{seasonCoach
-                  ? (() => {
+                <span className="text-neutral-400">
+                  {seasonCoach ? (
+                    (() => {
                       const names = seasonCoach
                         .split(",")
                         .map((n) => n.trim())
@@ -619,7 +697,10 @@ export default function RosterProfilePage() {
                         </span>
                       ));
                     })()
-                  : <span className="text-neutral-400">Non renseigné</span>}</span>
+                  ) : (
+                    <span className="text-neutral-400">Non renseigné</span>
+                  )}
+                </span>
               </p>
             )}
             {isCurrentSeason && !isEditingCoach && (
@@ -724,9 +805,19 @@ export default function RosterProfilePage() {
               </div>
             ) : (
               <p className="text-sm text-neutral-200">
-                <strong>Classement:</strong>{" "}
-                <span className="text-neutral-400 font-semibold text-base">{roster.currentRanking != null ? `${roster.currentRanking}e` : "Non renseigné"}</span>{" "}
-                <span className="text-neutral-400">({roster.currentPoints != null ? `${roster.currentPoints} pts` : "X pts"})</span>
+                <strong>Classement :</strong>{" "}
+                <span className="text-neutral-400 font-semibold text-base">
+                  {roster.currentRanking != null
+                    ? `${roster.currentRanking}e`
+                    : "Non renseigné"}
+                </span>{" "}
+                <span className="text-neutral-400">
+                  (
+                  {roster.currentPoints != null
+                    ? `${roster.currentPoints} pts`
+                    : "X pts"}
+                  )
+                </span>
               </p>
             )}
             {!isEditingRanking && (
@@ -744,6 +835,75 @@ export default function RosterProfilePage() {
               </button>
             )}
           </div>
+          <div className="flex items-center justify-between">
+            {isCurrentSeason && !isEditingPreviousRanking && (
+              <p className="text-xs text-neutral-500 mt-1 flex items-center gap-2">
+                <strong>Classement {PREVIOUS_SEASON} :</strong>{" "}
+                {previousSeasonRanking != null
+                  ? `${previousSeasonRanking}e (${previousSeasonPoints != null ? `${previousSeasonPoints} pts` : "X pts"})`
+                  : "Non renseigné"}
+                <button
+                  type="button"
+                  className="text-neutral-500 hover:text-neutral-300 transition-colors"
+                  onClick={() => {
+                    setPreviousRankingInput(
+                      previousSeasonRanking?.toString() ?? "",
+                    );
+                    setIsEditingPreviousRanking(true);
+                  }}
+                  aria-label={`Modifier le classement ${PREVIOUS_SEASON}`}
+                >
+                  <FontAwesomeIcon icon={faPenToSquareRegular} />
+                </button>
+              </p>
+            )}
+            {isCurrentSeason && isEditingPreviousRanking && (
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-xs text-neutral-500">
+                  Classement {PREVIOUS_SEASON} :
+                </span>
+                <input
+                  type="number"
+                  className="sp-input-control text-sm w-20 border-l-2 border-l-sky-500"
+                  autoFocus
+                  min={1}
+                  placeholder="Rang"
+                  value={previousRankingInput}
+                  onChange={(e) => setPreviousRankingInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") savePreviousSeasonRanking();
+                    if (e.key === "Escape") setIsEditingPreviousRanking(false);
+                  }}
+                />
+                <input
+                  type="number"
+                  className="sp-input-control text-sm w-20 border-l-2 border-l-sky-500"
+                  min={0}
+                  placeholder="Points"
+                  value={previousPointsInput}
+                  onChange={(e) => setPreviousPointsInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") savePreviousSeasonRanking();
+                    if (e.key === "Escape") setIsEditingPreviousRanking(false);
+                  }}
+                />
+                <button
+                  type="button"
+                  className="sp-button sp-button-xs sp-button-blue"
+                  onClick={savePreviousSeasonRanking}
+                >
+                  Enregistrer
+                </button>
+                <button
+                  type="button"
+                  className="sp-button sp-button-xs sp-button-light"
+                  onClick={() => setIsEditingPreviousRanking(false)}
+                >
+                  Annuler
+                </button>
+              </div>
+            )}
+          </div>
           <div>
             <div className="flex items-center justify-between">
               {!isEditingLastFive ? (
@@ -751,9 +911,15 @@ export default function RosterProfilePage() {
                   <strong>Série (5 derniers matchs):</strong>{" "}
                   {roster.lastFiveMatches && roster.lastFiveMatches.length > 0
                     ? (() => {
-                        const v = roster.lastFiveMatches.filter((r) => r.outcome === "victory").length;
-                        const d = roster.lastFiveMatches.filter((r) => r.outcome === "defeat").length;
-                        const n = roster.lastFiveMatches.filter((r) => r.outcome === "draw").length;
+                        const v = roster.lastFiveMatches.filter(
+                          (r) => r.outcome === "victory",
+                        ).length;
+                        const d = roster.lastFiveMatches.filter(
+                          (r) => r.outcome === "defeat",
+                        ).length;
+                        const n = roster.lastFiveMatches.filter(
+                          (r) => r.outcome === "draw",
+                        ).length;
                         return (
                           <>
                             {roster.lastFiveMatches.map((r, i) => (
@@ -762,7 +928,11 @@ export default function RosterProfilePage() {
                                 className={`inline-block w-5 h-5 rounded text-center text-xs font-bold leading-5 mr-0.5 ${r.outcome === "victory" ? "bg-emerald-600 text-white" : r.outcome === "defeat" ? "bg-red-600 text-white" : "bg-neutral-500 text-white"}`}
                                 title={r.resultText || r.opponent}
                               >
-                                {r.outcome === "victory" ? "V" : r.outcome === "defeat" ? "D" : "N"}
+                                {r.outcome === "victory"
+                                  ? "V"
+                                  : r.outcome === "defeat"
+                                    ? "D"
+                                    : "N"}
                               </span>
                             ))}
                           </>
@@ -771,7 +941,9 @@ export default function RosterProfilePage() {
                     : "Non renseigné"}
                 </p>
               ) : (
-                <p className="text-sm text-neutral-200 font-semibold">Série (5 derniers matchs)</p>
+                <p className="text-sm text-neutral-200 font-semibold">
+                  Série (5 derniers matchs)
+                </p>
               )}
               {!isEditingLastFive && (
                 <button
@@ -791,7 +963,9 @@ export default function RosterProfilePage() {
                     <select
                       className="sp-input-control text-sm w-28"
                       value={result.outcome}
-                      onChange={(e) => updateLastFiveDraft(index, "outcome", e.target.value)}
+                      onChange={(e) =>
+                        updateLastFiveDraft(index, "outcome", e.target.value)
+                      }
                     >
                       <option value="victory">Victoire</option>
                       <option value="defeat">Défaite</option>
@@ -801,13 +975,17 @@ export default function RosterProfilePage() {
                       className="sp-input-control text-sm flex-1"
                       placeholder="Adversaire"
                       value={result.opponent}
-                      onChange={(e) => updateLastFiveDraft(index, "opponent", e.target.value)}
+                      onChange={(e) =>
+                        updateLastFiveDraft(index, "opponent", e.target.value)
+                      }
                     />
                     <input
                       className="sp-input-control text-sm w-36"
                       placeholder="Score (ex: 28-14)"
                       value={result.resultText}
-                      onChange={(e) => updateLastFiveDraft(index, "resultText", e.target.value)}
+                      onChange={(e) =>
+                        updateLastFiveDraft(index, "resultText", e.target.value)
+                      }
                     />
                     <button
                       type="button"
@@ -906,9 +1084,14 @@ export default function RosterProfilePage() {
             ) : (
               <p className="text-sm text-neutral-200">
                 <strong>Matchs:</strong>{" "}
-                {roster.seasonRecord
-                  ? <span className="text-neutral-400 text-base">{roster.seasonRecord.victories}V {roster.seasonRecord.defeats}D {roster.seasonRecord.draws}N</span>
-                  : "Non renseigné"}
+                {roster.seasonRecord ? (
+                  <span className="text-neutral-400 text-base">
+                    {roster.seasonRecord.victories}V{" "}
+                    {roster.seasonRecord.defeats}D {roster.seasonRecord.draws}N
+                  </span>
+                ) : (
+                  "Non renseigné"
+                )}
               </p>
             )}
             {!isEditingSeasonRecord && (
@@ -916,8 +1099,12 @@ export default function RosterProfilePage() {
                 type="button"
                 className="ml-2 text-neutral-500 hover:text-neutral-300 transition-colors"
                 onClick={() => {
-                  setSeasonVInput(roster.seasonRecord?.victories?.toString() ?? "");
-                  setSeasonDInput(roster.seasonRecord?.defeats?.toString() ?? "");
+                  setSeasonVInput(
+                    roster.seasonRecord?.victories?.toString() ?? "",
+                  );
+                  setSeasonDInput(
+                    roster.seasonRecord?.defeats?.toString() ?? "",
+                  );
                   setSeasonNInput(roster.seasonRecord?.draws?.toString() ?? "");
                   setIsEditingSeasonRecord(true);
                 }}
@@ -927,8 +1114,7 @@ export default function RosterProfilePage() {
               </button>
             )}
           </div>
-          <p className="text-sm text-neutral-200">
-          </p>
+          <p className="text-sm text-neutral-200"></p>
         </section>
 
         {roster.logo && (
@@ -984,9 +1170,13 @@ export default function RosterProfilePage() {
           </div>
         </div>
         {seasonCalendar.length > 0 ? (
-          <div className="overflow-x-auto">
+          <div
+            className={`overflow-x-auto ${
+              seasonCalendar.length > 3 ? "max-h-56 overflow-y-auto" : ""
+            }`}
+          >
             <table className="w-full text-sm text-left">
-              <thead>
+              <thead className="sticky top-0 bg-neutral-900">
                 <tr className="text-xs text-neutral-400 border-b border-neutral-700">
                   <th className="pb-2 pr-3">Date</th>
                   <th className="pb-2 pr-3">Match</th>
@@ -1015,6 +1205,13 @@ export default function RosterProfilePage() {
                     const hasScore =
                       match.scoreHome != null && match.scoreAway != null;
                     const isCancelled = match.status === "cancelled";
+                    const matchCompetition =
+                      match.competition || roster.category;
+                    const opponentRoster = findOpponentRoster(
+                      rosters,
+                      match.opponent,
+                      matchCompetition,
+                    );
                     return (
                       <tr
                         key={`${match.date}-${match.opponent}-${idx}`}
@@ -1029,11 +1226,34 @@ export default function RosterProfilePage() {
                           )}
                         </td>
                         <td className="py-1.5 pr-3 text-neutral-200">
-                          {homeTeam} <span className="text-neutral-500">-</span>{" "}
-                          {awayTeam}
+                          {match.isHome ? (
+                            homeTeam
+                          ) : opponentRoster ? (
+                            <Link
+                              to={getRosterBackPath(opponentRoster.id)}
+                              className="hover:text-sky-400 hover:underline"
+                            >
+                              {homeTeam}
+                            </Link>
+                          ) : (
+                            homeTeam
+                          )}{" "}
+                          <span className="text-neutral-500">-</span>{" "}
+                          {!match.isHome ? (
+                            awayTeam
+                          ) : opponentRoster ? (
+                            <Link
+                              to={getRosterBackPath(opponentRoster.id)}
+                              className="hover:text-sky-400 hover:underline"
+                            >
+                              {awayTeam}
+                            </Link>
+                          ) : (
+                            awayTeam
+                          )}
                         </td>
                         <td className="py-1.5 pr-3 text-neutral-400">
-                          {match.competition || "—"}
+                          {matchCompetition || "—"}
                         </td>
                         <td className="py-1.5 pr-3 text-neutral-400">
                           {match.location || "—"}

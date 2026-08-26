@@ -4,7 +4,7 @@ import type { Route } from "./+types/roster-detail";
 import { useTeams } from "~/context/TeamsContext";
 import { toShortId, findFullId } from "~/utils/shortId";
 import { PLAYER_POSITIONS, CURRENT_SEASON, type PlayerPosition, type Team, getCompetitionScope, getCompetitionGender } from "~/types/tracker";
-import { TOP14_CLUBS_2025_2026, PROD2_CLUBS_2025_2026, ELITE1_CLUBS_2025_2026 } from "~/utils/clubs";
+import { TOP14_CLUBS_2026_2027, PROD2_CLUBS_2026_2027, ELITE1_CLUBS_2025_2026 } from "~/utils/clubs";
 import {
     addPlayerToRosterList,
     createPlayerFromNames,
@@ -196,7 +196,7 @@ export default function RosterDetailPage() {
             : rosterGender === 'feminine' ? 'feminine' : 'masculine';
     const clubOptions = effectiveGender === 'feminine'
         ? ELITE1_CLUBS_2025_2026
-        : [...TOP14_CLUBS_2025_2026, ...PROD2_CLUBS_2025_2026];
+        : [...TOP14_CLUBS_2026_2027, ...PROD2_CLUBS_2026_2027];
 
     const availableInternationalRosters = useMemo(() => {
         if (!roster || isInternational) return [];
