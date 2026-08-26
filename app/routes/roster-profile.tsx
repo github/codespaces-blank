@@ -24,6 +24,19 @@ function getPlayerProfilePath(rosterId: string | null | undefined, playerId: str
   return `/r/${toShortId(rosterId)}/p/${toShortId(playerId)}`;
 }
 
+function findOpponentRoster(
+  rosters: { id: string; name: string; category?: string }[],
+  opponentName: string,
+  competition: string | undefined
+) {
+  const candidates = rosters.filter(
+    (item) => item.name.trim().toLowerCase() === opponentName.trim().toLowerCase()
+  );
+  if (candidates.length === 0) return null;
+  if (candidates.length === 1) return candidates[0];
+  return candidates.find((item) => item.category === competition) ?? candidates[0];
+}
+
 
 function getSortableFirstName(fullName: string): string {
   const { first, last } = parsePlayerName(fullName.trim());
@@ -991,9 +1004,13 @@ export default function RosterProfilePage() {
           </div>
         </div>
         {seasonCalendar.length > 0 ? (
-          <div className="overflow-x-auto">
+          <div
+            className={`overflow-x-auto ${
+              seasonCalendar.length > 3 ? "max-h-56 overflow-y-auto" : ""
+            }`}
+          >
             <table className="w-full text-sm text-left">
-              <thead>
+              <thead className="sticky top-0 bg-neutral-900">
                 <tr className="text-xs text-neutral-400 border-b border-neutral-700">
                   <th className="pb-2 pr-3">Date</th>
                   <th className="pb-2 pr-3">Match</th>
@@ -1022,6 +1039,12 @@ export default function RosterProfilePage() {
                     const hasScore =
                       match.scoreHome != null && match.scoreAway != null;
                     const isCancelled = match.status === "cancelled";
+                    const matchCompetition = match.competition || roster.category;
+                    const opponentRoster = findOpponentRoster(
+                      rosters,
+                      match.opponent,
+                      matchCompetition
+                    );
                     return (
                       <tr
                         key={`${match.date}-${match.opponent}-${idx}`}
@@ -1036,11 +1059,34 @@ export default function RosterProfilePage() {
                           )}
                         </td>
                         <td className="py-1.5 pr-3 text-neutral-200">
-                          {homeTeam} <span className="text-neutral-500">-</span>{" "}
-                          {awayTeam}
+                          {match.isHome ? (
+                            homeTeam
+                          ) : opponentRoster ? (
+                            <Link
+                              to={getRosterBackPath(opponentRoster.id)}
+                              className="hover:text-sky-400 hover:underline"
+                            >
+                              {homeTeam}
+                            </Link>
+                          ) : (
+                            homeTeam
+                          )}{" "}
+                          <span className="text-neutral-500">-</span>{" "}
+                          {!match.isHome ? (
+                            awayTeam
+                          ) : opponentRoster ? (
+                            <Link
+                              to={getRosterBackPath(opponentRoster.id)}
+                              className="hover:text-sky-400 hover:underline"
+                            >
+                              {awayTeam}
+                            </Link>
+                          ) : (
+                            awayTeam
+                          )}
                         </td>
                         <td className="py-1.5 pr-3 text-neutral-400">
-                          {match.competition || "—"}
+                          {matchCompetition || "—"}
                         </td>
                         <td className="py-1.5 pr-3 text-neutral-400">
                           {match.location || "—"}
