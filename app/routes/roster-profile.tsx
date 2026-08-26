@@ -805,7 +805,7 @@ export default function RosterProfilePage() {
               </div>
             ) : (
               <p className="text-sm text-neutral-200">
-                <strong>Classement:</strong>{" "}
+                <strong>Classement :</strong>{" "}
                 <span className="text-neutral-400 font-semibold text-base">
                   {roster.currentRanking != null
                     ? `${roster.currentRanking}e`
@@ -838,7 +838,7 @@ export default function RosterProfilePage() {
           <div className="flex items-center justify-between">
             {isCurrentSeason && !isEditingPreviousRanking && (
               <p className="text-xs text-neutral-500 mt-1 flex items-center gap-2">
-                Classement {PREVIOUS_SEASON} :{" "}
+                <strong>Classement {PREVIOUS_SEASON} :</strong>{" "}
                 {previousSeasonRanking != null
                   ? `${previousSeasonRanking}e (${previousSeasonPoints != null ? `${previousSeasonPoints} pts` : "X pts"})`
                   : "Non renseigné"}
