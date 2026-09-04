@@ -1,0 +1,212 @@
+@base = http://localhost:5173
+
+### ===========================
+### PLAYERS
+### ===========================
+
+### Lister tous les joueurs
+GET {{base}}/api/players
+
+### Créer un joueur
+POST {{base}}/api/players
+Content-Type: application/json
+
+{
+  "id": "test-player-1",
+  "name": "Antoine Dupont",
+  "positions": ["demi de mêlée"],
+  "nationality": "FR"
+}
+
+### Lire un joueur par ID
+GET {{base}}/api/players?id=test-player-1
+
+### Modifier un joueur
+PATCH {{base}}/api/players?id=test-player-1
+Content-Type: application/json
+
+{
+  "positions": ["demi de mêlée", "arrière"],
+  "number": 9
+}
+
+### Supprimer un joueur
+DELETE {{base}}/api/players?id=test-player-1
+
+### ===========================
+### COACHES
+### ===========================
+
+### Lister tous les entraîneurs
+GET {{base}}/api/coaches
+
+### Créer un entraîneur
+POST {{base}}/api/coaches
+Content-Type: application/json
+
+{
+  "name": "Fabien Galthié",
+  "nationality": "FR"
+}
+
+### Lire un entraîneur par ID
+GET {{base}}/api/coaches?id=1
+
+### Modifier un entraîneur
+PATCH {{base}}/api/coaches?id=1
+Content-Type: application/json
+
+{
+  "club": "Stade Toulousain"
+}
+
+### Supprimer un entraîneur
+DELETE {{base}}/api/coaches?id=1
+
+### ===========================
+### PRESIDENTS
+### ===========================
+
+### Lister tous les présidents
+GET {{base}}/api/presidents
+
+### Créer un président
+POST {{base}}/api/presidents
+Content-Type: application/json
+
+{
+  "name": "Didier Lacroix",
+  "nationality": "FR",
+  "club": "Stade Toulousain"
+}
+
+### Lire un président par ID
+GET {{base}}/api/presidents?id=1
+
+### Modifier un président
+PATCH {{base}}/api/presidents?id=1
+Content-Type: application/json
+
+{
+  "club": "Racing 92"
+}
+
+### Supprimer un président
+DELETE {{base}}/api/presidents?id=1
+
+### ===========================
+### COMPETITIONS
+### ===========================
+
+### Lister toutes les compétitions
+GET {{base}}/api/competitions
+
+### Créer une compétition
+POST {{base}}/api/competitions
+Content-Type: application/json
+
+{
+  "name": "Champions Cup"
+}
+
+### Lire une compétition par ID
+GET {{base}}/api/competitions?id=1
+
+### Modifier une compétition
+PATCH {{base}}/api/competitions?id=1
+Content-Type: application/json
+
+{
+  "name": "Heineken Champions Cup"
+}
+
+### Supprimer une compétition
+DELETE {{base}}/api/competitions?id=1
+
+### ===========================
+### TITLES
+### ===========================
+
+### Lister tous les titres
+GET {{base}}/api/titles
+
+### Créer un titre (remplacer roster-id par un vrai ID)
+POST {{base}}/api/titles
+Content-Type: application/json
+
+{
+  "rosterId": "e525c291-be7d-4176-8f0c-c8e741b80642",
+  "competition": "Top 14",
+  "ranking": "Vainqueur",
+  "year": 2025
+}
+
+### Lire un titre par ID
+GET {{base}}/api/titles?id=1
+
+### Modifier un titre
+PATCH {{base}}/api/titles?id=1
+Content-Type: application/json
+
+{
+  "ranking": "Finaliste"
+}
+
+### Supprimer un titre
+DELETE {{base}}/api/titles?id=1
+
+### ===========================
+### RECHERCHE
+### ===========================
+
+### Rechercher des joueurs par nom
+GET {{base}}/api/search?entity=players&q=dupont
+
+### Rechercher des entraîneurs par nom
+GET {{base}}/api/search?entity=coaches&q=gal
+
+### Rechercher des présidents par nom
+GET {{base}}/api/search?entity=presidents&q=lacroix
+
+### Rechercher des titres par compétition
+GET {{base}}/api/search?entity=titles&q=top
+
+### ===========================
+### VALIDATION (doit retourner 400)
+### ===========================
+
+### Joueur sans nom (erreur attendue)
+POST {{base}}/api/players
+Content-Type: application/json
+
+{
+  "id": "bad",
+  "name": ""
+}
+
+### Joueur sans ID (erreur attendue)
+POST {{base}}/api/players
+Content-Type: application/json
+
+{
+  "name": "Test"
+}
+
+### Recherche sans paramètres (erreur attendue)
+GET {{base}}/api/search
+
+### ===========================
+### DB PERFORMANCE (admin only)
+### ===========================
+
+### Toutes les stats de performance
+GET {{base}}/api/admin/db-stats
+
+### Requêtes les plus lentes
+GET {{base}}/api/admin/db-stats?section=slow-queries&limit=10
+
+### Utilisation des index
+GET {{base}}/api/admin/db-stats?section=index-usage
+
+### Taille des tables
+GET {{base}}/api/admin/db-stats?section=table-sizes

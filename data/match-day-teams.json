@@ -1,0 +1,25 @@
+{
+  "selections": [
+    {
+      "championship": "Top 14",
+      "matchDay": "13",
+      "team1Id": "Roster_1_J13",
+      "team2Id": "Roster_2_J13",
+      "savedAt": "2026-02-24T15:02:04.862Z"
+    },
+    {
+      "championship": "Pro D2",
+      "matchDay": "14",
+      "team1Id": "Roster_4_J14",
+      "team2Id": "Roster_Cinq_J14",
+      "savedAt": "2026-02-26T16:19:43.801Z"
+    },
+    {
+      "championship": "Top 14",
+      "matchDay": "14",
+      "team1Id": "Roster_1_J14",
+      "team2Id": "Roster_2_J14",
+      "savedAt": "2026-02-26T22:53:01.076Z"
+    }
+  ]
+}

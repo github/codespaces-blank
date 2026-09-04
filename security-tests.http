@@ -1,0 +1,41 @@
+# --- Auth: routes protégées doivent retourner 401 sans cookie ---
+
+# admin-db (doit être 401 ou 403)
+curl -s -o /dev/null -w "%{http_code}" http://localhost:5173/admin/db
+
+# Compétitions loader (doit être 401 sans session)
+curl -s -o /dev/null -w "%{http_code}" http://localhost:5173/api/competitions
+
+# Live-matches POST (doit être 401)
+curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:5173/api/live-matches \
+  -H "Content-Type: application/json" -d '{}'
+
+# Coaches / Presidents loaders
+curl -s -o /dev/null -w "%{http_code}" http://localhost:5173/api/coaches
+curl -s -o /dev/null -w "%{http_code}" http://localhost:5173/api/presidents
+
+# --- SSRF: calendar-sync doit bloquer les URLs internes ---
+
+# IP privée (doit être 400)
+curl -s http://localhost:5173/api/calendar-sync \
+  -X POST -H "Content-Type: application/json" \
+  -d '{"rosterId":"x","icsUrl":"https://127.0.0.1/evil.ics"}'
+
+# Metadata AWS (doit être 400)
+curl -s http://localhost:5173/api/calendar-sync \
+  -X POST -H "Content-Type: application/json" \
+  -d '{"rosterId":"x","icsUrl":"https://169.254.169.254/latest/meta-data/"}'
+
+# Protocole file:// (doit être 400)
+curl -s http://localhost:5173/api/calendar-sync \
+  -X POST -H "Content-Type: application/json" \
+  -d '{"rosterId":"x","icsUrl":"file:///etc/passwd"}'
+
+# --- Sanitization: HTML strippé dans les noms ---
+
+# Créer un coach avec du HTML (le nom retourné ne doit PAS contenir de <script>)
+curl -s http://localhost:5173/api/coaches \
+  -X POST -H "Content-Type: application/json" \
+  -H "Cookie: sp_account_id=VOTRE_COOKIE" \
+  -d '{"name":"<script>alert(1)</script>Dupont"}'
+# Attendu: name = "alert(1)Dupont"

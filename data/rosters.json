@@ -1,0 +1,698 @@
+{
+  "rosters": [
+    {
+      "id": "e525c291-be7d-4176-8f0c-c8e741b80642",
+      "name": "Roster 1",
+      "players": [
+        {
+          "id": "bb22a06f-21ee-4bea-a17f-f0750d712854",
+          "name": "Baba Bam"
+        },
+        {
+          "id": "0a170f64-96ab-44a2-837c-36c7b0fec2ba",
+          "name": "Lilh Wes"
+        },
+        {
+          "id": "50a99220-aefa-4499-ac0d-d56133ab54eb",
+          "name": "Pa Pou"
+        },
+        {
+          "id": "aa204808-6527-474c-9d21-256e2368f0ad",
+          "name": "Chi Chi"
+        }
+      ],
+      "category": "Top 14"
+    },
+    {
+      "id": "b584429c-c62c-493d-bac2-57ada4eb423a",
+      "name": "Roster 2",
+      "players": [
+        {
+          "id": "9f33e986-ef92-4bec-9a1f-f708c5370b60",
+          "name": "Oui Oui"
+        },
+        {
+          "id": "9453fa7c-8ff7-43c9-abfb-0b1b2d063433",
+          "name": "No No"
+        },
+        {
+          "id": "38204cc1-7af1-4fed-a106-9395ba1a36e0",
+          "name": "Na Na"
+        }
+      ],
+      "category": "Top 14"
+    },
+    {
+      "id": "a38e24f0-af2c-479b-a52b-4f94de5c64cd",
+      "name": "Roster 3",
+      "players": [],
+      "category": "Top 14"
+    },
+    {
+      "id": "24ab827d-d917-4137-9aae-ba62d54981c7",
+      "name": "Roster 4",
+      "players": [
+        {
+          "id": "b024877f-3c49-436d-b231-838bb80d1737",
+          "name": "Un Un"
+        },
+        {
+          "id": "490cafab-2e5d-44c8-8512-544bba27c66f",
+          "name": "Deux Deux"
+        },
+        {
+          "id": "c62e9d1c-785e-46c0-a672-28fb7d998b01",
+          "name": "Trois Trois"
+        }
+      ],
+      "category": "Pro D2"
+    },
+    {
+      "id": "71718c03-81a2-4734-828a-c822747cb57d",
+      "name": "Roster Cinq",
+      "players": [
+        {
+          "id": "475eb1c3-6f85-41e0-85da-0ee7ab99352f",
+          "name": "Quatre Quatre"
+        },
+        {
+          "id": "b55f8d49-e61a-47fb-9e3a-edbcd1e26e61",
+          "name": "Cinq Cinq"
+        },
+        {
+          "id": "bea9faa8-4f73-4bf5-bdfc-c9f262943774",
+          "name": "Six Six"
+        }
+      ],
+      "category": "Pro D2"
+    },
+    {
+      "id": "b72f6307-83d4-4c0d-908d-b3a95be30209",
+      "name": "ASM Clermont",
+      "players": [],
+      "category": "Top 14"
+    },
+    {
+      "id": "98c78bec-4652-4958-aca4-6b55ec719182",
+      "name": "Union Bordeaux-Bègles",
+      "players": [],
+      "category": "Top 14"
+    },
+    {
+      "id": "7752aa27-8a8a-45fe-b147-a3ddfc706213",
+      "name": "USON Nevers",
+      "players": [],
+      "category": "Pro D2"
+    },
+    {
+      "id": "eca9fe9d-be30-47d9-8896-09b8691821f7",
+      "name": "FC Grenoble",
+      "players": [],
+      "category": "Pro D2"
+    },
+    {
+      "id": "b62b8cb8-80b7-498e-af89-1eb6c25473e5",
+      "name": "Nouveau test",
+      "players": [
+        {
+          "id": "dcd70134-168f-4c28-9b6a-d33352a8c622",
+          "name": "Tom Dar"
+        },
+        {
+          "id": "30f35c87-1f16-4e9a-b146-b443349f1d96",
+          "name": "Hol Ander"
+        },
+        {
+          "id": "01b59721-d115-4f82-802d-8e8ee317c361",
+          "name": "Koi Ngyij"
+        }
+      ],
+      "category": "Pro D2"
+    },
+    {
+      "id": "f7a1c3d5-8b2e-4f6a-9c7d-2e5a8f3b1d9a",
+      "name": "Racing 92",
+      "nickname": "Racing",
+      "color": "#1E90FF",
+      "players": [
+        {
+          "id": "a1b2c3d4-e5f6-47a8-b9c0-d1e2f3a4b5c6",
+          "name": "Antoine Dupont",
+          "number": 9,
+          "positions": ["demi de mêlée"]
+        },
+        {
+          "id": "b2c3d4e5-f6a7-48b9-c0d1-e2f3a4b5c6d7",
+          "name": "Finn Russell",
+          "number": 10,
+          "positions": ["demi d'ouverture"]
+        },
+        {
+          "id": "c3d4e5f6-a7b8-49ca-d1e2-f3a4b5c6d7e8",
+          "name": "Juan Imhoff",
+          "number": 14,
+          "positions": ["ailier"]
+        },
+        {
+          "id": "d4e5f6a7-b8c9-4adb-e2f3-a4b5c6d7e8f9",
+          "name": "Leone Nakarawa",
+          "number": 4,
+          "positions": ["deuxième ligne"]
+        },
+        {
+          "id": "e5f6a7b8-c9da-4bec-f3a4-b5c6d7e8f9a0",
+          "name": "Dominic Bird",
+          "number": 1,
+          "positions": ["première ligne"]
+        },
+        {
+          "id": "f6a7b8c9-daeb-4cfd-a4b5-c6d7e8f9a0b1",
+          "name": "Teddy Thomas",
+          "number": 11,
+          "positions": ["ailier"]
+        },
+        {
+          "id": "a7b8c9da-ebfc-4dae-b5c6-d7e8f9a0b1c2",
+          "name": "Gareth Evans",
+          "number": 6,
+          "positions": ["troisième ligne"]
+        },
+        {
+          "id": "b8c9daeb-fcad-4ebf-c6d7-e8f9a0b1c2d3",
+          "name": "Jacopo Mazzariol",
+          "number": 8,
+          "positions": ["troisième ligne"]
+        },
+        {
+          "id": "c9daebfc-adae-4fc0-d7e8-f9a0b1c2d3e4",
+          "name": "Nicolas Sanchez",
+          "number": 3,
+          "positions": ["talonneur"]
+        },
+        {
+          "id": "daebfcad-afbf-4ad1-e8f9-a0b1c2d3e4f5",
+          "name": "Yoan Tanga",
+          "number": 2,
+          "positions": ["première ligne"]
+        },
+        {
+          "id": "ebfcadaf-agc0-4be2-f9a0-b1c2d3e4f5a6",
+          "name": "Maxime Joatton",
+          "number": 15,
+          "positions": ["arrière"]
+        },
+        {
+          "id": "fcadafbc-ahd1-4cf3-a0b1-c2d3e4f5a6b7",
+          "name": "Jordan Joseph-Meyandje",
+          "number": 5,
+          "positions": ["deuxième ligne"]
+        },
+        {
+          "id": "adafbchd-ai2e-4dg4-b1c2-d3e4f5a6b7c8",
+          "name": "Jason Woodman",
+          "number": 7,
+          "positions": ["troisième ligne"]
+        },
+        {
+          "id": "dafbchd2-aj3f-4eh5-c2d3-e4f5a6b7c8d9",
+          "name": "Grégoire Alldritt",
+          "number": 13,
+          "positions": ["centre"]
+        },
+        {
+          "id": "ecfacid3-ak4g-4fi6-d3e4-f5a6b7c8d9ea",
+          "name": "Laurent Palis",
+          "number": 12,
+          "positions": ["centre"]
+        }
+      ],
+      "category": "Top 14"
+    }
+  ],
+  "teams": [
+    {
+      "id": "Roster_1_J13",
+      "name": "Roster 1 J13",
+      "rosterId": "e525c291-be7d-4176-8f0c-c8e741b80642",
+      "starters": [
+        {
+          "player": {
+            "id": "bb22a06f-21ee-4bea-a17f-f0750d712854",
+            "name": "Baba Bam"
+          },
+          "number": 1
+        },
+        {
+          "player": {
+            "id": "0a170f64-96ab-44a2-837c-36c7b0fec2ba",
+            "name": "Lilh Wes"
+          },
+          "number": 2
+        },
+        {
+          "player": {
+            "id": "50a99220-aefa-4499-ac0d-d56133ab54eb",
+            "name": "Pa Pou"
+          },
+          "number": 9
+        }
+      ],
+      "substitutes": [
+        {
+          "player": {
+            "id": "aa204808-6527-474c-9d21-256e2368f0ad",
+            "name": "Chi Chi"
+          },
+          "number": 16
+        }
+      ]
+    },
+    {
+      "id": "Roster_2_J13",
+      "name": "Roster 2 J13",
+      "rosterId": "b584429c-c62c-493d-bac2-57ada4eb423a",
+      "starters": [
+        {
+          "player": {
+            "id": "9f33e986-ef92-4bec-9a1f-f708c5370b60",
+            "name": "Oui Oui"
+          },
+          "number": 1
+        },
+        {
+          "player": {
+            "id": "9453fa7c-8ff7-43c9-abfb-0b1b2d063433",
+            "name": "No No"
+          },
+          "number": 9
+        }
+      ],
+      "substitutes": [
+        {
+          "player": {
+            "id": "38204cc1-7af1-4fed-a106-9395ba1a36e0",
+            "name": "Na Na"
+          },
+          "number": 18
+        }
+      ]
+    },
+    {
+      "id": "Roster_1_J14",
+      "name": "Roster 1 J14",
+      "rosterId": "e525c291-be7d-4176-8f0c-c8e741b80642",
+      "starters": [
+        {
+          "player": {
+            "id": "bb22a06f-21ee-4bea-a17f-f0750d712854",
+            "name": "Baba Bam"
+          },
+          "number": 1
+        },
+        {
+          "player": {
+            "id": "0a170f64-96ab-44a2-837c-36c7b0fec2ba",
+            "name": "Lilh Wes"
+          },
+          "number": 2
+        },
+        {
+          "player": {
+            "id": "50a99220-aefa-4499-ac0d-d56133ab54eb",
+            "name": "Pa Pou"
+          },
+          "number": 2
+        }
+      ],
+      "substitutes": [
+        {
+          "player": {
+            "id": "aa204808-6527-474c-9d21-256e2368f0ad",
+            "name": "Chi Chi"
+          },
+          "number": 18
+        }
+      ]
+    },
+    {
+      "id": "Roster_4_J14",
+      "name": "Roster 4 J14",
+      "rosterId": "24ab827d-d917-4137-9aae-ba62d54981c7",
+      "starters": [
+        {
+          "player": {
+            "id": "b024877f-3c49-436d-b231-838bb80d1737",
+            "name": "Un Un"
+          },
+          "number": 1
+        },
+        {
+          "player": {
+            "id": "490cafab-2e5d-44c8-8512-544bba27c66f",
+            "name": "Deux Deux"
+          },
+          "number": 15
+        }
+      ],
+      "substitutes": [
+        {
+          "player": {
+            "id": "c62e9d1c-785e-46c0-a672-28fb7d998b01",
+            "name": "Trois Trois"
+          },
+          "number": 20
+        }
+      ]
+    },
+    {
+      "id": "Roster_Cinq_J14",
+      "name": "Roster Cinq J14",
+      "rosterId": "71718c03-81a2-4734-828a-c822747cb57d",
+      "starters": [
+        {
+          "player": {
+            "id": "475eb1c3-6f85-41e0-85da-0ee7ab99352f",
+            "name": "Quatre Quatre"
+          },
+          "number": 1
+        },
+        {
+          "player": {
+            "id": "b55f8d49-e61a-47fb-9e3a-edbcd1e26e61",
+            "name": "Cinq Cinq"
+          },
+          "number": 8
+        }
+      ],
+      "substitutes": [
+        {
+          "player": {
+            "id": "bea9faa8-4f73-4bf5-bdfc-c9f262943774",
+            "name": "Six Six"
+          },
+          "number": 18
+        }
+      ]
+    },
+    {
+      "id": "Roster_2_J14",
+      "name": "Roster 2 J14",
+      "rosterId": "b584429c-c62c-493d-bac2-57ada4eb423a",
+      "starters": [
+        {
+          "player": {
+            "id": "9f33e986-ef92-4bec-9a1f-f708c5370b60",
+            "name": "Oui Oui"
+          },
+          "number": 13
+        },
+        {
+          "player": {
+            "id": "9453fa7c-8ff7-43c9-abfb-0b1b2d063433",
+            "name": "No No"
+          },
+          "number": 10
+        }
+      ],
+      "substitutes": [
+        {
+          "player": {
+            "id": "38204cc1-7af1-4fed-a106-9395ba1a36e0",
+            "name": "Na Na"
+          },
+          "number": 19
+        }
+      ]
+    },
+    {
+      "id": "Nouveau_test_J14",
+      "name": "Nouveau test J14",
+      "rosterId": "b62b8cb8-80b7-498e-af89-1eb6c25473e5",
+      "starters": [
+        {
+          "player": {
+            "id": "dcd70134-168f-4c28-9b6a-d33352a8c622",
+            "name": "Tom Dar"
+          },
+          "number": 1
+        },
+        {
+          "player": {
+            "id": "30f35c87-1f16-4e9a-b146-b443349f1d96",
+            "name": "Hol Ander"
+          },
+          "number": 12
+        }
+      ],
+      "substitutes": [
+        {
+          "player": {
+            "id": "01b59721-d115-4f82-802d-8e8ee317c361",
+            "name": "Koi Ngyij"
+          },
+          "number": 23
+        }
+      ],
+      "captainPlayerId": "dcd70134-168f-4c28-9b6a-d33352a8c622"
+    },
+    {
+      "id": "Union_Bordeaux-Bègles_J14",
+      "name": "Union Bordeaux-Bègles J14",
+      "rosterId": "98c78bec-4652-4958-aca4-6b55ec719182",
+      "starters": [],
+      "substitutes": []
+    },
+    {
+      "id": "Racing_92_J13",
+      "name": "Racing 92 J13",
+      "rosterId": "f7a1c3d5-8b2e-4f6a-9c7d-2e5a8f3b1d9a",
+      "starters": [
+        {
+          "player": {
+            "id": "e5f6a7b8-c9da-4bec-f3a4-b5c6d7e8f9a0",
+            "name": "Dominic Bird"
+          },
+          "number": 1
+        },
+        {
+          "player": {
+            "id": "c9daebfc-adae-4fc0-d7e8-f9a0b1c2d3e4",
+            "name": "Nicolas Sanchez"
+          },
+          "number": 3
+        },
+        {
+          "player": {
+            "id": "daebfcad-afbf-4ad1-e8f9-a0b1c2d3e4f5",
+            "name": "Yoan Tanga"
+          },
+          "number": 2
+        },
+        {
+          "player": {
+            "id": "d4e5f6a7-b8c9-4adb-e2f3-a4b5c6d7e8f9",
+            "name": "Leone Nakarawa"
+          },
+          "number": 4
+        },
+        {
+          "player": {
+            "id": "fcadafbc-ahd1-4cf3-a0b1-c2d3e4f5a6b7",
+            "name": "Jordan Joseph-Meyandje"
+          },
+          "number": 5
+        },
+        {
+          "player": {
+            "id": "a7b8c9da-ebfc-4dae-b5c6-d7e8f9a0b1c2",
+            "name": "Gareth Evans"
+          },
+          "number": 6
+        },
+        {
+          "player": {
+            "id": "adafbchd-ai2e-4dg4-b1c2-d3e4f5a6b7c8",
+            "name": "Jason Woodman"
+          },
+          "number": 7
+        },
+        {
+          "player": {
+            "id": "b8c9daeb-fcad-4ebf-c6d7-e8f9a0b1c2d3",
+            "name": "Jacopo Mazzariol"
+          },
+          "number": 8
+        },
+        {
+          "player": {
+            "id": "a1b2c3d4-e5f6-47a8-b9c0-d1e2f3a4b5c6",
+            "name": "Antoine Dupont"
+          },
+          "number": 9
+        },
+        {
+          "player": {
+            "id": "b2c3d4e5-f6a7-48b9-c0d1-e2f3a4b5c6d7",
+            "name": "Finn Russell"
+          },
+          "number": 10
+        },
+        {
+          "player": {
+            "id": "f6a7b8c9-daeb-4cfd-a4b5-c6d7e8f9a0b1",
+            "name": "Teddy Thomas"
+          },
+          "number": 11
+        },
+        {
+          "player": {
+            "id": "dafbchd2-aj3f-4eh5-c2d3-e4f5a6b7c8d9",
+            "name": "Grégoire Alldritt"
+          },
+          "number": 12
+        },
+        {
+          "player": {
+            "id": "ecfacid3-ak4g-4fi6-d3e4-f5a6b7c8d9ea",
+            "name": "Laurent Palis"
+          },
+          "number": 13
+        },
+        {
+          "player": {
+            "id": "c3d4e5f6-a7b8-49ca-d1e2-f3a4b5c6d7e8",
+            "name": "Juan Imhoff"
+          },
+          "number": 14
+        },
+        {
+          "player": {
+            "id": "ebfcadaf-agc0-4be2-f9a0-b1c2d3e4f5a6",
+            "name": "Maxime Joatton"
+          },
+          "number": 15
+        }
+      ],
+      "substitutes": [],
+      "captainPlayerId": "a1b2c3d4-e5f6-47a8-b9c0-d1e2f3a4b5c6"
+    },
+    {
+      "id": "Racing_92_J14",
+      "name": "Racing 92 J14",
+      "rosterId": "f7a1c3d5-8b2e-4f6a-9c7d-2e5a8f3b1d9a",
+      "starters": [
+        {
+          "player": {
+            "id": "e5f6a7b8-c9da-4bec-f3a4-b5c6d7e8f9a0",
+            "name": "Dominic Bird"
+          },
+          "number": 1
+        },
+        {
+          "player": {
+            "id": "c9daebfc-adae-4fc0-d7e8-f9a0b1c2d3e4",
+            "name": "Nicolas Sanchez"
+          },
+          "number": 3
+        },
+        {
+          "player": {
+            "id": "daebfcad-afbf-4ad1-e8f9-a0b1c2d3e4f5",
+            "name": "Yoan Tanga"
+          },
+          "number": 2
+        },
+        {
+          "player": {
+            "id": "d4e5f6a7-b8c9-4adb-e2f3-a4b5c6d7e8f9",
+            "name": "Leone Nakarawa"
+          },
+          "number": 4
+        },
+        {
+          "player": {
+            "id": "fcadafbc-ahd1-4cf3-a0b1-c2d3e4f5a6b7",
+            "name": "Jordan Joseph-Meyandje"
+          },
+          "number": 5
+        },
+        {
+          "player": {
+            "id": "a7b8c9da-ebfc-4dae-b5c6-d7e8f9a0b1c2",
+            "name": "Gareth Evans"
+          },
+          "number": 6
+        },
+        {
+          "player": {
+            "id": "adafbchd-ai2e-4dg4-b1c2-d3e4f5a6b7c8",
+            "name": "Jason Woodman"
+          },
+          "number": 7
+        },
+        {
+          "player": {
+            "id": "b8c9daeb-fcad-4ebf-c6d7-e8f9a0b1c2d3",
+            "name": "Jacopo Mazzariol"
+          },
+          "number": 8
+        },
+        {
+          "player": {
+            "id": "a1b2c3d4-e5f6-47a8-b9c0-d1e2f3a4b5c6",
+            "name": "Antoine Dupont"
+          },
+          "number": 9
+        },
+        {
+          "player": {
+            "id": "b2c3d4e5-f6a7-48b9-c0d1-e2f3a4b5c6d7",
+            "name": "Finn Russell"
+          },
+          "number": 10
+        },
+        {
+          "player": {
+            "id": "f6a7b8c9-daeb-4cfd-a4b5-c6d7e8f9a0b1",
+            "name": "Teddy Thomas"
+          },
+          "number": 11
+        },
+        {
+          "player": {
+            "id": "dafbchd2-aj3f-4eh5-c2d3-e4f5a6b7c8d9",
+            "name": "Grégoire Alldritt"
+          },
+          "number": 12
+        },
+        {
+          "player": {
+            "id": "ecfacid3-ak4g-4fi6-d3e4-f5a6b7c8d9ea",
+            "name": "Laurent Palis"
+          },
+          "number": 13
+        },
+        {
+          "player": {
+            "id": "c3d4e5f6-a7b8-49ca-d1e2-f3a4b5c6d7e8",
+            "name": "Juan Imhoff"
+          },
+          "number": 14
+        },
+        {
+          "player": {
+            "id": "ebfcadaf-agc0-4be2-f9a0-b1c2d3e4f5a6",
+            "name": "Maxime Joatton"
+          },
+          "number": 15
+        }
+      ],
+      "substitutes": [],
+      "captainPlayerId": "a1b2c3d4-e5f6-47a8-b9c0-d1e2f3a4b5c6"
+    }
+  ],
+  "activeRosterId": "eca9fe9d-be30-47d9-8896-09b8691821f7",
+  "matchDay": "23",
+  "sport": "Rugby",
+  "championship": "Pro D2"
+}
