@@ -119,6 +119,7 @@ const SEED_TEST_ACCOUNT_NAME = process.env.SEED_TEST_ACCOUNT_NAME?.trim() || "Co
 const SEED_TEST_ACCOUNT_ACCESS_CODE = process.env.SEED_TEST_ACCOUNT_ACCESS_CODE?.trim() || "";
 const SEED_ELITE1_ACCOUNT_NAME = process.env.SEED_ELITE1_ACCOUNT_NAME?.trim() || "";
 const SEED_ELITE1_SEASON = process.env.SEED_ELITE1_SEASON?.trim() || "2026/2027";
+const LEGACY_DATA_MIGRATION_TARGET_EMAIL = process.env.LEGACY_DATA_MIGRATION_TARGET_EMAIL?.trim().toLowerCase() || "";
 
 const defaultRosterState: RosterStatePayload = {
   rosters: [],
@@ -1704,6 +1705,51 @@ async function seedDefaultRosters(pool: Pool): Promise<void> {
   await seedDefaultRostersForAccount(pool, LEGACY_ACCOUNT_ID);
 }
 
+async function migrateLegacyRosterState(pool: Pool): Promise<void> {
+  if (!LEGACY_DATA_MIGRATION_TARGET_EMAIL) return;
+
+  const targetResult = await pool.query<{ id: string }>(
+    `SELECT id FROM accounts WHERE LOWER(email) = $1 LIMIT 1`,
+    [LEGACY_DATA_MIGRATION_TARGET_EMAIL]
+  );
+  const targetAccountId = targetResult.rows[0]?.id;
+  if (!targetAccountId || targetAccountId === LEGACY_ACCOUNT_ID) return;
+
+  const states = await pool.query<{ account_id: string; payload: string }>(
+    `SELECT account_id, payload FROM account_rosters_state WHERE account_id IN ($1, $2)`,
+    [LEGACY_ACCOUNT_ID, targetAccountId]
+  );
+  const legacyPayload = states.rows.find((row) => row.account_id === LEGACY_ACCOUNT_ID)?.payload;
+  const targetPayload = states.rows.find((row) => row.account_id === targetAccountId)?.payload;
+  const legacyState = legacyPayload ? parseJsonOrNull<RosterStatePayload>(legacyPayload) : null;
+  const targetState = targetPayload ? parseJsonOrNull<RosterStatePayload>(targetPayload) : null;
+
+  if (!legacyState || (targetState?.rosters.length ?? 0) > 0) return;
+
+  const requiredCategories: Championship[] = ["Top 14", "Pro D2", "Elite 1", "World Series"];
+  const categories = new Set(legacyState.rosters.map((roster) => roster.category));
+  if (!requiredCategories.every((category) => categories.has(category))) {
+    console.error("[migration] Legacy roster state is missing required championships; migration skipped.");
+    return;
+  }
+
+  const validated = rosterStatePayloadSchema.safeParse(legacyState);
+  if (!validated.success) {
+    console.error("[migration] Legacy roster state is invalid; migration skipped.");
+    return;
+  }
+
+  const payload = validated.data as RosterStatePayload;
+  await pool.query(
+    `INSERT INTO account_rosters_state (account_id, payload, updated_at)
+     VALUES ($1, $2, $3)
+     ON CONFLICT (account_id) DO UPDATE SET payload = EXCLUDED.payload, updated_at = EXCLUDED.updated_at`,
+    [targetAccountId, JSON.stringify(payload), new Date().toISOString()]
+  );
+  await syncRosterDataToTables(pool, targetAccountId, payload);
+  console.log(`[migration] Migrated ${payload.rosters.length} legacy roster(s) to account ${targetAccountId}.`);
+}
+
 /**
  * Pour chaque compte ayant au moins un effectif Women's Six Nations,
  * ajoute les joueuses du XV de France Féminin manquantes (contrôle doublon
@@ -1786,6 +1832,7 @@ async function ensureInitialized() {
     await backfillStructuredTables(pool);
     await migrateStadeToulousainFeminin(pool);
     await seedDefaultRosters(pool);
+    await migrateLegacyRosterState(pool);
     await ensureTestAccount(pool);
     await seedElite1ForNamedAccount(pool);
     await seedFranceW6NPlayers(pool);
@@ -1850,6 +1897,15 @@ export async function saveRostersStateForAccount(accountId: string, payload: Ros
   const previousParsed = previous.rows[0]
     ? parseJsonOrNull<RosterStatePayload>(previous.rows[0].payload)
     : null;
+  const previousHasRosterData =
+    (previousParsed?.rosters.length ?? 0) > 0 ||
+    (previousParsed?.teams.length ?? 0) > 0;
+  const incomingHasRosterData =
+    (payload.rosters?.length ?? 0) > 0 ||
+    (payload.teams?.length ?? 0) > 0;
+  if (previousHasRosterData && !incomingHasRosterData) {
+    throw new Error("Refusing to overwrite non-empty roster data with an empty payload");
+  }
   const rosterDataUnchanged =
     JSON.stringify(previousParsed?.rosters ?? []) === JSON.stringify(payload.rosters ?? []) &&
     JSON.stringify(previousParsed?.teams ?? []) === JSON.stringify(payload.teams ?? []);
