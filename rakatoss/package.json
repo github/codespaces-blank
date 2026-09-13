@@ -1,0 +1,46 @@
+{
+	"name": "rakatoss",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"prepare": "svelte-kit sync || echo ''",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"db:generate": "drizzle-kit generate",
+		"db:migrate": "drizzle-kit migrate",
+		"db:studio": "drizzle-kit studio",
+		"deploy": "npm run build && wrangler pages deploy .svelte-kit/cloudflare"
+	},
+	"devDependencies": {
+		"@sveltejs/kit": "^2.63.0",
+		"@sveltejs/vite-plugin-svelte": "^7.1.2",
+		"@types/qrcode": "^1.5.6",
+		"drizzle-kit": "^0.31.10",
+		"svelte": "^5.56.1",
+		"svelte-check": "^4.6.0",
+		"typescript": "^6.0.3",
+		"vite": "^8.0.16",
+		"wrangler": "^4.131.1"
+	},
+	"dependencies": {
+		"@libsql/client": "^0.18.0",
+		"@lucia-auth/adapter-sqlite": "^3.0.2",
+		"@oslojs/crypto": "^1.0.1",
+		"@oslojs/otp": "^1.1.0",
+		"@sveltejs/adapter-cloudflare": "^7.2.9",
+		"@tailwindcss/vite": "^4.3.3",
+		"arctic": "^3.7.0",
+		"chart.js": "^4.5.1",
+		"cloudinary": "^2.11.0",
+		"drizzle-orm": "^0.45.2",
+		"lucia": "^3.2.2",
+		"nanoid": "^6.0.1",
+		"qrcode": "^1.5.4",
+		"tailwindcss": "^4.3.3",
+		"zod": "^4.6.4"
+	}
+}

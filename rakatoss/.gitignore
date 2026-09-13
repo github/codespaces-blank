@@ -1,0 +1,10 @@
+node_modules
+.svelte-kit
+.env
+.env.*
+!.env.example
+dist
+*.db
+*.db-shm
+*.db-wal
+/drizzle/migrations/*.sql
