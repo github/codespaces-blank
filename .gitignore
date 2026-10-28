@@ -1,0 +1,12 @@
+# Python caches
+__pycache__/
+*.pyc
+
+# Buildozer environment and cache directories
+.buildozer/
+bin/
+.venv/
+ENV/
+
+# OS specific hidden files
+.DS_Store
